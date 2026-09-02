@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вступне заняття: Знайомство із ШІ</title>
+<style>
+  :root {
+    --c-bg: #f0f4f8;
+    --c-card: #ffffff;
+    --c-text: #1e293b;
+    --c-text-sec: #475569;
+    --c-text-muted: #64748b;
+    --c-border: #cbd5e1;
+    --c-accent: #3b82f6;
+    --c-accent-light: #dbeafe;
+    --c-green: #10b981;
+    --c-green-light: #d1fae5;
+    --c-orange: #f59e0b;
+    --c-orange-light: #fef3c7;
+    --c-red: #ef4444;
+    --c-red-light: #fee2e2;
+    --c-purple: #8b5cf6;
+    --c-purple-light: #ede9fe;
+    --c-pink: #ec4899;
+    --c-pink-light: #fce7f3;
+    --c-teal: #14b8a6;
+    --c-teal-light: #ccfbf1;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.03);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--c-bg);
+    color: var(--c-text);
+    line-height: 1.7;
+    font-size: 17px;
+  }
+  .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 50px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: var(--radius);
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.3;
+  }
+  .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; position: relative; }
+  .hero p { font-size: 18px; opacity: 0.95; position: relative; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-top: 16px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--c-card);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--c-border);
+  }
+  .card h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--c-text);
+  }
+  .card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 24px 0 12px;
+    color: var(--c-text-sec);
+  }
+  .card p, .card li {
+    font-size: 17px;
+    color: var(--c-text-sec);
+    margin-bottom: 12px;
+  }
+  .card ul, .card ol { padding-left: 24px; margin-bottom: 16px; }
+  .card li { margin-bottom: 8px; }
+
+  /* Sections */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--c-accent);
+    margin-bottom: 12px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    background: var(--c-accent);
+    border-radius: 50%;
+  }
+
+  /* Highlight boxes */
+  .info-box {
+    background: var(--c-accent-light);
+    border-left: 4px solid var(--c-accent);
+    padding: 18px 20px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin: 18px 0;
+    font-size: 17px;
+  }
+  .info-box strong { color: var(--c-accent); }
+
+  .example-box {
+    background: var(--c-green-light);
+    border: 1px solid #a7f3d0;
+    padding: 16px 20px;
+    border-radius: var(--radius-sm);
+    margin: 14px 0;
+  }
+  .example-box strong { color: var(--c-green); }
+
+  .warning-box {
+    background: var(--c-orange-light);
+    border: 1px solid #fde68a;
+    padding: 16px 20px;
+    border-radius: var(--radius-sm);
+    margin: 14px 0;
+  }
+  .warning-box strong { color: var(--c-orange); }
+
+  .think-box {
+    background: var(--c-purple-light);
+    border: 2px dashed var(--c-purple);
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    margin: 14px 0;
+  }
+  .think-box .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: var(--c-purple);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 15px;
+    margin-right: 10px;
+  }
+
+  /* Fun fact */
+  .fun-fact {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    background: #fffbeb;
+    border-radius: var(--radius-sm);
+    margin: 16px 0;
+    align-items: flex-start;
+    border: 1px solid #fef3c7;
+  }
+  .fun-fact-icon { font-size: 28px; flex-shrink: 0; }
+  .fun-fact p { margin: 0; font-size: 16px; color: var(--c-text-sec); }
+  .fun-fact strong { color: var(--c-orange); }
+
+  /* Grid cards */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .grid-card {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .grid-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+  .grid-card .icon { font-size: 36px; margin-bottom: 8px; }
+  .grid-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .grid-card p { font-size: 14px; color: var(--c-text-muted); margin: 0; }
+
+  /* Field cards */
+  .field-card {
+    display: flex;
+    gap: 16px;
+    padding: 18px;
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    margin: 12px 0;
+    transition: all 0.2s;
+  }
+  .field-card:hover {
+    border-color: var(--c-accent);
+    box-shadow: var(--shadow);
+  }
+  .field-icon {
+    width: 48px; height: 48px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .field-content h4 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .field-content p { font-size: 15px; color: var(--c-text-muted); margin: 0; }
+
+  /* Movie cards */
+  .movie-card {
+    display: flex;
+    gap: 16px;
+    padding: 18px;
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    margin: 12px 0;
+  }
+  .movie-poster {
+    width: 56px; height: 56px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .movie-info h4 { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+  .movie-source { font-size: 14px; color: var(--c-text-muted); margin-bottom: 6px; }
+  .movie-info p { font-size: 15px; color: var(--c-text-sec); margin: 0 0 8px; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .badge-real { background: var(--c-green-light); color: var(--c-green); }
+  .badge-partial { background: var(--c-orange-light); color: var(--c-orange); }
+  .badge-future { background: var(--c-purple-light); color: var(--c-purple); }
+
+  /* Quiz */
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    margin: 8px 0;
+    border: 2px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--c-card);
+  }
+  .quiz-option:hover { border-color: var(--c-accent); background: var(--c-accent-light); }
+  .quiz-option.correct { border-color: var(--c-green); background: var(--c-green-light); }
+  .quiz-option.wrong { border-color: var(--c-red); background: var(--c-red-light); }
+  .quiz-option .letter {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--c-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .quiz-option.correct .letter { background: var(--c-green); color: white; }
+  .quiz-option.wrong .letter { background: var(--c-red); color: white; }
+
+  /* NN Diagram */
+  .nn-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 28px;
+    background: #f8fafc;
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .nn-layer { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .nn-node {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .nn-label { font-size: 13px; color: var(--c-text-muted); text-align: center; margin-top: 6px; font-weight: 500; }
+  .nn-arrow { font-size: 24px; color: var(--c-text-muted); }
+
+  /* Interactive demo */
+  .demo-box {
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    margin: 16px 0;
+    text-align: center;
+  }
+  .demo-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    margin: 4px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    user-select: none;
+  }
+  .demo-btn:hover { transform: scale(1.05); }
+  .demo-cat { background: var(--c-accent-light); color: var(--c-accent); }
+  .demo-dog { background: var(--c-red-light); color: var(--c-red); }
+  .demo-result {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-border);
+    transition: all 0.3s;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    background: var(--c-card);
+    border-radius: var(--radius);
+    margin-top: 30px;
+    border: 1px solid var(--c-border);
+  }
+  .footer h2 { font-size: 22px; margin-bottom: 12px; }
+  .footer p { color: var(--c-text-muted); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 24px; }
+    .nn-diagram { gap: 10px; padding: 16px; }
+    .nn-node { width: 36px; height: 36px; font-size: 11px; }
+    body { font-size: 16px; }
+    .card { padding: 20px; }
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card { animation: fadeInUp 0.5s ease; }
+
+  /* Table of contents */
+  .toc {
+    background: var(--c-card);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--c-border);
+  }
+  .toc h3 { font-size: 18px; margin-bottom: 14px; }
+  .toc-list { list-style: none; padding: 0; }
+  .toc-list li { margin: 8px 0; }
+  .toc-list a {
+    color: var(--c-accent);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toc-list a:hover { text-decoration: underline; }
+  .toc-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: var(--c-accent-light);
+    color: var(--c-accent);
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* Scroll to top */
+  .scroll-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px; height: 48px;
+    background: var(--c-accent);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 100;
+  }
+  .scroll-top.visible { opacity: 1; }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <svg width="80" height="80" viewBox="0 0 80 80" style="margin-bottom:16px;">
+      <rect x="15" y="10" width="50" height="40" rx="10" fill="white" opacity="0.9"/>
+      <rect x="25" y="20" width="10" height="10" rx="5" fill="#667eea"/>
+      <rect x="45" y="20" width="10" height="10" rx="5" fill="#667eea"/>
+      <rect x="32" y="35" width="16" height="5" rx="2.5" fill="#667eea"/>
+      <rect x="35" y="50" width="10" height="15" rx="3" fill="white" opacity="0.9"/>
+      <rect x="20" y="62" width="15" height="10" rx="3" fill="white" opacity="0.9"/>
+      <rect x="45" y="62" width="15" height="10" rx="3" fill="white" opacity="0.9"/>
+      <circle cx="30" cy="25" r="2.5" fill="white"/>
+      <circle cx="50" cy="25" r="2.5" fill="white"/>
+      <path d="M10 25 Q5 25 5 30 Q5 35 10 35" stroke="white" stroke-width="3" fill="none" opacity="0.8"/>
+      <path d="M70 25 Q75 25 75 30 Q75 35 70 35" stroke="white" stroke-width="3" fill="none" opacity="0.8"/>
+    </svg>
+    <h1>Вступне заняття:<br>Знайомство із ШІ</h1>
+    <p>Для учнів 8–12 років • Інтерактивний навчальний модуль</p>
+    <div class="hero-badge">⏱ Тривалість: 90 хвилин</div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>📋 Зміст заняття</h3>
+    <ul class="toc-list">
+      <li><a href="#intro"><span class="toc-num">1</span> Знайомство та привітання</a></li>
+      <li><a href="#why-ai"><span class="toc-num">2</span> Для чого вчити штучний інтелект?</a></li>
+      <li><a href="#what-is-ai"><span class="toc-num">3</span> Що таке ШІ, машинне навчання та нейронні мережі</a></li>
+      <li><a href="#fields"><span class="toc-num">4</span> Галузі застосування ШІ</a></li>
+      <li><a href="#movies"><span class="toc-num">5</span> Штучний інтелект у фільмах і мультиках</a></li>
+      <li><a href="#think"><span class="toc-num">6</span> Творчі питання «Подумати вдома»</a></li>
+      <li><a href="#glossary"><span class="toc-num">7</span> Словник термінів</a></li>
+    </ul>
+  </div>
+
+  <!-- SECTION 1: INTRO -->
+  <div class="card" id="intro">
+    <div class="section-title"><span class="dot"></span> Розділ 1</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-accent);">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Привіт! Давай знайомитись!
+    </h2>
+
+    <p>Ти, напевно, чув(-ла) слова <strong>«штучний інтелект»</strong> чи <strong>«ШІ»</strong>. Але що це насправді? Чи може комп'ютер думати як людина? Чи стануть роботи розумнішими за нас?</p>
+
+    <div class="info-box">
+      <strong>На цьому занятті ти дізнаєшся:</strong>
+      <ul style="margin-top:10px; margin-bottom:0;">
+        <li>Що таке штучний інтелект простими словами</li>
+        <li>Як комп'ютери «вчаться» розпізнавати котів і собак</li>
+        <li>Де ШІ працює зараз і де з'явиться скоро</li>
+        <li>Які роботи з фільмів вже існують насправді</li>
+      </ul>
+    </div>
+
+    <div class="fun-fact">
+      <span class="fun-fact-icon">💡</span>
+      <p><strong>Цікавий факт:</strong> Твій телефон уже використовує ШІ, коли розпізнає твоє обличчя для розблокування або радить наступну пісню в плейлисті!</p>
+    </div>
+
+    <h3>🎮 Ігрове знайомство «ШІ чи людина?»</h3>
+    <p>Спробуй вгадати — хто це зробив: ШІ чи людина?</p>
+
+    <div class="quiz-option" onclick="checkQuiz(this, true)">
+      <span class="letter">1</span>
+      <span>Намалював картину у стилі Ван Гога</span>
+    </div>
+    <div class="quiz-option" onclick="checkQuiz(this, false)">
+      <span class="letter">2</span>
+      <span>Приготував борщ за бабусиним рецептом</span>
+    </div>
+    <div class="quiz-option" onclick="checkQuiz(this, true)">
+      <span class="letter">3</span>
+      <span>Розпізнав пісню за наспівуванням (Shazam)</span>
+    </div>
+    <div class="quiz-option" onclick="checkQuiz(this, true)">
+      <span class="letter">4</span>
+      <span>Написав вірш про кота за запитом</span>
+    </div>
+
+    <div class="info-box" style="background:var(--c-purple-light); border-color:var(--c-purple); margin-top:16px;">
+      <strong>Висновок:</strong> ШІ вже оточує нас скрізь. І сьогодні ми дізнаємось, як він працює!
+    </div>
+  </div>
+
+  <!-- SECTION 2: WHY AI -->
+  <div class="card" id="why-ai">
+    <div class="section-title"><span class="dot"></span> Розділ 2</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-green);">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Для чого вчити штучний інтелект?
+    </h2>
+
+    <p>Штучний інтелект — це не просто модне слово. Це технологія, яка вже змінює світ навколо нас.</p>
+
+    <h3>✨ Що вміє ШІ?</h3>
+    <div class="grid-2">
+      <div class="grid-card">
+        <div class="icon">🎨</div>
+        <h4>Творчість</h4>
+        <p>Малює картини, пише музику, створює історії</p>
+      </div>
+      <div class="grid-card">
+        <div class="icon">📚</div>
+        <h4>Навчання</h4>
+        <p>Пояснює складні теми простими словами</p>
+      </div>
+      <div class="grid-card">
+        <div class="icon">🗣️</div>
+        <h4>Мови</h4>
+        <p>Перекладає в реальному часі</p>
+      </div>
+      <div class="grid-card">
+        <div class="icon">🎮</div>
+        <h4>Ігри</h4>
+        <p>Грає краще за чемпіонів світу</p>
+      </div>
+    </div>
+
+    <h3>🎓 Як ШІ допомагає у навчанні?</h3>
+    <ul>
+      <li>Пояснює складні теми простими словами (як зараз робимо ми!)</li>
+      <li>Допомагає вивчати іноземні мови — розмовляєш із ним, а він виправляє помилки</li>
+      <li>Рекомендує книги та фільми відповідно до твоїх інтересів</li>
+      <li>Створює тести та кросворди для повторення матеріалу</li>
+    </ul>
+
+    <h3>🖌️ Як ШІ допомагає у творчості?</h3>
+    <ul>
+      <li>Малює картини за твоїм описом: <em>«намалюй кота-астронавта на Марсі»</em></li>
+      <li>Пише музику у будь-якому стилі</li>
+      <li>Допомагає придумувати сюжети для ігор, коміксів, фільмів</li>
+      <li>Генерує ідеї, коли «фантазія закінчилась»</li>
+    </ul>
+
+    <div class="warning-box">
+      <strong>🤔 Головне запитання:</strong> Чи може ШІ замінити вчителя? Чи художника? Чи письменника?
+      <br><br>
+      <em>Відповідь: Ні. ШІ — це інструмент, як пензель чи калькулятор. Він допомагає, але творчість, емоції та мрії — це те, що робить тільки людина.</em>
+    </div>
+  </div>
+
+  <!-- SECTION 3: WHAT IS AI -->
+  <div class="card" id="what-is-ai">
+    <div class="section-title"><span class="dot"></span> Розділ 3</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-accent);">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      Що таке штучний інтелект?
+    </h2>
+
+    <div class="info-box">
+      <strong>Штучний інтелект (ШІ)</strong> — це комп'ютерна програма, яка вміє <strong>навчатися</strong> на прикладах і потім <strong>виконувати завдання</strong>, які раніше могла робити тільки людина.
+    </div>
+
+    <h3>🐕 Аналогія: Навчання цуценя</h3>
+    <p>Уявіть, що ви вчите цуценя команді «Сидіти!». Спочатку воно не розуміє. Ви показуєте багато разів — і воно навчається.</p>
+    <p><strong>ШІ працює схоже:</strong> йому «показують» тисячі прикладів, і він «вчиться» знаходити закономірності.</p>
+
+    <div class="example-box">
+      <strong>📸 Приклад:</strong> Якщо показати ШІ 10 000 фотографій котів і собак із підписами — він навчиться відрізняти їх. А потім зможе сказати: <em>«На цьому фото — кіт!»</em> — навіть якщо це фото він ніколи раніше не бачив.
+    </div>
+
+    <h3>🧪 Інтерактив: Навчи ШІ розрізняти тварин</h3>
+    <p>Натисни на картинки, щоб «показати» ШІ приклади. Чим більше прикладів — тим точніше він навчиться!</p>
+
+    <div class="demo-box">
+      <div>
+        <span class="demo-btn demo-cat" onclick="trainAI('cat')">🐱 Кіт</span>
+        <span class="demo-btn demo-cat" onclick="trainAI('cat')">🐱 Кіт</span>
+        <span class="demo-btn demo-cat" onclick="trainAI('cat')">🐱 Кіт</span>
+        <span class="demo-btn demo-dog" onclick="trainAI('dog')">🐕 Собака</span>
+        <span class="demo-btn demo-dog" onclick="trainAI('dog')">🐕 Собака</span>
+        <span class="demo-btn demo-dog" onclick="trainAI('dog')">🐕 Собака</span>
+      </div>
+      <div class="demo-result" id="trainResult">📊 Натисни на тварин, щоб розпочати навчання...</div>
+    </div>
+
+    <div class="fun-fact">
+      <span class="fun-fact-icon">🧠</span>
+      <p>Щоб навчити ШІ розпізнавати кота, йому потрібно показати не 5-10 фото, а <strong>десятки тисяч</strong>! Чим більше прикладів — тим розумніший ШІ.</p>
+    </div>
+  </div>
+
+  <!-- MACHINE LEARNING -->
+  <div class="card">
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-green);">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      Машинне навчання
+    </h2>
+
+    <div class="info-box" style="background:var(--c-green-light); border-color:var(--c-green);">
+      <strong>Машинне навчання</strong> — це спосіб, за допомогою якого ШІ <strong>навчається</strong>. Замість того щоб програміст прописував усі правила вручну, комп'ютер сам знаходить правила, аналізуючи дані.
+    </div>
+
+    <h3>🎵 Аналогія: Гра «Вгадай мелодію»</h3>
+    <p>Спочатку ти не знаєш, як вгадувати. Але після 100 пісень починаєш помічати: <em>«О, якщо на початку гітара — це, мабуть, рок!»</em></p>
+    <p>Так і ШІ: чим більше даних він «почує» — тим краще вгадує.</p>
+
+    <h3>📊 Три типи машинного навчання</h3>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-accent-light); color:var(--c-accent);">👨‍🏫</div>
+      <div class="field-content">
+        <h4>Навчання з учителем</h4>
+        <p>Показуємо приклади з правильними відповідями. 1000 фото яблук і груш із підписами → ШІ вчиться розрізняти.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-green-light); color:var(--c-green);">🔍</div>
+      <div class="field-content">
+        <h4>Навчання без учителя</h4>
+        <p>ШІ сам знаходить групи. Даємо 1000 фото тварин → він сам ділить на хутряних, пір'ястих, водних.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-purple-light); color:var(--c-purple);">🏆</div>
+      <div class="field-content">
+        <h4>Навчання з підкріпленням</h4>
+        <p>ШІ пробує, отримує «нагороду» або «штраф». Грає в гру: за перемогу +1, за програш -1. Сам шукає найкращу стратегію!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEURAL NETWORKS -->
+  <div class="card">
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-purple);">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      Нейронні мережі
+    </h2>
+
+    <div class="info-box" style="background:var(--c-purple-light); border-color:var(--c-purple);">
+      <strong>Нейронна мережа</strong> — це комп'ютерна модель, побудована за прикладом людського мозку. Вона складається з шарів «нейронів», які передають один одному сигнали.
+    </div>
+
+    <h3>🏫 Аналогія: Школа з передачі знань</h3>
+    <p>Уявіть школу, де учень 1-го класу бачить картинку і каже: <em>«Там є щось пухнасте!»</em> → передає учню 2-го класу. Той додає: <em>«І є вуса!»</em> → передає учню 3-го. Той каже: <em>«Це КІТ!»</em></p>
+
+    <div class="nn-diagram">
+      <div class="nn-layer">
+        <div class="nn-node" style="background:var(--c-accent);">👁️</div>
+        <div class="nn-node" style="background:var(--c-accent);">👁️</div>
+        <div class="nn-node" style="background:var(--c-accent);">👁️</div>
+        <div class="nn-label">Фото</div>
+      </div>
+      <span class="nn-arrow">→</span>
+      <div class="nn-layer">
+        <div class="nn-node" style="background:var(--c-accent);">Лінії</div>
+        <div class="nn-node" style="background:var(--c-accent);">Кольори</div>
+        <div class="nn-label">Шар 1</div>
+      </div>
+      <span class="nn-arrow">→</span>
+      <div class="nn-layer">
+        <div class="nn-node" style="background:var(--c-green);">Форми</div>
+        <div class="nn-node" style="background:var(--c-green);">Деталі</div>
+        <div class="nn-label">Шар 2</div>
+      </div>
+      <span class="nn-arrow">→</span>
+      <div class="nn-layer">
+        <div class="nn-node" style="background:var(--c-purple); width:56px; height:56px; font-size:16px;">🐱 КІТ!</div>
+        <div class="nn-label">Відповідь</div>
+      </div>
+    </div>
+
+    <p style="text-align:center; font-size:15px; color:var(--c-text-muted);">Кожен шар визначає щось простіше. Останній шар робить висновок!</p>
+
+    <div class="fun-fact">
+      <span class="fun-fact-icon">🍕</span>
+      <p><strong>Спробуй уявити:</strong> Якби нейронна мережа розпізнавала піцу, які шари їй потрібні? Коло → сир → ковбаска → <strong>ПІЦА!</strong></p>
+    </div>
+  </div>
+
+  <!-- SECTION 4: FIELDS -->
+  <div class="card" id="fields">
+    <div class="section-title"><span class="dot"></span> Розділ 4</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-teal);">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      Галузі застосування ШІ
+    </h2>
+
+    <p>ШІ вже працює в багатьох сферах. Ось де він допомагає прямо зараз:</p>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-red-light); color:var(--c-red);">🏥</div>
+      <div class="field-content">
+        <h4>Медицина</h4>
+        <p>Діагностика хвороб за знімками, пошук ліків. ШІ аналізує рентген і знаходить перелом швидше за лікаря.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-accent-light); color:var(--c-accent);">🚗</div>
+      <div class="field-content">
+        <h4>Транспорт</h4>
+        <p>Безпілотні автомобілі, оптимізація маршрутів. Tesla їде сама, а Google Maps прокладає дорогу без заторів.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-purple-light); color:var(--c-purple);">🎮</div>
+      <div class="field-content">
+        <h4>Ігри</h4>
+        <p>Розумні суперники, генерація світів. У Minecraft ШІ створює унікальні світи; у FIFA — суперники адаптуються до твоєї гри.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-green-light); color:var(--c-green);">🎨</div>
+      <div class="field-content">
+        <h4>Мистецтво</h4>
+        <p>Генерація музики, малюнків, відео. Midjourney та DALL-E малюють картини за описом.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-orange-light); color:var(--c-orange);">🌾</div>
+      <div class="field-content">
+        <h4>Сільське господарство</h4>
+        <p>Дрони аналізують поля, роботи збирають врожай. ШІ знає, де рослинам потрібна вода.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:#fce7f3; color:var(--c-pink);">🔒</div>
+      <div class="field-content">
+        <h4>Безпека</h4>
+        <p>Розпізнавання облич, виявлення шахрайства. Твій телефон розблоковується, коли дивишся на нього.</p>
+      </div>
+    </div>
+
+    <h3>🔮 Найближчим часом</h3>
+    <div class="grid-2">
+      <div class="grid-card" style="background:var(--c-purple-light); border-color:#ddd6fe;">
+        <div class="icon">🤖</div>
+        <h4>Роботи-помічники</h4>
+        <p>Прибиратимуть, готуватимуть, доглядатимуть за людьми</p>
+      </div>
+      <div class="grid-card" style="background:var(--c-red-light); border-color:#fecaca;">
+        <div class="icon">🏥</div>
+        <h4>Персональні лікарі</h4>
+        <p>Аналізуватимуть стан 24/7 через годинник</p>
+      </div>
+      <div class="grid-card" style="background:var(--c-accent-light); border-color:#bfdbfe;">
+        <div class="icon">🎓</div>
+        <h4>Віртуальні вчителі</h4>
+        <p>Уроки, що змінюються під тебе в реальному часі</p>
+      </div>
+      <div class="grid-card" style="background:var(--c-green-light); border-color:#a7f3d0;">
+        <div class="icon">🚀</div>
+        <h4>Космос</h4>
+        <p>ШІ керуватиме марсоходами та шукатиме життя на планетах</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: MOVIES -->
+  <div class="card" id="movies">
+    <div class="section-title"><span class="dot"></span> Розділ 5</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-pink);">
+        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+        <line x1="7" y1="2" x2="7" y2="22"/>
+        <line x1="17" y1="2" x2="17" y2="22"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <line x1="2" y1="7" x2="7" y2="7"/>
+        <line x1="2" y1="17" x2="7" y2="17"/>
+        <line x1="17" y1="17" x2="22" y2="17"/>
+        <line x1="17" y1="7" x2="22" y2="7"/>
+      </svg>
+      Штучний інтелект у фільмах і мультиках
+    </h2>
+
+    <p>Багато роботів з кіно вже існують насправді! Перевіримо:</p>
+
+    <div class="movie-card">
+      <div class="movie-poster" style="background:linear-gradient(135deg, var(--c-accent), var(--c-purple));">🤖</div>
+      <div class="movie-info">
+        <h4>ВАЛЛ-І</h4>
+        <div class="movie-source">«ВАЛЛ-І» (мультфільм)</div>
+        <p>Прибирає сміття, навчається, має почуття</p>
+        <span class="badge badge-partial">Частково реально — роботи-пилососи вже є, але почуття поки ні</span>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="movie-poster" style="background:linear-gradient(135deg, var(--c-green), var(--c-accent));">🤍</div>
+      <div class="movie-info">
+        <h4>Беймакс</h4>
+        <div class="movie-source">«Суперсімейка Біґ Хіро»</div>
+        <p>Діагностика, догляд, дружба</p>
+        <span class="badge badge-partial">Медичні системи є, але «дружба» — вигадка</span>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="movie-poster" style="background:linear-gradient(135deg, var(--c-orange), var(--c-purple));">🤖</div>
+      <div class="movie-info">
+        <h4>Сі-3ПО та R2-D2</h4>
+        <div class="movie-source">«Зоряні війни»</div>
+        <p>Переклад мов, пілотування, допомога</p>
+        <span class="badge badge-real">Переклад — реально. Пілотування — в розробці</span>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="movie-poster" style="background:linear-gradient(135deg, var(--c-red), #1e293b);">🔴</div>
+      <div class="movie-info">
+        <h4>Термінатор</h4>
+        <div class="movie-source">«Термінатор»</div>
+        <p>Навчання, бойові навички</p>
+        <span class="badge badge-future">Роботи-воїни існують, але не такі розумні</span>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="movie-poster" style="background:linear-gradient(135deg, var(--c-accent), var(--c-green));">🔷</div>
+      <div class="movie-info">
+        <h4>Джарвіс / ФРІДЕЙ</h4>
+        <div class="movie-source">«Залізна людина»</div>
+        <p>Керує будинком, створює костюми, радить</p>
+        <span class="badge badge-real">Розумні будинки та голосові помічники вже є</span>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <div class="movie-poster" style="background:linear-gradient(135deg, var(--c-purple), var(--c-pink));">🚗</div>
+      <div class="movie-info">
+        <h4>Оптімус Прайм</h4>
+        <div class="movie-source">«Трансформери»</div>
+        <p>Трансформація, лідерство, моральний вибір</p>
+        <span class="badge badge-future">Роботи-трансформери вже створюються в Японії!</span>
+      </div>
+    </div>
+
+    <div class="info-box" style="background:var(--c-pink-light); border-color:var(--c-pink); margin-top:20px;">
+      <strong>💭 Обговорення:</strong>
+      <ul style="margin-top:10px; margin-bottom:0;">
+        <li>Чи хочеш ти мати друга-робота, як ВАЛЛ-І?</li>
+        <li>Чи страшно тобі, що ШІ стане занадто розумним?</li>
+        <li>Які риси людини не зможе повторити жоден робот?</li>
+      </ul>
+    </div>
+
+    <div class="warning-box">
+      <strong>Висновок:</strong> У фільмах ШІ часто показують або ідеальним другом, або загрозою. Насправді ШІ — це інструмент, і все залежить від того, як його використовують люди.
+    </div>
+  </div>
+
+  <!-- SECTION 6: THINK AT HOME -->
+  <div class="card" id="think">
+    <div class="section-title"><span class="dot"></span> Розділ 6</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-purple);">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+      </svg>
+      Подумати вдома
+    </h2>
+
+    <p>Ці питання обговори з батьками або запиши в щоденник:</p>
+
+    <div class="think-box">
+      <span class="num">1</span>
+      <strong>Якби ти міг створити ШІ для допомоги у школі, що б він умів?</strong><br>
+      <span style="color:var(--c-text-muted); font-size:15px;">Робив уроки цікавішими? Допомагав з математикою? Нагадував про домашнє завдання?</span>
+    </div>
+
+    <div class="think-box">
+      <span class="num">2</span>
+      <strong>Який супергеройський костюм з фільму ти б хотів, щоб ШІ створив для тебе?</strong><br>
+      <span style="color:var(--c-text-muted); font-size:15px;">Які б у нього були функції?</span>
+    </div>
+
+    <div class="think-box">
+      <span class="num">3</span>
+      <strong>Чи може ШІ бути справжнім другом? Чому так / чому ні?</strong>
+    </div>
+
+    <div class="think-box">
+      <span class="num">4</span>
+      <strong>Придумай назву для свого власного ШІ-помічника.</strong><br>
+      <span style="color:var(--c-text-muted); font-size:15px;">Як він виглядав би? Що б він для тебе робив?</span>
+    </div>
+
+    <div class="think-box">
+      <span class="num">5</span>
+      <strong>Що було б у світі краще, а що гірше, якби ШІ робив усе замість людей?</strong>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="card" id="glossary">
+    <div class="section-title"><span class="dot"></span> Додатково</div>
+    <h2>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--c-teal);">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+      Словник термінів
+    </h2>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-accent-light); color:var(--c-accent); font-size:18px;">🧠</div>
+      <div class="field-content">
+        <h4>Штучний інтелект (ШІ)</h4>
+        <p>Комп'ютерна програма, яка вміє навчатися на прикладах і виконувати завдання, які раніше могла робити тільки людина.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-green-light); color:var(--c-green); font-size:18px;">📚</div>
+      <div class="field-content">
+        <h4>Машинне навчання</h4>
+        <p>Спосіб, за допомогою якого ШІ навчається. Комп'ютер сам знаходить правила, аналізуючи дані, замість того щоб програміст прописував усе вручну.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-purple-light); color:var(--c-purple); font-size:18px;">🔗</div>
+      <div class="field-content">
+        <h4>Нейронна мережа</h4>
+        <p>Комп'ютерна модель, побудована за прикладом мозку. Складається з шарів «нейронів», які передають один одному сигнали.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-orange-light); color:var(--c-orange); font-size:18px;">🎯</div>
+      <div class="field-content">
+        <h4>Дані</h4>
+        <p>Інформація, яку ми даємо ШІ для навчання: фото, тексти, числа, звуки.</p>
+      </div>
+    </div>
+
+    <div class="field-card">
+      <div class="field-icon" style="background:var(--c-red-light); color:var(--c-red); font-size:18px;">🤖</div>
+      <div class="field-content">
+        <h4>Алгоритм</h4>
+        <p>Набір інструкцій, за якими працює комп'ютер. ШІ використовує складні алгоритми для навчання.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <h2>🎉 Вітаємо!</h2>
+    <p>Ти пройшов(-ла) перший модуль із штучного інтелекту. На наступному занятті ти навчишся правильно спілкуватись із ШІ</p>
+    <div style="margin-top:16px; font-size:14px; color:var(--c-text-muted);">
+      Навчальний матеріал для учнів 8–12 років • Інтерактивний дистанційний курс
+    </div>
+  </div>
+
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Quiz logic
+  function checkQuiz(el, isCorrect) {
+    if(el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    if(isCorrect) {
+      el.classList.add('correct');
+      el.querySelector('.letter').innerHTML = '✓';
+    } else {
+      el.classList.add('wrong');
+      el.querySelector('.letter').innerHTML = '✕';
+    }
+  }
+
+  // Training demo
+  let catCount = 0, dogCount = 0;
+  function trainAI(type) {
+    const result = document.getElementById('trainResult');
+    if(type === 'cat') catCount++;
+    if(type === 'dog') dogCount++;
+    const total = catCount + dogCount;
+    if(total < 3) {
+      result.innerHTML = '📊 Навчання: показано ' + total + ' прикладів... Продовжуй!';
+      result.style.background = 'var(--c-orange-light)';
+      result.style.color = 'var(--c-orange)';
+    } else if(total < 6) {
+      result.innerHTML = '📊 ШІ аналізує: ' + catCount + ' котів, ' + dogCount + ' собак... Вже краще!';
+      result.style.background = 'var(--c-accent-light)';
+      result.style.color = 'var(--c-accent)';
+    } else {
+      result.innerHTML = '✅ <strong>ШІ навчено!</strong> Тепер він може розрізняти котів і собак. Чим більше прикладів — тим точніше!';
+      result.style.background = 'var(--c-green-light)';
+      result.style.color = 'var(--c-green)';
+    }
+  }
+
+  // Scroll to top button
+  window.addEventListener('scroll', function() {
+    const btn = document.getElementById('scrollTop');
+    if(window.scrollY > 400) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+</script>
+
+</body>
+</html>
