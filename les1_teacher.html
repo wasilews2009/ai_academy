@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Методичний супровід: Вступне заняття «Знайомство із ШІ»</title>
+<style>
+  :root {
+    --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --text-sec: #334155;
+    --text-muted: #64748b; --border: #e2e8f0; --accent: #3b82f6; --accent-light: #eff6ff;
+    --green: #10b981; --green-light: #ecfdf5; --orange: #f59e0b; --orange-light: #fffbeb;
+    --red: #ef4444; --red-light: #fef2f2; --purple: #8b5cf6; --purple-light: #f5f3ff;
+    --teal: #14b8a6; --teal-light: #f0fdfa; --pink: #ec4899; --pink-light: #fdf2f8;
+    --radius: 14px; --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; font-size: 15px; }
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
+  .sidebar { width: 280px; background: var(--card); border-right: 1px solid var(--border); padding: 24px 20px; position: fixed; height: 100vh; overflow-y: auto; top: 0; left: 0; z-index: 50; }
+  .sidebar h1 { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .sidebar .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .timer-box { background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 12px; text-align: center; margin-bottom: 20px; }
+  .timer-box .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 600; }
+  .timer-box .time { font-size: 28px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .timer-box .total { font-size: 12px; color: var(--text-muted); }
+  .timer-controls { display: flex; gap: 6px; margin-top: 8px; }
+  .timer-controls button { flex: 1; padding: 6px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; background: var(--accent); color: white; }
+  .timer-controls button.secondary { background: white; color: var(--text); border: 1px solid var(--border); }
+  .nav-list { list-style: none; }
+  .nav-list li { margin: 4px 0; }
+  .nav-list a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); color: var(--text-sec); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.15s; }
+  .nav-list a:hover, .nav-list a.active { background: var(--accent-light); color: var(--accent); }
+  .nav-list .num { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: var(--border); border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .nav-list a:hover .num, .nav-list a.active .num { background: var(--accent); color: white; }
+  .nav-list .time-badge { margin-left: auto; font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  .main { margin-left: 280px; flex: 1; padding: 32px 40px; max-width: 800px; }
+  .lesson-meta { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 28px; border-radius: var(--radius); margin-bottom: 24px; }
+  .lesson-meta h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  .meta-item { background: rgba(255,255,255,0.1); padding: 12px; border-radius: var(--radius-sm); }
+  .meta-item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 4px; }
+  .meta-item .value { font-size: 15px; font-weight: 600; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px; overflow: hidden; }
+  .section-header { padding: 18px 24px; background: var(--accent-light); border-bottom: 1px solid #bfdbfe; display: flex; align-items: center; gap: 12px; }
+  .section-header .num { width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .section-header h3 { font-size: 18px; font-weight: 700; flex: 1; }
+  .section-header .duration { background: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--accent); border: 1px solid #bfdbfe; }
+  .section-body { padding: 24px; }
+  .goal-box { background: var(--green-light); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 16px; font-size: 14px; }
+  .goal-box strong { color: var(--green); }
+  .actor-block { margin: 16px 0; border-radius: var(--radius-sm); overflow: hidden; }
+  .actor-header { padding: 10px 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .actor-body { padding: 14px 16px; font-size: 14px; line-height: 1.7; }
+  .actor-body ul { padding-left: 20px; margin: 8px 0; }
+  .actor-body li { margin: 4px 0; }
+  .teacher-block .actor-header { background: var(--accent-light); color: var(--accent); }
+  .teacher-block .actor-body { background: #f8fafc; }
+  .pupil-block .actor-header { background: var(--green-light); color: var(--green); }
+  .pupil-block .actor-body { background: var(--green-light); }
+  .speech { background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin: 10px 0; font-style: italic; color: var(--text-sec); position: relative; font-size: 14px; }
+  .speech::before { content: "💬"; position: absolute; top: -10px; left: 12px; background: white; padding: 0 4px; font-style: normal; }
+  .speech strong { font-style: normal; color: var(--text); }
+  .note-box { background: var(--orange-light); border: 1px solid #fde68a; border-radius: var(--radius-sm); padding: 14px 16px; margin: 14px 0; font-size: 14px; }
+  .note-box strong { color: var(--orange); }
+  .warning-box { background: var(--red-light); border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 14px 16px; margin: 14px 0; font-size: 14px; }
+  .warning-box strong { color: var(--red); }
+  .tip-box { background: var(--purple-light); border: 1px solid #ddd6fe; border-radius: var(--radius-sm); padding: 14px 16px; margin: 14px 0; font-size: 14px; }
+  .tip-box strong { color: var(--purple); }
+  .materials-list { list-style: none; padding: 0; }
+  .materials-list li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .materials-list li:last-child { border-bottom: none; }
+  .materials-list .icon { font-size: 18px; flex-shrink: 0; }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 14px; }
+  .checklist .check { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.15s; }
+  .checklist .check:hover { border-color: var(--accent); }
+  .checklist .check.checked { background: var(--green); border-color: var(--green); position: relative; }
+  .checklist .check.checked::after { content: "✓"; color: white; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 700; }
+  h4 { font-size: 15px; font-weight: 700; margin: 18px 0 8px; color: var(--text); }
+  .section-body p { font-size: 14px; color: var(--text-sec); margin-bottom: 10px; }
+  .section-body ul, .section-body ol { padding-left: 22px; margin: 10px 0; font-size: 14px; color: var(--text-sec); }
+  .section-body li { margin: 5px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 4px; }
+  .tag-blue { background: var(--accent-light); color: var(--accent); }
+  .tag-green { background: var(--green-light); color: var(--green); }
+  .tag-orange { background: var(--orange-light); color: var(--orange); }
+  .tag-purple { background: var(--purple-light); color: var(--purple); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+  th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  th { background: var(--bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--bg); }
+  .scroll-top { position: fixed; bottom: 20px; right: 20px; width: 48px; height: 48px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 20px; cursor: pointer; box-shadow: var(--shadow-md); opacity: 0; transition: opacity 0.3s; z-index: 100; }
+  .scroll-top.visible { opacity: 1; }
+  @media print { .sidebar { display: none; } .main { margin-left: 0; padding: 20px; } .section { break-inside: avoid; page-break-inside: avoid; } .timer-box { display: none; } }
+  @media (max-width: 900px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .meta-grid { grid-template-columns: 1fr; } .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h1>Методичний супровід уроку</h1>
+  <div class="subtitle">Тема: «Знайомство із ШІ»<br>8–12 років • 90 хв</div>
+  <div class="timer-box">
+    <div class="label">Таймер уроку</div>
+    <div class="time" id="lessonTimer">90:00</div>
+    <div class="total">з 90 хвилин</div>
+    <div class="timer-controls">
+      <button onclick="toggleTimer()" id="timerBtn">▶ Старт</button>
+      <button class="secondary" onclick="resetTimer()">↺</button>
+    </div>
+  </div>
+  <ul class="nav-list">
+    <li><a href="#info" class="active"><span class="num">i</span> Інфо</a></li>
+    <li><a href="#stage1"><span class="num">1</span> Знайомство <span class="time-badge">10 хв</span></a></li>
+    <li><a href="#stage2"><span class="num">2</span> Для чого ШІ? <span class="time-badge">15 хв</span></a></li>
+    <li><a href="#stage3"><span class="num">3</span> Що таке ШІ? <span class="time-badge">25 хв</span></a></li>
+    <li><a href="#stage4"><span class="num">4</span> Галузі <span class="time-badge">20 хв</span></a></li>
+    <li><a href="#stage5"><span class="num">5</span> ШІ у кіно <span class="time-badge">15 хв</span></a></li>
+    <li><a href="#stage6"><span class="num">6</span> Рефлексія <span class="time-badge">5 хв</span></a></li>
+    <li><a href="#appendix"><span class="num">A</span> Додатки</a></li>
+  </ul>
+</aside>
+<main class="main">
+
+<!-- LESSON INFO -->
+<div class="lesson-meta" id="info">
+  <h2>Вступне заняття: Знайомство із ШІ</h2>
+  <p style="opacity:0.9; font-size:15px;">Методичний супровід для вчителя • Дистанційний/очний формат</p>
+  <div class="meta-grid">
+    <div class="meta-item"><div class="label">Вік учнів</div><div class="value">8–12 років (3–6 клас)</div></div>
+    <div class="meta-item"><div class="label">Тривалість</div><div class="value">90 хвилин (1,5 год)</div></div>
+    <div class="meta-item"><div class="label">Формат</div><div class="value">Очний / Дистанційний / Змішаний</div></div>
+    <div class="meta-item"><div class="label">Кількість учнів</div><div class="value">10–25 осіб (оптимально 15)</div></div>
+    <div class="meta-item"><div class="label">Тип уроку</div><div class="value">Комбінований (вступний)</div></div>
+    <div class="meta-item"><div class="label">Предмет</div><div class="value">Інформатика / STEM / Курс ШІ</div></div>
+  </div>
+</div>
+
+<!-- META GOALS -->
+<div class="section">
+  <div class="section-header" style="background:#f0fdfa; border-color:#99f6e4;">
+    <span class="num" style="background:var(--teal);">🎯</span>
+    <h3>Мета та очікувані результати</h3>
+  </div>
+  <div class="section-body">
+    <div class="goal-box">
+      <strong>Мета уроку:</strong> Сформувати в учнів початкове уявлення про штучний інтелект, його можливості та сфери застосування; зацікавити дітей темою через ігрові форми, приклади з життя та улюблених фільмів.
+    </div>
+    <h4>Очікувані результати (учень зможе):</h4>
+    <ul class="checklist">
+      <li><span class="check" onclick="this.classList.toggle('checked')"></span> Пояснити простими словами, що таке штучний інтелект</li>
+      <li><span class="check" onclick="this.classList.toggle('checked')"></span> Навести 3–5 прикладів використання ШІ у повсякденному житті</li>
+      <li><span class="check" onclick="this.classList.toggle('checked')"></span> Розрізняти поняття «штучний інтелект», «машинне навчання» та «нейронна мережа»</li>
+      <li><span class="check" onclick="this.classList.toggle('checked')"></span> Назвати 3–4 галузі, де застосовується ШІ</li>
+      <li><span class="check" onclick="this.classList.toggle('checked')"></span> Визначити, які можливості ШІ з фільмів уже реальні, а які — вигадка</li>
+      <li><span class="check" onclick="this.classList.toggle('checked')"></span> Сформулювати власне ставлення до ролі ШІ в житті людини</li>
+    </ul>
+    <h4>Компетентності (за НУШ):</h4>
+    <p><span class="tag tag-blue">Навчання впродовж життя</span> <span class="tag tag-green">Ініціативність і підприємливість</span> <span class="tag tag-purple">Екологічна грамотність</span> <span class="tag tag-orange">Інформаційна грамотність</span></p>
+  </div>
+</div>
+
+<!-- EQUIPMENT -->
+<div class="section">
+  <div class="section-header" style="background:#fffbeb; border-color:#fde68a;">
+    <span class="num" style="background:var(--orange);">📦</span>
+    <h3>Обладнання та матеріали</h3>
+  </div>
+  <div class="section-body">
+    <div class="two-col">
+      <div>
+        <h4>Техніка:</h4>
+        <ul class="materials-list">
+          <li><span class="icon">💻</span> Комп'ютер / планшет / ноутбук (для вчителя)</li>
+          <li><span class="icon">📽️</span> Проєктор / інтерактивна дошка (для очного формату)</li>
+          <li><span class="icon">🌐</span> Доступ до інтернету (для демонстрації ШІ в дії)</li>
+          <li><span class="icon">🔊</span> Колонки (для прикладів голосових помічників)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Матеріали:</h4>
+        <ul class="materials-list">
+          <li><span class="icon">📋</span> Роздатковий матеріал «Тварини для навчання ШІ» (додаток А)</li>
+          <li><span class="icon">🃏</span> Картки «ШІ чи людина?» (додаток Б)</li>
+          <li><span class="icon">📝</span> Стікери / наліпки для голосування (червона/зелена)</li>
+          <li><span class="icon">📱</span> Доступ до ChatGPT / Midjourney / DALL-E (опціонально)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>💡 Підготовка перед уроком:</strong> Перевірте роботу проєктора, інтернет-з'єднання та заздалегідь відкрийте вкладки з демо-ШІ (ChatGPT, DALL-E, Midjourney або вітчизняні аналоги). Підготуйте 3–4 запити для демонстрації.
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 1 -->
+<div class="section" id="stage1">
+  <div class="section-header">
+    <span class="num">1</span>
+    <h3>Знайомство та привітання</h3>
+    <span class="duration">10 хв</span>
+  </div>
+  <div class="section-body">
+    <div class="goal-box">
+      <strong>Мета етапу:</strong> Зняти психологічну напругу, створити довірливу атмосферу, зацікавити темою через ігрову взаємодію.
+    </div>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Привітайте учнів. Представтеся коротко та цікаво (2 хв).</li>
+          <li>Запропонуйте дітям назватися та відповісти на одне питання на вибір (3 хв):</li>
+        </ul>
+        <div class="speech">
+          <strong>Можливі питання для знайомства:</strong><br>
+          • «Який твій улюблений гаджет і чому?»<br>
+          • «Що ти робиш у телефоні найчастіше?»<br>
+          • «Чи спілкувався(-лася) ти колись із голосовим помічником (Siri, Аліса, Google)? Що ти його питав(-ла)?»
+        </div>
+        <ul>
+          <li>Запустіть гру «ШІ чи людина?» (5 хв).</li>
+          <li>Читайте ситуації по черзі. Діти голосують: піднімають <strong>зелену картку</strong> (ШІ) або <strong>червону</strong> (людина).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="actor-block pupil-block">
+      <div class="actor-header">🎒 Дії учнів</div>
+      <div class="actor-body">
+        <ul>
+          <li>Називаються, відповідають на питання.</li>
+          <li>Голосують картками у грі «ШІ чи людина?».</li>
+          <li>Обґрунтовують свою думку (чому це ШІ / людина).</li>
+        </ul>
+      </div>
+    </div>
+    <h4>🗣️ Розмовні фрази для вчителя:</h4>
+    <div class="speech">«Привіт, дослідники! Сьогодні ми вирушаємо в подорож у світ технологій майбутнього. Але спочатку — давайте дізнаємось одне про одного трохи більше!»</div>
+    <div class="speech">«А тепер — гра на уважність! Я буду читати ситуації, а ви підніматимете картку: зелену, якщо це зробив ШІ, і червону — якщо людина. Готові?»</div>
+    <div class="speech">«Цікаво, що деякі речі може зробити і ШІ, і людина. Наприклад, написати вірш. Але чи однаково вони його напишуть? Подивимось!»</div>
+    <h4>🎮 Ситуації для гри «ШІ чи людина?»:</h4>
+    <ol>
+      <li><strong>Намалював картину у стилі Ван Гога</strong> → ШІ (Midjourney, DALL-E)</li>
+      <li><strong>Приготував борщ за бабусиним рецептом</strong> → Людина (робот не вміє готувати з душею)</li>
+      <li><strong>Розпізнав пісню за наспівуванням</strong> → ШІ (Shazam, SoundHound)</li>
+      <li><strong>Написав вірш про кота</strong> → Може бути і те, і інше! (важливий момент для обговорення)</li>
+      <li><strong>Переміг чемпіона світу з шахів</strong> → ШІ (Deep Blue, AlphaZero)</li>
+      <li><strong>Погладив собаку по голові</strong> → Людина (робот не відчуває тактильних емоцій)</li>
+    </ol>
+    <div class="tip-box">
+      <strong>💡 Методична підказка:</strong> Якщо діти не знають відповіді — це чудово! Невизначеність стимулює цікавість. Не поспішайте давати правильну відповідь, дайте учням обговорити.
+    </div>
+    <div class="note-box">
+      <strong>⏱️ Контроль часу:</strong> Якщо гра затягується, обмежтеся 4–5 ситуаціями. Головне — емоційний настрій, а не кількість прикладів.
+    </div>
+    <div class="warning-box">
+      <strong>⚠️ Можлива трудність:</strong> Тихі учні можуть не хотіти голосувати. <strong>Вихід:</strong> дозвольте їм просто підняти картку без слів або попросіть сусіда сказати за них.
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 2 -->
+<div class="section" id="stage2">
+  <div class="section-header" style="background:var(--green-light); border-color:#a7f3d0;">
+    <span class="num" style="background:var(--green);">2</span>
+    <h3>Для чого вчити штучний інтелект?</h3>
+    <span class="duration" style="color:var(--green); border-color:#a7f3d0;">15 хв</span>
+  </div>
+  <div class="section-body">
+    <div class="goal-box" style="background:var(--green-light); border-color:var(--green);">
+      <strong>Мета етапу:</strong> Сформувати мотивацію до вивчення теми; показати практичну цінність ШІ для дитини.
+    </div>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Поставте учням питання: <em>«Що, на вашу думку, вміє ШІ?»</em> Запишіть відповіді на дошці / у хмарі (3 хв).</li>
+          <li>Доповніть список власними прикладами (2 хв).</li>
+          <li>Перейдіть до блоку «Як ШІ допомагає у навчанні та творчості» (5 хв).</li>
+          <li>Запустіть коротку демонстрацію ШІ в дії (якщо є технічна можливість) (5 хв).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="actor-block pupil-block">
+      <div class="actor-header">🎒 Дії учнів</div>
+      <div class="actor-body">
+        <ul>
+          <li>Діляться власним досвідом використання ШІ.</li>
+          <li>Пропонують ідеї, де ще можна використати ШІ.</li>
+          <li>Спостерігають за демонстрацією, задають запитання.</li>
+        </ul>
+      </div>
+    </div>
+    <h4>🗣️ Розмовні фрази:</h4>
+    <div class="speech">«Давайте подумаємо разом: навіщо взагалі вчити штучний інтелект? Чи не простіше просто користуватися готовими програмами?»</div>
+    <div class="speech">«А тепер уявіть: ви готуєтесь до контрольної з математики, але тема зовсім не зрозуміла. ШІ може пояснити її 10 різними способами — доки не знайде той, який зрозумілий саме вам. Це як мати власного терплячого репетитора!»</div>
+    <div class="speech">«Але чи може ШІ замінити вчителя? Хто думає — так? А хто — ні? Давайте обговоримо!»</div>
+    <h4>📋 Що записати на дошці (мозковий штурм):</h4>
+    <div class="two-col">
+      <div>
+        <h4>✅ Що вміє ШІ:</h4>
+        <ul>
+          <li>Розпізнавати обличчя та голос</li>
+          <li>Перекладати мови в реальному часі</li>
+          <li>Розпізнавати хвороби за фото</li>
+          <li>Грати в шахи краще за чемпіонів</li>
+          <li>Створювати музику, малюнки, відео</li>
+          <li>Допомагати з домашніми завданнями</li>
+          <li>Керувати машинами без водія</li>
+        </ul>
+      </div>
+      <div>
+        <h4>🎓 У навчанні:</h4>
+        <ul>
+          <li>Пояснює складні теми просто</li>
+          <li>Виправляє помилки в іноземних мовах</li>
+          <li>Рекомендує книги та фільми</li>
+          <li>Створює тести та кросворди</li>
+        </ul>
+        <h4>🖌️ У творчості:</h4>
+        <ul>
+          <li>Малює за описом</li>
+          <li>Пише музику у будь-якому стилі</li>
+          <li>Придумує сюжети для ігор</li>
+          <li>Генерує ідеї</li>
+        </ul>
+      </div>
+    </div>
+    <h4>🎬 Демонстрація (5 хв):</h4>
+    <div class="tip-box">
+      <strong>Що продемонструвати:</strong><br>
+      1. Відкрийте ChatGPT / Claude / Gemini — попросіть учнів сформулювати запит (наприклад: «Поясни, що таке фотосинтез, як для 10-річного»).<br>
+      2. Відкрийте DALL-E / Midjourney / Kandinsky — згенеруйте малюнок за запитом дітей (наприклад: «котик-астронавт на Марсі»).<br>
+      3. Покажіть голосового помічника (Siri, Аліса, Google) — попросіть розповісти анекдот.
+    </div>
+    <div class="warning-box">
+      <strong>⚠️ Важливо:</strong> Під час демонстрації акцентуйте: <em>«ШІ — це інструмент. Він допомагає, але не замінює людину. Творчість, емоції, мрії — це те, що робить тільки людина.»</em>
+    </div>
+    <div class="note-box">
+      <strong>⏱️ Контроль часу:</strong> Якщо демонстрація затягується через технічні проблеми, перейдіть до наступного блоку. Не витрачайте на це більше 5 хвилин — краще покажіть 1 приклад якісно, ніж 3 поспіхом.
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 3 -->
+<div class="section" id="stage3">
+  <div class="section-header" style="background:var(--purple-light); border-color:#ddd6fe;">
+    <span class="num" style="background:var(--purple);">3</span>
+    <h3>Що таке ШІ, машинне навчання та нейронні мережі</h3>
+    <span class="duration" style="color:var(--purple); border-color:#ddd6fe;">25 хв</span>
+  </div>
+  <div class="section-body">
+    <div class="goal-box" style="background:var(--purple-light); border-color:var(--purple);">
+      <strong>Мета етапу:</strong> Сформувати розуміння базових понять через аналогії та інтерактивні приклади.
+    </div>
+
+    <h4>📚 Підрозділ 3.1. Що таке штучний інтелект? (7 хв)</h4>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Дайте визначення ШІ простими словами.</li>
+          <li>Використайте аналогію з цуценям.</li>
+          <li>Покажіть приклад із 10 000 фото котів і собак.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="speech">«Штучний інтелект — це комп'ютерна програма, яка вміє навчатися на прикладах і потім виконувати завдання, які раніше могла робити тільки людина.»</div>
+    <div class="speech">«Уявіть, що ви вчите цуценя команді «Сидіти!». Спочатку воно не розуміє. Ви показуєте багато разів — і воно навчається. ШІ працює схоже: йому «показують» тисячі прикладів, і він «вчиться» знаходити закономірності.»</div>
+    <div class="speech">«Наприклад, якщо показати ШІ 10 000 фотографій котів і собак із підписами — він навчиться відрізняти їх. А потім зможе сказати: «На цьому фото — кіт!» — навіть якщо це фото він ніколи раніше не бачив.»</div>
+    <div class="note-box">
+      <strong>💡 Візуалізація:</strong> Покажіть на екрані 4×4 сітку фото котів і собак. Поясніть: «ШІ бачить усі ці фото і шукає: що спільного у котів? А що — у собак?»
+    </div>
+
+    <h4>📚 Підрозділ 3.2. Машинне навчання (8 хв)</h4>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Поясніть, що машинне навчання — це спосіб, яким ШІ навчається.</li>
+          <li>Використайте аналогію з грою «Вгадай мелодію».</li>
+          <li>Презентуйте три типи навчання (таблиця нижче).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="speech">«Машинне навчання — це спосіб, за допомогою якого ШІ навчається. Замість того щоб програміст прописував усі правила вручну, комп'ютер сам знаходить правила, аналізуючи дані.»</div>
+    <div class="speech">«Уявіть гру «Вгадай мелодію». Спочатку ви не знаєте, як вгадувати. Але після 100 пісень починаєте помічати: «О, якщо на початку гітара — це, мабуть, рок!» Так і ШІ: чим більше даних він «почує» — тим краще вгадує.»</div>
+    <h4>📊 Три типи машинного навчання:</h4>
+    <table>
+      <tr><th>Тип</th><th>Що це</th><th>Приклад</th></tr>
+      <tr><td><strong>З учителем</strong></td><td>Показуємо приклади з правильними відповідями</td><td>1000 фото яблук і груш із підписами → ШІ вчиться розрізняти</td></tr>
+      <tr><td><strong>Без учителя</strong></td><td>ШІ сам знаходить групи та закономірності</td><td>Даємо 1000 фото тварин → він сам ділить на хутряних, пір'ястих, водних</td></tr>
+      <tr><td><strong>З підкріпленням</strong></td><td>ШІ пробує, отримує «нагороду» або «штраф»</td><td>Грає в гру: за перемогу +1, за програш -1. Сам шукає найкращу стратегію</td></tr>
+    </table>
+    <div class="tip-box">
+      <strong>💡 Інтерактив:</strong> Попросіть учнів придумати, який тип навчання підходить для різних ситуацій:<br>
+      • Навчити робота прибирати кімнату → <strong>з підкріпленням</strong><br>
+      • Розсортувати листи на спам і не спам → <strong>з учителем</strong><br>
+      • Знайти групи друзів у соцмережі за інтересами → <strong>без учителя</strong>
+    </div>
+
+    <h4>📚 Підрозділ 3.3. Нейронні мережі (10 хв)</h4>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Поясніть, що нейронна мережа — це модель, побудована за прикладом мозку.</li>
+          <li>Використайте аналогію зі школою.</li>
+          <li>Намалюйте на дошці / покажіть схему шарів нейронів.</li>
+          <li>Проведіть інтерактив «Нейронна мережа для піци».</li>
+        </ul>
+      </div>
+    </div>
+    <div class="speech">«Нейронна мережа — це комп'ютерна модель, побудована за прикладом людського мозку. Вона складається з шарів «нейронів» — маленьких обчислювальних одиниць, які передають один одному сигнали.»</div>
+    <div class="speech">«Уявіть школу, де учень 1-го класу бачить картинку і каже: «Там є щось пухнасте!» → передає учню 2-го класу. Той додає: «І є вуса!» → передає учню 3-го. Той каже: «Це КІТ!» Кожен шар визначає щось просте: спочатку лінії, потім форми, потім деталі, а останній шар робить висновок.»</div>
+    <div class="note-box">
+      <strong>📐 Схема для дошки / слайда:</strong><br>
+      <strong>ФОТО КОТА</strong> → [Шар 1: лінії, кольори] → [Шар 2: форми, деталі] → [Шар 3: вуха, вуса, хвіст] → <strong>Відповідь: КІТ! (99%)</strong>
+    </div>
+    <div class="tip-box">
+      <strong>🍕 Інтерактив «Нейронна мережа для піци»:</strong><br>
+      Попросіть учнів уявити, що вони — нейронна мережа, яка розпізнає піцу. Які шари їм потрібні?<br>
+      <em>Очікувана відповідь:</em> Коло → сир → ковбаска → помідори → <strong>ПІЦА!</strong>
+    </div>
+    <div class="warning-box">
+      <strong>⚠️ Можлива трудність:</strong> Діти можуть плутати «нейронну мережу» з «інтернетом». <strong>Вихід:</strong> підкресліть: «Це не Wi-Fi і не Instagram. Це математична модель всередині комп'ютера.»
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 4 -->
+<div class="section" id="stage4">
+  <div class="section-header" style="background:var(--teal-light); border-color:#99f6e4;">
+    <span class="num" style="background:var(--teal);">4</span>
+    <h3>Галузі застосування ШІ</h3>
+    <span class="duration" style="color:var(--teal); border-color:#99f6e4;">20 хв</span>
+  </div>
+  <div class="section-body">
+    <div class="goal-box" style="background:var(--teal-light); border-color:var(--teal);">
+      <strong>Мета етапу:</strong> Розширити уявлення учнів про сфери застосування ШІ; спрогнозувати майбутнє.
+    </div>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Презентуйте 6–7 галузей, де ШІ вже працює (10 хв).</li>
+          <li>Проведіть гру «ШІ сьогодні чи завтра?» (5 хв).</li>
+          <li>Обговоріть прогнози на найближче майбутнє (5 хв).</li>
+        </ul>
+      </div>
+    </div>
+    <h4>🏭 Галузі (таблиця для презентації):</h4>
+    <table>
+      <tr><th>Галузь</th><th>Як використовується ШІ</th><th>Приклад для дітей</th></tr>
+      <tr><td>🏥 Медицина</td><td>Діагностика хвороб за знімками, пошук ліків</td><td>ШІ аналізує рентген і знаходить перелом швидше за лікаря</td></tr>
+      <tr><td>🚗 Транспорт</td><td>Безпілотні автомобілі, оптимізація маршрутів</td><td>Tesla їде сама, Google Maps прокладає дорогу без заторів</td></tr>
+      <tr><td>🎮 Ігри</td><td>Розумні суперники, генерація світів</td><td>У Minecraft ШІ створює унікальні світи; у FIFA — суперники адаптуються</td></tr>
+      <tr><td>🎨 Мистецтво</td><td>Генерація музики, малюнків, відео</td><td>Midjourney, DALL-E малюють картини за описом</td></tr>
+      <tr><td>📚 Освіта</td><td>Персоналізоване навчання, перевірка завдань</td><td>Duolingo підлаштовує уроки під твій рівень</td></tr>
+      <tr><td>🌾 Сільське господарство</td><td>Дрони аналізують поля, роботи збирають врожай</td><td>ШІ знає, де рослинам потрібна вода</td></tr>
+      <tr><td>🔒 Безпека</td><td>Розпізнавання облич, виявлення шахрайства</td><td>Твій телефон розблоковується, коли дивишся на нього</td></tr>
+    </table>
+    <h4>🔮 Прогнози на найближче майбутнє:</h4>
+    <ul>
+      <li><strong>🤖 Роботи-домашні помічники</strong> — прибиратимуть, готуватимуть, доглядатимуть за літніми людьми</li>
+      <li><strong>🏥 Персональні лікарі-асистенти</strong> — аналізуватимуть твій стан 24/7 через годинник</li>
+      <li><strong>🎓 Віртуальні вчителі</strong> — адаптивні уроки, які змінюються під тебе в реальному часі</li>
+      <li><strong>🌍 Прогнозування стихій</strong> — точніше передбачатимуть урагани та повені</li>
+      <li><strong>🚀 Космос</strong> — ШІ керуватиме марсоходами та шукатиме життя на інших планетах</li>
+      <li><strong>🧬 Редагування генів</strong> — допомагатиме лікувати спадкові хвороби</li>
+    </ul>
+    <h4>🎮 Гра «ШІ сьогодні чи завтра?»</h4>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Правила гри</div>
+      <div class="actor-body">
+        <ul>
+          <li>Вчитель називає сценарій.</li>
+          <li>Учні піднімають картки: 🔴 (вже є) чи 🟢 (буде скоро).</li>
+          <li>Обговорюєте кожен варіант.</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Сценарії:</h4>
+    <ol>
+      <li>Робот, який пише твої шкільні твори замість тебе → 🟡 (вже може, але вчитель не схвалить!)</li>
+      <li>Машина, яка сама їздить містом → 🔴 (вже є, але не скрізь дозволена)</li>
+      <li>Робот-хірург, який оперує сам → 🟢 (скоро)</li>
+      <li>Голосовий помічник, який розмовляє з тобою → 🔴 (Siri, Аліса)</li>
+      <li>Робот, який готує обід → 🟢 (вже тестується)</li>
+      <li>ШІ, який передбачає погоду на місяць → 🟢 (в розробці)</li>
+    </ol>
+    <div class="tip-box">
+      <strong>💡 Методична підказка:</strong> Якщо діти не знають відповіді — це чудово! Невизначеність стимулює цікавість. Обговоріть, чому це складно визначити.
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 5 -->
+<div class="section" id="stage5">
+  <div class="section-header" style="background:var(--pink-light); border-color:#fbcfe8;">
+    <span class="num" style="background:var(--pink);">5</span>
+    <h3>Штучний інтелект у фільмах і мультиках</h3>
+    <span class="duration" style="color:var(--pink); border-color:#fbcfe8;">15 хв</span>
+  </div>
+  <div class="section-body">
+    <div class="goal-box" style="background:var(--pink-light); border-color:var(--pink);">
+      <strong>Мета етапу:</strong> Зацікавити через улюблені фільми; розвинути критичне мислення щодо реалістичності ШІ в кіно.
+    </div>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Покажіть картинки / постери персонажів (можна підготувати слайди).</li>
+          <li>Для кожного персонажа обговоріть: що він вміє → чи це реально → наскільки.</li>
+          <li>Проведіть обговорення (5 хв).</li>
+        </ul>
+      </div>
+    </div>
+    <h4>🎬 Персонажі для обговорення:</h4>
+    <table>
+      <tr><th>Персонаж</th><th>Звідки</th><th>Що вміє</th><th>Наскільки реально?</th></tr>
+      <tr><td><strong>ВАЛЛ-І</strong></td><td>«ВАЛЛ-І»</td><td>Прибирає сміття, навчається, має почуття</td><td><span class="tag tag-orange">Частково</span> — роботи-пилососи вже є, але почуття — поки ні</td></tr>
+      <tr><td><strong>ЕВА</strong></td><td>«ВАЛЛ-І»</td><td>Літає, сканує, захищає</td><td><span class="tag tag-green">Реально</span> — дрони та сканери вже існують</td></tr>
+      <tr><td><strong>Беймакс</strong></td><td>«Суперсімейка Біґ Хіро»</td><td>Діагностика, догляд, дружба</td><td><span class="tag tag-orange">Частково</span> — медичні системи є, але «дружба» — вигадка</td></tr>
+      <tr><td><strong>Сі-3ПО та R2-D2</strong></td><td>«Зоряні війни»</td><td>Переклад мов, пілотування, допомога</td><td><span class="tag tag-green">Реально</span> — переклад — реально. Пілотування — в розробці</td></tr>
+      <tr><td><strong>Термінатор</strong></td><td>«Термінатор»</td><td>Навчання, бойові навички</td><td><span class="tag tag-purple">Скоро</span> — роботи-воїни існують, але не такі розумні</td></tr>
+      <tr><td><strong>Джарвіс / ФРІДЕЙ</strong></td><td>«Залізна людина»</td><td>Керує будинком, створює костюми, радить</td><td><span class="tag tag-green">Реально</span> — розумні будинки та голосові помічники вже є</td></tr>
+      <tr><td><strong>Оптімус Прайм</strong></td><td>«Трансформери»</td><td>Трансформація, лідерство, моральний вибір</td><td><span class="tag tag-purple">Скоро</span> — роботи-трансформери вже створюються в Японії!</td></tr>
+    </table>
+    <h4>💭 Обговорення:</h4>
+    <div class="speech">«Чи хочете ви мати друга-робота, як ВАЛЛ-І?»</div>
+    <div class="speech">«Чи страшно вам, що ШІ стане занадто розумним, як у «Термінаторі»?»</div>
+    <div class="speech">«Які риси людини не зможе повторити жоден робот?»</div>
+    <div class="info-box" style="background:var(--pink-light); border-color:var(--pink); margin-top:16px;">
+      <strong>Висновок:</strong> У фільмах ШІ часто показують або ідеальним другом, або загрозою. Насправді ШІ — це інструмент, і все залежить від того, як його використовують люди.
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 6 -->
+<div class="section" id="stage6">
+  <div class="section-header" style="background:var(--purple-light); border-color:#ddd6fe;">
+    <span class="num" style="background:var(--purple);">6</span>
+    <h3>Рефлексія та творчі питання «Подумати вдома»</h3>
+    <span class="duration" style="color:var(--purple); border-color:#ddd6fe;">5 хв</span>
+  </div>
+  <div class="section-body">
+    <div class="goal-box" style="background:var(--purple-light); border-color:var(--purple);">
+      <strong>Мета етапу:</strong> Закріпити матеріал; стимулювати подальше роздуми; отримати зворотний зв'язок.
+    </div>
+    <div class="actor-block teacher-block">
+      <div class="actor-header">👨‍🏫 Дії вчителя</div>
+      <div class="actor-body">
+        <ul>
+          <li>Підведіть підсумки уроку (2 хв).</li>
+          <li>Запропонуйте учням 5 творчих питань для обговорення вдома (2 хв).</li>
+          <li>Подякуйте за активність, анонсуйте наступне заняття (1 хв).</li>
+        </ul>
+      </div>
+    </div>
+    <h4>🗣️ Заключні фрази:</h4>
+    <div class="speech">«Сьогодні ми зробили перший крок у світ штучного інтелекту. Ми дізналися, що ШІ — це не магія, а математика та великі дані.»</div>
+    <div class="speech">«На наступних заняттях ми навчимо комп'ютер розпізнавати ваші малюнки та створимо свої перші програми зі ШІ. Чекаємо на вас!»</div>
+    <h4>🤔 Творчі питання «Подумати вдома»:</h4>
+    <div class="think-box" style="background:var(--purple-light); border:2px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin:10px 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--purple);color:white;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;">1</span>
+      <strong>Якби ти міг створити ШІ для допомоги у школі, що б він умів?</strong><br>
+      <span style="color:var(--text-muted); font-size:14px;">Робив уроки цікавішими? Допомагав з математикою? Нагадував про домашнє завдання?</span>
+    </div>
+    <div class="think-box" style="background:var(--purple-light); border:2px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin:10px 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--purple);color:white;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;">2</span>
+      <strong>Який супергеройський костюм з фільму ти б хотів, щоб ШІ створив для тебе?</strong><br>
+      <span style="color:var(--text-muted); font-size:14px;">Які б у нього були функції?</span>
+    </div>
+    <div class="think-box" style="background:var(--purple-light); border:2px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin:10px 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--purple);color:white;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;">3</span>
+      <strong>Чи може ШІ бути справжнім другом? Чому так / чому ні?</strong>
+    </div>
+    <div class="think-box" style="background:var(--purple-light); border:2px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin:10px 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--purple);color:white;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;">4</span>
+      <strong>Придумай назву для свого власного ШІ-помічника.</strong><br>
+      <span style="color:var(--text-muted); font-size:14px;">Як він виглядав би? Що б він для тебе робив?</span>
+    </div>
+    <div class="think-box" style="background:var(--purple-light); border:2px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin:10px 0;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--purple);color:white;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;">5</span>
+      <strong>Що було б у світі краще, а що гірше, якби ШІ робив усе замість людей?</strong>
+    </div>
+  </div>
+</div>
+
+<!-- APPENDIX -->
+<div class="section" id="appendix">
+  <div class="section-header" style="background:#f0fdfa; border-color:#99f6e4;">
+    <span class="num" style="background:var(--teal);">A</span>
+    <h3>Додатки</h3>
+  </div>
+  <div class="section-body">
+
+    <h4>📎 Додаток А: Роздатковий матеріал «Тварини для навчання ШІ»</h4>
+    <p>Роздрукуйте 2 набори карток (коти та собаки) по 8 штук кожна. Учні використовують їх для інтерактиву «Навчи ШІ».</p>
+    <div class="two-col">
+      <div style="background:var(--accent-light); padding:16px; border-radius:var(--radius-sm); text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">🐱 🐱 🐱 🐱<br>🐱 🐱 🐱 🐱</div>
+        <strong>Набір «Коти»</strong><br>
+        <span style="font-size:13px; color:var(--text-muted);">8 карток з різними котами</span>
+      </div>
+      <div style="background:var(--red-light); padding:16px; border-radius:var(--radius-sm); text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">🐕 🐕 🐕 🐕<br>🐕 🐕 🐕 🐕</div>
+        <strong>Набір «Собаки»</strong><br>
+        <span style="font-size:13px; color:var(--text-muted);">8 карток з різними собаками</span>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>💡 Використання:</strong> Роздайте картки учням. Попросіть по черзі «показувати» їх «ШІ» (вчитель). Після кожної пари карток оголошуйте: «ШІ навчився ще трохи!» — це створює ефект прогресу.
+    </div>
+
+    <h4>📎 Додаток Б: Картки «ШІ чи людина?»</h4>
+    <p>Роздрукуйте картки для гри на початку уроку. На звороті кожної картки — правильна відповідь та коротке пояснення.</p>
+    <table>
+      <tr><th>Ситуація</th><th>Відповідь</th><th>Пояснення для вчителя</th></tr>
+      <tr><td>Намалював картину у стилі Ван Гога</td><td>ШІ</td><td>Midjourney, DALL-E, Stable Diffusion генерують картини в стилі будь-якого художника</td></tr>
+      <tr><td>Приготував борщ за бабусиним рецептом</td><td>Людина</td><td>Робот може дотримуватися рецепта, але не відчуває смаку та любові, які вкладає бабуся</td></tr>
+      <tr><td>Розпізнав пісню за наспівуванням</td><td>ШІ</td><td>Shazam, SoundHound використовують ШІ для порівняння мелодій</td></tr>
+      <tr><td>Написав вірш про кота</td><td>Обидва</td><td>І ШІ (ChatGPT), і людина можуть написати вірш. Але емоційна глибина — це людина</td></tr>
+      <tr><td>Переміг чемпіона світу з шахів</td><td>ШІ</td><td>Deep Blue переміг Каспарова 1997 року. AlphaZero — 2017</td></tr>
+      <tr><td>Погладив собаку по голові</td><td>Людина</td><td>Робот може торкнутися, але не відчуває емпатії та тепла</td></tr>
+    </table>
+
+    <h4>📎 Додаток В: Критерії оцінювання</h4>
+    <p>Для внутрішнього використання вчителем (не для виставлення оцінок учням!):</p>
+    <table>
+      <tr><th>Критерій</th><th>Так</th><th>Частково</th><th>Ні</th></tr>
+      <tr><td>Учень активно бере участь у дискусії</td><td>Постійно висловлює думки</td><td>Іноді відповідає на запитання</td><td>Пасивний протягом усього уроку</td></tr>
+      <tr><td>Учень розуміє, що таке ШІ</td><td>Може пояснити власними словами</td><td>Повторює визначення вчителя</td><td>Не може сформулювати</td></tr>
+      <tr><td>Учень наводить приклади застосування ШІ</td><td>3+ приклади з різних галузей</td><td>1–2 приклади</td><td>Не може навести жодного</td></tr>
+      <tr><td>Учень розрізняє ШІ та людину</td><td>Чітко аргументує відмінності</td><td>Називає 1–2 відмінності</td><td>Плутає або не розуміє різниці</td></tr>
+      <tr><td>Учень демонструє критичне мислення</td><td>Задає глибокі запитання, аналізує</td><td>Висловлює власну думку</td><td>Не аналізує, лише запам'ятовує</td></tr>
+    </table>
+    <div class="tip-box">
+      <strong>💡 Примітка:</strong> На вступному занятті оцінювання має бути <strong>формативним</strong>, а не підсумковим. Мета — зрозуміти рівень учнів, а не виставити оцінку.
+    </div>
+
+    <h4>📎 Додаток Г: Корисні ресурси</h4>
+    <ul>
+      <li><strong>Elements of AI</strong> (elements-of-ai.com) — безкоштовний курс про ШІ для школярів (є українською)</li>
+      <li><strong>Machine Learning for Kids</strong> (machinelearningforkids.co.uk) — платформа для навчання дітей програмуванню з ШІ</li>
+      <li><strong>Quick, Draw!</strong> (quickdraw.withgoogle.com) — гра від Google, де ШІ вгадує малюнки</li>
+      <li><strong>Teachable Machine</strong> (teachablemachine.withgoogle.com) — інструмент для створення власних моделей ШІ без програмування</li>
+      <li><strong>AI4K12</strong> (ai4k12.org) — міжнародні стандарти викладання ШІ в школі</li>
+    </ul>
+
+    <h4>📎 Додаток Д: Словник термінів для вчителя</h4>
+    <table>
+      <tr><th>Термін</th><th>Визначення простими словами</th><th>Аналогія для дітей</th></tr>
+      <tr><td><strong>Штучний інтелект (ШІ)</strong></td><td>Комп'ютерна програма, яка навчається на прикладах і виконує завдання, які раніше могла робити тільки людина</td><td>Розумний помічник, який стає розумнішим, коли бачить більше прикладів</td></tr>
+      <tr><td><strong>Машинне навчання</strong></td><td>Спосіб, за допомогою якого ШІ навчається самостійно, без прописування всіх правил програмістом</td><td>Як учень вчиться вгадувати мелодію: чим більше пісень чує, тим краще вгадує</td></tr>
+      <tr><td><strong>Нейронна мережа</strong></td><td>Комп'ютерна модель, побудована за прикладом мозку, із шарами обчислювальних одиниць</td><td>Школа, де учні передають один одному знання: 1-й клас бачить лінії, 2-й — форми, 3-й — каже «це кіт!»</td></tr>
+      <tr><td><strong>Дані</strong></td><td>Інформація, яку дають ШІ для навчання: фото, тексти, числа, звуки</td><td>Підручники та зошити, за якими вчиться учень</td></tr>
+      <tr><td><strong>Алгоритм</strong></td><td>Набір інструкцій, за якими працює комп'ютер</td><td>Рецепт приготування страви: крок за кроком</td></tr>
+      <tr><td><strong>Модель</strong></td><td>Результат навчання ШІ — програма, яка вміє робити прогнози</td><td>Уміння, яке з'явилося після тренувань</td></tr>
+      <tr><td><strong>Навчання з учителем</strong></td><td>ШІ навчається на прикладах із правильними відповідями</td><td>Учитель пояснює задачу й показує правильну відповідь</td></tr>
+      <tr><td><strong>Навчання без учителя</strong></td><td>ШІ сам знаходить групи та закономірності в даних</td><td>Діти самі діляться на команди за інтересами</td></tr>
+      <tr><td><strong>Навчання з підкріпленням</strong></td><td>ШІ пробує різні дії та отримує нагороду чи штраф</td><td>Гра в відеогру: за перемогу — бали, за програш — мінус</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="section">
+  <div class="section-body" style="text-align:center; padding:32px;">
+    <h3 style="margin-bottom:12px;">🎉 Урок завершено!</h3>
+    <p style="color:var(--text-muted);">Методичний матеріал підготовлено для супроводу вступного заняття з штучного інтелекту.<br>Бажаємо плідної роботи та натхнення!</p>
+    <div style="margin-top:16px; font-size:13px; color:var(--text-muted);">
+      Навчальний курс «ШІ для школярів» • Для учнів 8–12 років
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Timer
+  let timerInterval;
+  let totalSeconds = 90 * 60;
+  let isRunning = false;
+
+  function updateTimerDisplay() {
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+    document.getElementById('lessonTimer').textContent = m + ':' + s;
+  }
+
+  function toggleTimer() {
+    const btn = document.getElementById('timerBtn');
+    if (isRunning) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      btn.textContent = '▶ Старт';
+    } else {
+      timerInterval = setInterval(function() {
+        if (totalSeconds > 0) { totalSeconds--; updateTimerDisplay(); }
+        else { clearInterval(timerInterval); isRunning = false; btn.textContent = '▶ Старт'; }
+      }, 1000);
+      isRunning = true;
+      btn.textContent = '⏸ Пауза';
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    isRunning = false;
+    totalSeconds = 90 * 60;
+    updateTimerDisplay();
+    document.getElementById('timerBtn').textContent = '▶ Старт';
+  }
+
+  // Scroll to top
+  window.addEventListener('scroll', function() {
+    const btn = document.getElementById('scrollTop');
+    if (window.scrollY > 400) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+
+  // Active nav link
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.nav-list a');
+  window.addEventListener('scroll', function() {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (window.scrollY >= sectionTop - 100) current = section.getAttribute('id');
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
