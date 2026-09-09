@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Генерація тексту та промпт-інжиніринг • Навчальний модуль</title>
+<style>
+  :root {
+    --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --text-sec: #475569;
+    --text-muted: #64748b; --border: #cbd5e1; --accent: #3b82f6; --accent-light: #dbeafe;
+    --green: #10b981; --green-light: #d1fae5; --orange: #f59e0b; --orange-light: #fef3c7;
+    --red: #ef4444; --red-light: #fee2e2; --purple: #8b5cf6; --purple-light: #ede9fe;
+    --pink: #ec4899; --pink-light: #fce7f3; --teal: #14b8a6; --teal-light: #ccfbf1;
+    --indigo: #6366f1; --indigo-light: #e0e7ff; --cyan: #06b6d4; --cyan-light: #cffafe;
+    --radius: 16px; --radius-sm: 10px; --shadow: 0 4px 6px -1px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  .hero { text-align: center; padding: 50px 30px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; border-radius: var(--radius); margin-bottom: 30px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; }
+  .hero::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3; }
+  .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; position: relative; }
+  .hero p { font-size: 18px; opacity: 0.95; position: relative; }
+  .hero-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; font-size: 14px; margin-top: 16px; backdrop-filter: blur(4px); }
+
+  .card { background: var(--card); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .card h2 { font-size: 24px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .card h3 { font-size: 20px; font-weight: 600; margin: 24px 0 12px; color: var(--text-sec); }
+  .card h4 { font-size: 17px; font-weight: 600; margin: 18px 0 10px; color: var(--text); }
+  .card p, .card li { font-size: 16px; color: var(--text-sec); margin-bottom: 12px; }
+  .card ul, .card ol { padding-left: 24px; margin-bottom: 16px; }
+  .card li { margin-bottom: 8px; }
+
+  .section-title { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 12px; }
+  .section-title .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+
+  .info-box { background: var(--accent-light); border-left: 4px solid var(--accent); padding: 18px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 18px 0; font-size: 16px; }
+  .info-box strong { color: var(--accent); }
+  .green-box { background: var(--green-light); border-left: 4px solid var(--green); padding: 18px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 18px 0; }
+  .green-box strong { color: var(--green); }
+  .orange-box { background: var(--orange-light); border-left: 4px solid var(--orange); padding: 18px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 18px 0; }
+  .orange-box strong { color: var(--orange); }
+  .red-box { background: var(--red-light); border-left: 4px solid var(--red); padding: 18px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 18px 0; }
+  .red-box strong { color: var(--red); }
+  .purple-box { background: var(--purple-light); border-left: 4px solid var(--purple); padding: 18px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 18px 0; }
+  .purple-box strong { color: var(--purple); }
+  .teal-box { background: var(--teal-light); border-left: 4px solid var(--teal); padding: 18px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 18px 0; }
+  .teal-box strong { color: var(--teal); }
+
+  .example-box { background: var(--green-light); border: 1px solid #a7f3d0; padding: 16px 20px; border-radius: var(--radius-sm); margin: 14px 0; }
+  .example-box strong { color: var(--green); }
+  .warning-box { background: var(--orange-light); border: 1px solid #fde68a; padding: 16px 20px; border-radius: var(--radius-sm); margin: 14px 0; }
+  .warning-box strong { color: var(--orange); }
+  .error-box { background: var(--red-light); border: 1px solid #fecaca; padding: 16px 20px; border-radius: var(--radius-sm); margin: 14px 0; }
+  .error-box strong { color: var(--red); }
+  .task-box { background: var(--purple-light); border: 2px dashed var(--purple); padding: 20px; border-radius: var(--radius-sm); margin: 16px 0; }
+  .task-box .num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--purple); color: white; border-radius: 50%; font-size: 14px; font-weight: 700; margin-right: 10px; }
+
+  .fun-fact { display: flex; gap: 14px; padding: 16px; background: #fffbeb; border-radius: var(--radius-sm); margin: 16px 0; align-items: flex-start; border: 1px solid #fef3c7; }
+  .fun-fact-icon { font-size: 28px; flex-shrink: 0; }
+  .fun-fact p { margin: 0; font-size: 15px; color: var(--text-sec); }
+  .fun-fact strong { color: var(--orange); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .grid-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+  .grid-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .grid-card .icon { font-size: 36px; margin-bottom: 8px; }
+  .grid-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .grid-card p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+  .prompt-good { background: var(--green-light); border: 2px solid var(--green); padding: 14px 18px; border-radius: var(--radius-sm); margin: 10px 0; font-family: monospace; font-size: 14px; position: relative; }
+  .prompt-good::before { content: "✅ ХОРОШИЙ ПРОМПТ"; position: absolute; top: -10px; left: 12px; background: var(--green); color: white; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: sans-serif; }
+  .prompt-bad { background: var(--red-light); border: 2px solid var(--red); padding: 14px 18px; border-radius: var(--radius-sm); margin: 10px 0; font-family: monospace; font-size: 14px; position: relative; }
+  .prompt-bad::before { content: "❌ ПОМИЛКОВИЙ ПРОМПТ"; position: absolute; top: -10px; left: 12px; background: var(--red); color: white; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: sans-serif; }
+  .prompt-analysis { background: #f8fafc; border: 1px solid var(--border); padding: 14px 18px; border-radius: var(--radius-sm); margin: 10px 0; font-size: 15px; }
+  .prompt-analysis strong { color: var(--text); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0; }
+  th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+  th { background: var(--bg); font-weight: 600; }
+  tr:nth-child(even) { background: #f8fafc; }
+
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-right: 4px; }
+  .tag-green { background: var(--green-light); color: var(--green); }
+  .tag-orange { background: var(--orange-light); color: var(--orange); }
+  .tag-red { background: var(--red-light); color: var(--red); }
+  .tag-blue { background: var(--accent-light); color: var(--accent); }
+  .tag-purple { background: var(--purple-light); color: var(--purple); }
+
+  .scroll-top { position: fixed; bottom: 20px; right: 20px; width: 48px; height: 48px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 20px; cursor: pointer; box-shadow: var(--shadow-lg); opacity: 0; transition: opacity 0.3s; z-index: 100; }
+  .scroll-top.visible { opacity: 1; }
+
+  .toc { background: var(--card); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .toc h3 { font-size: 18px; margin-bottom: 14px; }
+  .toc-list { list-style: none; padding: 0; }
+  .toc-list li { margin: 8px 0; }
+  .toc-list a { color: var(--accent); text-decoration: none; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .toc-list a:hover { text-decoration: underline; }
+  .toc-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-size: 13px; font-weight: 700; }
+
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } .hero h1 { font-size: 24px; } body { font-size: 15px; } .card { padding: 20px; } }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .card { animation: fadeInUp 0.5s ease; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <svg width="80" height="80" viewBox="0 0 80 80" style="margin-bottom:16px;">
+    <rect x="10" y="15" width="60" height="45" rx="8" fill="white" opacity="0.9"/>
+    <line x1="18" y1="28" x2="62" y2="28" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+    <line x1="18" y1="38" x2="55" y2="38" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+    <line x1="18" y1="48" x2="48" y2="48" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="65" cy="55" r="10" fill="#8b5cf6" opacity="0.9"/>
+    <path d="M60 55 L65 50 L70 55 L68 55 L68 60 L62 60 L62 55 Z" fill="white"/>
+  </svg>
+  <h1>Генерація тексту та промпт-інжиніринг</h1>
+  <p>Навчись розмовляти зі ШІ так, щоб він розумів тебе з півслова</p>
+  <div class="hero-badge">⏱ 90 хвилин • Для учнів 8–12 років</div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h3>📋 Зміст заняття</h3>
+  <ul class="toc-list">
+    <li><a href="#llm"><span class="toc-num">1</span> Великі мовні моделі: огляд та порівняння</a></li>
+    <li><a href="#ethics"><span class="toc-num">2</span> Етика спілкування із ШІ</a></li>
+    <li><a href="#media"><span class="toc-num">3</span> Медіаграмотність та критичне сприйняття</a></li>
+    <li><a href="#rule1"><span class="toc-num">4</span> Правило 1: Відкритий та закритий запит</a></li>
+    <li><a href="#rule2"><span class="toc-num">5</span> Правило 2: Контекст та обмеження</a></li>
+    <li><a href="#rule3"><span class="toc-num">6</span> Правило 3: Використання баз даних ШІ</a></li>
+    <li><a href="#rule4"><span class="toc-num">7</span> Правило 4: Використання прикладів</a></li>
+    <li><a href="#rule5"><span class="toc-num">8</span> Правило 5: Експериментування та ітерації</a></li>
+    <li><a href="#rule6"><span class="toc-num">9</span> Правило 6: Інтерпретація та аналіз відповідей</a></li>
+    <li><a href="#summary"><span class="toc-num">10</span> Підсумок та пам'ятка</a></li>
+  </ul>
+</div>
+
+<!-- SECTION 1: LLM OVERVIEW -->
+<div class="card" id="llm">
+  <div class="section-title"><span class="dot"></span> Розділ 1</div>
+  <h2>🤖 Великі мовні моделі: огляд та порівняння</h2>
+
+  <div class="info-box">
+    <strong>Велика мовна модель (LLM)</strong> — це програма-штучний інтелект, яка навчилася на мільярдах текстів (книг, статей, сайтів) і може генерувати тексти, відповідати на запитання, перекладати та навіть писати код.
+  </div>
+
+  <h3>Як це працює?</h3>
+  <p>Уявіть, що ви прочитали всі книги у світовій бібліотеці. Тепер ви знаєте, які слова часто йдуть одне за одним. Коли хтось каже «Колись давно у далекій...», ви з великою ймовірністю продовжите «...галактиці». Саме так працюють мовні моделі — вони передбачають наступне слово на основі всього, що прочитали.</p>
+
+  <div class="fun-fact">
+    <span class="fun-fact-icon">📚</span>
+    <p><strong>Цікавий факт:</strong> Сучасні моделі типу GPT-5.6 або Claude Fable 5 «прочитали» більше текстів, ніж людина могла б прочитати за 10 000 років!</p>
+  </div>
+
+  <h3>🔍 Порівняння популярних моделей (2026)</h3>
+  <p>На сьогодні існує багато мовних моделей. Розглянемо найпопулярніші:</p>
+
+  <table>
+    <tr>
+      <th>Модель</th>
+      <th>Компанія</th>
+      <th>Що вміє найкраще</th>
+      <th>Вартість (Pro)</th>
+      <th>Безкоштовно?</th>
+    </tr>
+    <tr>
+      <td><strong>ChatGPT (GPT-5.6)</strong></td>
+      <td>OpenAI</td>
+      <td>Універсальні завдання, кодування, аналіз даних</td>
+      <td>$20/міс</td>
+      <td><span class="tag tag-green">Так</span> (обмежено)</td>
+    </tr>
+    <tr>
+      <td><strong>Claude Fable 5</strong></td>
+      <td>Anthropic</td>
+      <td>Найкраща якість тексту, глибокий аналіз, творче письмо</td>
+      <td>$20/міс</td>
+      <td><span class="tag tag-orange">Обмежено</span></td>
+    </tr>
+    <tr>
+      <td><strong>Gemini 3.1 Pro</strong></td>
+      <td>Google</td>
+      <td>Робота з довгими документами, багатомодальність (текст+фото+відео)</td>
+      <td>$20/міс</td>
+      <td><span class="tag tag-green">Так</span></td>
+    </tr>
+    <tr>
+      <td><strong>Grok 4.5</strong></td>
+      <td>xAI (Ілон Маск)</td>
+      <td>Доступ до актуальних новин, мінімальні обмеження</td>
+      <td>$30/міс</td>
+      <td><span class="tag tag-orange">Частково</span></td>
+    </tr>
+    <tr>
+      <td><strong>DeepSeek V4</strong></td>
+      <td>DeepSeek</td>
+      <td>Дешеве та якісне рішення для програмування</td>
+      <td>Безкоштовно / дуже дешево</td>
+      <td><span class="tag tag-green">Так</span></td>
+    </tr>
+    <tr>
+      <td><strong>Llama 4</strong></td>
+      <td>Meta (Facebook)</td>
+      <td>Відкрита модель — можна встановити на власний комп'ютер</td>
+      <td>Безкоштовно</td>
+      <td><span class="tag tag-green">Так</span></td>
+    </tr>
+  </table>
+
+  <div class="orange-box">
+    <strong>💰 Про вартість API (для розробників):</strong><br>
+    API — це спосіб підключити ШІ до власної програми. Ціна залежить від кількості «токенів» (шматочків тексту). Наприклад:<br>
+    • GPT-5.6 Luna: <strong>$0.20</strong> за 1 млн вхідних токенів (найдешевший)<br>
+    • Claude Fable 5: <strong>$10</strong> за 1 млн токенів (преміум)<br>
+    • Gemini 3.5 Flash: <strong>$1.50</strong> за 1 млн токенів (оптимальний баланс)<br>
+    <em>Для порівняння: 1 млн токенів — це приблизно 2–3 романи «Гаррі Поттера».</em>
+  </div>
+
+  <h3>🎯 Яку модель обрати?</h3>
+  <div class="grid-2">
+    <div class="grid-card">
+      <div class="icon">🎓</div>
+      <h4>Для навчання</h4>
+      <p>ChatGPT (безкоштовна версія) або Gemini — найкращі пояснення простими словами</p>
+    </div>
+    <div class="grid-card">
+      <div class="icon">✍️</div>
+      <h4>Для творчого письма</h4>
+      <p>Claude Fable 5 — найкраща якість тексту та стилістика</p>
+    </div>
+    <div class="grid-card">
+      <div class="icon">💻</div>
+      <h4>Для програмування</h4>
+      <p>GPT-5.6 Sol або Claude Opus 5 — найкраще розуміють код</p>
+    </div>
+    <div class="grid-card">
+      <div class="icon">📄</div>
+      <h4>Для довгих текстів</h4>
+      <p>Gemini 3.1 Pro — може «прочитати» цілу книгу за раз (1 млн токенів)</p>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>🧠 Важливо розуміти:</strong> Жодна модель не «думає» як людина. Всі вони просто передбачають наступні слова на основі статистики. Тому вони можуть помилятися, вигадувати факти (це називається <strong>галюцинація</strong>) або повторювати упередження з інтернету.
+  </div>
+</div>
+
+<!-- SECTION 2: ETHICS -->
+<div class="card" id="ethics">
+  <div class="section-title"><span class="dot"></span> Розділ 2</div>
+  <h2>⚖️ Етика спілкування із ШІ</h2>
+
+  <div class="green-box">
+    <strong>Етика</strong> — це правила, які допомагають нам розуміти, що добре, а що погано. Коли ми спілкуємося зі ШІ, теж потрібно дотримуватися певних правил.
+  </div>
+
+  <h3>1. Чесність та прозорість</h3>
+  <p>Якщо ти використав ШІ для написання твору, есе або проєкту — скажи про це. Це не соромно! ШІ — це інструмент, як калькулятор чи Word. Але привласнювати чужу роботу за власну — це плагіат, навіть якщо «автор» — робот.</p>
+
+  <div class="example-box">
+    <strong>✅ Правильно:</strong> «Я написав цей твір сам, але використав ШІ для перевірки граматики та ідей.»<br>
+    <strong>❌ Неправильно:</strong> Віддати роботу, повністю написану ШІ, як свою власну.
+  </div>
+
+  <h3>2. Не використовуй ШІ для шкоди</h3>
+  <p>ШІ може генерувати будь-який текст — і хороший, і поганий. Не можна використовувати його для:</p>
+  <ul>
+    <li>Створення образливих повідомлень про однокласників (булінг)</li>
+    <li>Написання фейкових новин, які можуть налякати людей</li>
+    <li>Генерації неправдивих відгуків про товари чи людей</li>
+    <li>Створення інструкцій для небезпечних дій</li>
+  </ul>
+
+  <div class="warning-box">
+    <strong>⚠️ Пам'ятай:</strong> Навіть якщо ШІ щось згенерував, <strong>ти</strong> несеш відповідальність за те, як це використовуєш. ШІ — це інструмент, а не твій адвокат.
+  </div>
+
+  <h3>3. Поважай авторські права</h3>
+  <p>ШІ навчався на текстах, які написали реальні люди — письменники, журналісти, вчені. Коли ти просиш ШІ «напиши у стилі Джоан Роулінг», це не означає, що ти можеш продавати цей текст як свій. Стиль — це теж частина творчості автора.</p>
+
+  <h3>4. Захист персональних даних</h3>
+  <p>Ніколи не вводь у ШІ:</p>
+  <ul>
+    <li>Своє справжнє прізвище та адресу (якщо це публічний чат)</li>
+    <li>Номер телефону чи банківської картки</li>
+    <li>Паролі від соцмереж</li>
+    <li>Особисту інформацію друзів чи родичів без їхнього дозволу</li>
+  </ul>
+
+  <div class="red-box">
+    <strong>🔒 Чому це небезпечно:</strong> Дані, які ти вводиш у чат із ШІ, можуть зберігатися на серверах компанії. Навіть якщо видалити повідомлення, його копія може залишитися в системі.
+  </div>
+
+  <h3>5. Моральний бік: ШІ — друг чи інструмент?</h3>
+  <p>Деякі люди спілкуються зі ШІ як із другом: розповідають про свої проблеми, просять поради. Це нормально, але важливо пам'ятати:</p>
+  <ul>
+    <li>ШІ <strong>не відчуває емоцій</strong>. Він лише імітує емпатію, бо бачив такі розмови в інтернеті.</li>
+    <li>ШІ <strong>не замінить психолога</strong> чи батьків. Якщо у тебе серйозні проблеми — звернись до дорослих.</li>
+    <li>ШІ <strong>не має совісті</strong>. Він не може бути «хорошим» чи «поганим» — це просто програма.</li>
+  </ul>
+
+  <div class="purple-box">
+    <strong>💭 Подумай:</strong> Чи можна образити ШІ? Чи варто дякувати ШІ за відповідь? Чи є різниця між тим, як ти розмовляєш з людиною і з програмою?
+  </div>
+</div>
+
+<!-- SECTION 3: MEDIA LITERACY -->
+<div class="card" id="media">
+  <div class="section-title"><span class="dot"></span> Розділ 3</div>
+  <h2>🔍 Медіаграмотність та критичне сприйняття</h2>
+
+  <div class="info-box">
+    <strong>Медіаграмотність</strong> — це вміння перевіряти інформацію, яку ти отримуєш. А <strong>критичне мислення</strong> — це навичка не вірити всьому на слово, а аналізувати та порівнювати.
+  </div>
+
+  <h3>🚨 Чому ШІ може брехати?</h3>
+  <p>ШІ не «знає» правду. Він просто передбачає, які слова найімовірніші в контексті запиту. Іноді це призводить до <strong>галюцинацій</strong> — коли модель впевнено видає вигадану інформацію за факт.</p>
+
+  <div class="example-box">
+    <strong>📌 Приклад галюцинації:</strong><br>
+    Ти питаєш: «Хто написав книгу «Пригоди електроника»?»<br>
+    ШІ може відповісти: «Цю книгу написав Сергій Лук'яненко» (хоча насправді її написав Євген Велтистов).<br>
+    ШІ «вигадує», бо не розрізняє факти та ймовірності.
+  </div>
+
+  <h3>🔎 Правила перевірки інформації від ШІ</h3>
+
+  <div class="grid-2">
+    <div class="grid-card" style="text-align:left; align-items:flex-start;">
+      <div class="icon" style="font-size:28px;">1️⃣</div>
+      <h4>Перевіряй факти</h4>
+      <p>Якщо ШІ називає дату, ім'я або цифру — перевір у Вікіпедії, підручнику або на офіційному сайті.</p>
+    </div>
+    <div class="grid-card" style="text-align:left; align-items:flex-start;">
+      <div class="icon" style="font-size:28px;">2️⃣</div>
+      <h4>Порівнюй джерела</h4>
+      <p>Не довіряй одному джерелу. Запитай те саме у різних моделей або пошукай у Google.</p>
+    </div>
+    <div class="grid-card" style="text-align:left; align-items:flex-start;">
+      <div class="icon" style="font-size:28px;">3️⃣</div>
+      <h4>Аналізуй логіку</h4>
+      <p>Чи відповідь ШІ логічна? Чи немає протиріч? Чи не занадто «ідеальна»?</p>
+    </div>
+    <div class="grid-card" style="text-align:left; align-items:flex-start;">
+      <div class="icon" style="font-size:28px;">4️⃣</div>
+      <h4>Шукай джерела</h4>
+      <p>Попроси ШІ вказати, звідки він узяв інформацію. Якщо не може — це підозріло.</p>
+    </div>
+  </div>
+
+  <h3>🧪 Тест на критичне мислення</h3>
+  <p>ШІ сказав: <em>«Кіт Шредінгера був реальним вченим, який проводив експерименти з котами в коробках.»</em></p>
+  <div class="orange-box">
+    <strong>Що тут не так?</strong><br>
+    • Ервін Шредінгер був реальним вченим, але його «експеримент з котом» — це <strong>умовний розумовий експеримент</strong>, а не реальний.<br>
+    • Жоден кіт не постраждав!<br>
+    • ШІ змішав факт (вчений існував) із вигадкою (експеримент був реальним).
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠️ Правило «Золотого трикутника» перевірки:</strong><br>
+    Перед тим як використати інформацію від ШІ, перевір її <strong>мінімум у трьох незалежних джерелах</strong>. Це стосується: історичних фактів, наукових даних, новин, медичних порад, рецептів.
+  </div>
+
+  <h3>🎯 Червоні прапорці — коли ШІ, ймовірно, бреше:</h3>
+  <ul>
+    <li>📅 Відповідь містить конкретні дати, але без джерел</li>
+    <li>👤 Згадуються імена людей, яких ти не знаєш</li>
+    <li>📊 Наведені статистичні дані без посилань</li>
+    <li>🔗 ШІ пропонує посилання, які не відкриваються</li>
+    <li>🌍 Інформація суперечить тому, що ти знав раніше</li>
+    <li>😇 Відповідь занадто «ідеальна» — без жодних нюансів</li>
+  </ul>
+</div>
+
+<!-- RULE 1 -->
+<div class="card" id="rule1">
+  <div class="section-title"><span class="dot"></span> Правило 1</div>
+  <h2>🚪 Відкритий та закритий запит</h2>
+
+  <div class="info-box">
+    <strong>Запит (prompt)</strong> — це текст, який ти пишеш ШІ, щоб отримати відповідь. Від того, як сформульований запит, залежить якість відповіді.
+  </div>
+
+  <h3>Що таке відкритий та закритий запит?</h3>
+  <div class="grid-2">
+    <div class="grid-card" style="text-align:left; align-items:flex-start; background:var(--green-light); border-color:#a7f3d0;">
+      <div class="icon" style="font-size:28px;">🔓</div>
+      <h4>Відкритий запит</h4>
+      <p>Дає ШІ свободу творчості. Не обмежує формат відповіді.</p>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px;"><strong>Приклад:</strong> «Розкажи мені про космос.»</p>
+    </div>
+    <div class="grid-card" style="text-align:left; align-items:flex-start; background:var(--accent-light); border-color:#bfdbfe;">
+      <div class="icon" style="font-size:28px;">🔒</div>
+      <h4>Закритий запит</h4>
+      <p>Чітко визначає, що саме потрібно отримати. Обмежує формат.</p>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:8px;"><strong>Приклад:</strong> «Назви 3 планети Сонячної системи, які є газовими гігантами.»</p>
+    </div>
+  </div>
+
+  <h3>📊 Порівняння</h3>
+  <table>
+    <tr><th>Критерій</th><th>Відкритий запит</th><th>Закритий запит</th></tr>
+    <tr><td><strong>Перевага</strong></td><td>Творчі, неочікувані відповіді; підходить для brainstorming</td><td>Точні, конкретні відповіді; менше галюцинацій</td></tr>
+    <tr><td><strong>Недолік</strong></td><td>Може «зайти не туди»; відповідь занадто довга</td><td>Обмежує креативність; може пропустити цікаві деталі</td></tr>
+    <tr><td><strong>Коли використовувати</strong></td><td>Творче письмо, ідеї, розповіді, есе</td><td>Факти, списки, інструкції, тести, таблиці</td></tr>
+    <tr><td><strong>Ризик</strong></td><td>Відповідь може бути не по темі</td><td>Відповідь може бути занадто короткою</td></tr>
+  </table>
+
+  <h3>❌ Помилкові промпти та їх аналіз</h3>
+
+  <div class="prompt-bad">«Напиши щось цікаве.»</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> Занадто відкритий. ШІ не розуміє, про що йдеться мова — про науку, історію, тварин чи космос? Відповідь буде випадковою.<br>
+    <strong>✅ Як виправити:</strong> «Напиши цікавий факт про те, як пінгвіни виживають в Антарктиді.»
+  </div>
+
+  <div class="prompt-bad">«Поясни мені фотосинтез.»</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> Не вказано рівень складності. ШІ може написати наукову статтю для біологів або занадто спрощений текст.<br>
+    <strong>✅ Як виправити:</strong> «Поясни фотосинтез простими словами, як для учня 5 класу. Не більше 5 речень.»
+  </div>
+
+  <div class="prompt-good">«Назви 5 тварин, які мешкають в Україні, і для кожної напиши одне речення про її звички. Відповідь у форматі списку.»</div>
+  <div class="prompt-analysis">
+    <strong>✅ Чому це добре:</strong> Чітко вказано: кількість (5), тема (тварини України), формат (список), обсяг (одне речення). ШІ точно знає, що робити.
+  </div>
+
+  <h3>📝 Практичні завдання</h3>
+
+  <div class="task-box">
+    <span class="num">1</span>
+    <strong>Завдання: «Відкритий → Закритий»</strong><br><br>
+    <strong>Інструкція:</strong> У тебе є відкритий запит: <em>«Розкажи про динозаврів.»</em><br>
+    Перетвори його на закритий запит, який дасть точну, структуровану відповідь.<br><br>
+    <strong>Що потрібно зробити:</strong><br>
+    1. Визнач, яку саме інформацію ти хочеш отримати (назви, дати, розміри?)<br>
+    2. Вкажи кількість пунктів у відповіді.<br>
+    3. Обери формат (список, таблиця, текст).<br>
+    4. Напиши покращений запит.<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Назви 3 види динозаврів, які жили в крейдовому періоді. Для кожного вкажи приблизну довжину тіла та чим він харчувався. Відповідь у форматі таблиці.»</em><br><br>
+    <strong>Пояснення:</strong> Тепер ШІ знає: скільки пунктів (3), який період (крейдовий), які дані потрібні (довжина, їжа), формат (таблиця). Відповідь буде точною та структурованою.
+  </div>
+
+  <div class="task-box">
+    <span class="num">2</span>
+    <strong>Завдання: «Закритий → Відкритий»</strong><br><br>
+    <strong>Інструкція:</strong> У тебе є закритий запит: <em>«Назви столицю Франції.»</em><br>
+    Це занадто просто. Перетвори його на відкритий запит, який стимулює творчість ШІ.<br><br>
+    <strong>Що потрібно зробити:</strong><br>
+    1. Замість факту попроси історію, опис або уявний сценарій.<br>
+    2. Додай емоційний або творчий елемент.<br>
+    3. Не обмежуй формат жорстко.<br>
+    4. Напиши покращений запит.<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Уями, що ти мишка, яка живе під дахом Нотр-Дам де Парі. Розкажи, як ти проводиш один день у Парижі, що бачиш, чуєш і відчуваєш.»</em><br><br>
+    <strong>Пояснення:</strong> Замість сухого факту («Париж») ми отримаємо творчий опис, який допоможе краще уявити атмосферу міста. ШІ має свободу для фантазії, але тема чітка.
+  </div>
+</div>
+
+<!-- RULE 2 -->
+<div class="card" id="rule2">
+  <div class="section-title"><span class="dot"></span> Правило 2</div>
+  <h2>🗺️ Вказування контексту та обмежень</h2>
+
+  <div class="info-box">
+    <strong>Контекст</strong> — це фон, ситуація, в якої відбувається розмова. <strong>Обмеження</strong> — це рамки, в яких ШІ має працювати. Без них ШІ «стріляє навмання».
+  </div>
+
+  <h3>Що таке контекст?</h3>
+  <p>Контекст — це все, що допомагає ШІ зрозуміти, <em>для кого</em> і <em>навіщо</em> він пише текст. Це як пояснити другу, чому ти питаєш про щось: «Я пишу реферат для школи» або «Я готую презентацію для батьків».</p>
+
+  <h3>Що таке обмеження?</h3>
+  <p>Обмеження — це правила гри: скільки слів, у якому стилі, що включати, що виключати. Без обмежень ШІ може написати 10 сторінок замість потрібних 5 речень.</p>
+
+  <h3>📊 Порівняння: з контекстом vs без</h3>
+  <table>
+    <tr><th>Елемент</th><th>Без контексту</th><th>З контекстом</th></tr>
+    <tr><td><strong>Запит</strong></td><td>«Поясни Велику французьку революцію.»</td><td>«Поясни Велику французьку революцію як для учня 6 класу. Не більше 100 слів. Використай прості слова.»</td></tr>
+    <tr><td><strong>Відповідь</strong></td><td>Довгий науковий текст із датами, іменами, подіями</td><td>Короткий, зрозумілий текст із головними ідеями</td></tr>
+    <tr><td><strong>Користь</strong></td><td>Маленька — занадто складно</td><td>Велика — точно те, що потрібно</td></tr>
+  </table>
+
+  <h3>✅ Переваги вказування контексту та обмежень</h3>
+  <ul>
+    <li>📏 <strong>Економія часу</strong> — не потрібно переписувати запит 5 разів</li>
+    <li>🎯 <strong>Точність</strong> — відповідь відразу відповідає потребам</li>
+    <li>📉 <strong>Менше галюцинацій</strong> — ШІ не «фантазує» поза темою</li>
+    <li>👤 <strong>Адаптація</strong> — текст підходить саме твоєму віку та рівню</li>
+  </ul>
+
+  <h3>❌ Недоліки (якщо переборщити)</h3>
+  <ul>
+    <li>🧱 <strong>Занадто жорсткі обмеження</strong> можуть «задушити» творчість</li>
+    <li>⏱️ <strong>Довгий запит</strong> — сам по собі може бути складним для написання</li>
+    <li>🔄 <strong>Якщо контекст неправильний</strong> — відповідь буде неправильною</li>
+  </ul>
+
+  <h3>❌ Помилкові промпти та їх аналіз</h3>
+
+  <div class="prompt-bad">«Напиши мені текст про космос.»</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> Немає контексту (для кого? навіщо?) і немає обмежень (скільки слів? який стиль?). ШІ може написати наукову статтю на 5 сторінок, а тобі потрібно 3 речення для презентації.<br>
+    <strong>✅ Як виправити:</strong> «Напиши 3 речення про космос для моєї шкільної презентації (5 клас). Використай прості слова. Додай цікавий факт, який здивує однокласників.»
+  </div>
+
+  <div class="prompt-bad">«Переклади це на англійську.» (без вказування, що саме перекладати)</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ не бачить тексту для перекладу, бо ти його не вставив. Або якщо це продовження розмови — ШІ може не зрозуміти, який саме фрагмент перекладати.<br>
+    <strong>✅ Як виправити:</strong> «Переклади на англійську: 'Сьогодні гарна погода, і я йду гуляти в парк.' Використай розмовний стиль, а не книжний.»
+  </div>
+
+  <div class="prompt-good">«Ти — вчитель фізики. Поясни закон Архімеда учню 7 класу. Використай приклад із купанням у ванні. Не більше 80 слів. Додай один простий приклад з життя.»</div>
+  <div class="prompt-analysis">
+    <strong>✅ Чому це добре:</strong><br>
+    • <strong>Роль (контекст):</strong> «Ти — вчитель фізики» — ШІ adoptує стиль викладача.<br>
+    • <strong>Аудиторія:</strong> «учень 7 класу» — рівень складності.<br>
+    • <strong>Тема:</strong> закон Архімеда.<br>
+    • <strong>Обмеження:</strong> не більше 80 слів.<br>
+    • <strong>Стиль:</strong> приклад із купанням у ванні — конкретна аналогія.<br>
+    • <strong>Структура:</strong> один приклад з життя.
+  </div>
+
+  <h3>📝 Практичні завдання</h3>
+
+  <div class="task-box">
+    <span class="num">1</span>
+    <strong>Завдання: «Додай контекст»</strong><br><br>
+    <strong>Інструкція:</strong> У тебе є запит: <em>«Напиши про тигрів.»</em><br>
+    Покращи його, додавши контекст та обмеження.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Визнач роль ШІ (хто він? вчитель? журналіст? мандрівник?).<br>
+    2. Вкажи аудиторію (для кого текст?).<br>
+    3. Встанови обмеження (обсяг, формат, стиль).<br>
+    4. Додай специфіку (що саме про тигрів?).<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Ти — мандрівник, який бачив тигрів у дикій природі. Напиши захопливий опис тигра для дітей 8–9 років. Не більше 120 слів. Опиши його зовнішність, звички та чому він на межі зникнення. Використай прості, яскраві слова.»</em><br><br>
+    <strong>Пояснення:</strong> Роль (мандрівник) додає емоційності. Аудиторія (діти 8–9 років) визначає складність. Обмеження (120 слів) контролює обсяг. Специфіка (зовнішність, звички, зникнення) вузько визначає тему.
+  </div>
+
+  <div class="task-box">
+    <span class="num">2</span>
+    <strong>Завдання: «Перевірка обмежень»</strong><br><br>
+    <strong>Інструкція:</strong> Напиши запит до ШІ, який містить <strong>5 різних обмежень</strong>, і перевір, чи ШІ їх дотримався.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Обери тему (наприклад: «Як зробити смузі»).<br>
+    2. Придумай 5 обмежень (наприклад: кількість кроків, склад, час, формат, заборона).<br>
+    3. Напиши запит.<br>
+    4. Відправ запит у ChatGPT.<br>
+    5. Перевір відповідь: чи всі обмеження виконані? Якщо ні — вкажи, яке порушено.<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Напиши рецепт смузі. Обмеження: 1) не більше 4 інгредієнтів; 2) без бананів (у мене алергія); 3) час приготування не більше 5 хвилин; 4) формат — нумерований список; 5) додай один корисний факт про інгредієнт.»</em><br><br>
+    <strong>Пояснення:</strong> Після отримання відповіді аналізуй:<br>
+    • Чи 4 інгредієнти? • Чи немає бананів? • Чи ≤5 хвилин? • Чи нумерований список? • Чи є факт?<br>
+    Якщо ШІ додав банан — ти побачив, як важливі чіткі обмеження!
+  </div>
+</div>
+
+<!-- RULE 3 -->
+<div class="card" id="rule3">
+  <div class="section-title"><span class="dot"></span> Правило 3</div>
+  <h2>📚 Використання баз даних ШІ</h2>
+
+  <div class="info-box">
+    <strong>База даних ШІ</strong> — це все, на чому модель навчалася: книги, статті, вебсайти, наукові роботи. Але важливо розуміти: <strong>ШІ не має доступу до інтернету в реальному часі</strong> (окрім деяких моделей із спеціальним режимом). Він знає лише те, що було в його «навчальних даних».
+  </div>
+
+  <h3>Що ШІ знає, а що ні?</h3>
+  <div class="grid-2">
+    <div class="grid-card" style="text-align:left; align-items:flex-start; background:var(--green-light); border-color:#a7f3d0;">
+      <div class="icon" style="font-size:28px;">✅</div>
+      <h4>ШІ, ймовірно, знає</h4>
+      <p>• Історичні факти до 2023–2024 року<br>• Загальні наукові знання<br>• Класичну літературу<br>• Базову математику та фізику<br>• Популярні мови програмування</p>
+    </div>
+    <div class="grid-card" style="text-align:left; align-items:flex-start; background:var(--red-light); border-color:#fecaca;">
+      <div class="icon" style="font-size:28px;">❌</div>
+      <h4>ШІ, ймовірно, НЕ знає</h4>
+      <p>• Новини сьогодення (2025–2026)<br>• Погоду зараз<br>• Результати матчів, що щойно закінчилися<br>• Що відбувається у твоєму місті<br>• Особисту інформацію про тебе</p>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠️ Важливо:</strong> Навіть якщо ШІ знає тему, його знання «заморожені» на момент навчання. Наприклад, ChatGPT (без режиму пошуку) не знає, хто зараз президент, якщо вибори відбулися після його навчання.
+  </div>
+
+  <h3>Як використовувати базу даних ШІ?</h3>
+  <p>Замість того щоб сподіватися, що ШІ «згадає» правильно, можна <strong>дати йому контекст самостійно</strong>. Це називається <strong>«надання контексту через запит»</strong> або <strong>RAG</strong> (Retrieval-Augmented Generation).</p>
+
+  <h3>✅ Переваги</h3>
+  <ul>
+    <li>📈 <strong>Точність</strong> — ШІ відповідає на основі наданих даних, а не «фантазує»</li>
+    <li>🔒 <strong>Конфіденційність</strong> — можна використовувати власні документи, не викладаючи їх у публічний доступ</li>
+    <li>📅 <strong>Актуальність</strong> — можна дати ШІ тексти, написані вчора</li>
+  </ul>
+
+  <h3>❌ Недоліки</h3>
+  <ul>
+    <li>📏 <strong>Обмеження за обсягом</strong> — не весь підручник влізе в один запит</li>
+    <li>⏱️ <strong>Час</strong> — потрібно підготувати та скопіювати текст</li>
+    <li>🧩 <strong>Фрагментація</strong> — якщо дати лише частину тексту, ШІ може втратити загальний контекст</li>
+  </ul>
+
+  <h3>❌ Помилкові промпти та їх аналіз</h3>
+
+  <div class="prompt-bad">«Що сказав президент України на прес-конференції вчора?»</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ не має доступу до інтернету в реальному часі (якщо не ввімкнено спеціальний режим пошуку). Він «вигадує» відповідь на основі шаблонів або каже, що не знає.<br>
+    <strong>✅ Як виправити:</strong> «Ось текст виступу президента України [вставити текст]. Проаналізуй головні тези та сформулюй 3 ключові повідомлення.»
+  </div>
+
+  <div class="prompt-bad">«Поясни мені цей уривок.» (без вставки уривка)</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ не бачить уривка, який ти маєш на увазі. Він не читає твої думки!<br>
+    <strong>✅ Як виправити:</strong> «Ось уривок із книги: [вставити текст]. Поясни, що автор мав на увазі під фразою '...'. Використай 2–3 речення.»
+  </div>
+
+  <div class="prompt-good">«Ось стаття з підручника біології (7 клас): [вставити 3 абзаци]. На основі цього тексту: 1) Які 3 ознаки рослин названо в тексті? 2) Чому рослини важливі для людини? Відповідай ТІЛЬКИ на основі наданого тексту.»</div>
+  <div class="prompt-analysis">
+    <strong>✅ Чому це добре:</strong> Ти явно надав джерело (текст із підручника) і вказав, що відповідь має ґрунтуватися тільки на ньому. ШІ не піде «фантазувати» додаткові факти.
+  </div>
+
+  <h3>📝 Практичні завдання</h3>
+
+  <div class="task-box">
+    <span class="num">1</span>
+    <strong>Завдання: «ШІ як помічник із домашнім завданням»</strong><br><br>
+    <strong>Інструкція:</strong> У тебе є уривок із підручника з історії (5–6 речень). Скопіюй його в ChatGPT і попроси ШІ допомогти з завданням.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Знайди уривок у підручнику (наприклад, про Київську Русь).<br>
+    2. Скопіюй його та встав у запит.<br>
+    3. Напиши запит: «На основі цього тексту дай відповідь на запитання: [твоє запитання]. Відповідай тільки на основі наданого уривка.»<br>
+    4. Отримай відповідь.<br>
+    5. Перевір: чи ШІ додав інформацію, якої не було в тексті? Якщо так — це галюцинація!<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Ось уривок: 'Київська Русь виникла в IX столітті. Її засновником вважається князь Олег. Столицею було місто Київ. Найвідоміший правитель — Ярослав Мудрий.'<br><br>
+    Запитання: Хто заснував Київську Русь? Яке місто було столицею? Назви одного правителя. Відповідай ТІЛЬКИ на основі тексту.»</em><br><br>
+    <strong>Пояснення:</strong> Це завдання навчає перевіряти, чи ШІ справді використовує наданий текст, чи «додає» власні знання. Якщо ШІ назве Володимира Великого як правителя — це фактично правильно, але НЕ відповідає обмеженню «тільки на основі тексту».
+  </div>
+
+  <div class="task-box">
+    <span class="num">2</span>
+    <strong>Завдання: «Порівняння: з контекстом vs без»</strong><br><br>
+    <strong>Інструкція:</strong> Постав одне й те саме запитання ШІ двічі — спочатку без контексту, потім із контекстом. Порівняй відповіді.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Обери тему (наприклад: «Що таке 'зелена енергетика'?»).<br>
+    2. <strong>Запит 1 (без контексту):</strong> «Що таке зелена енергетика?»<br>
+    3. Запиши відповідь.<br>
+    4. Знайди 2–3 речення про зелену енергетику з надійного джерела (Вікіпедія, підручник).<br>
+    5. <strong>Запит 2 (з контекстом):</strong> «Ось визначення: [вставити текст]. На основі цього поясни, що таке зелена енергетика.»<br>
+    6. Порівняй дві відповіді: яка точніша? Яка коротша? Яка ближча до джерела?<br><br>
+    <strong>Пояснення:</strong> Це завдання демонструє, як надання контексту зменшує галюцинації та робить відповідь ближчою до джерела. Відзнач, які деталі з'явилися тільки в другій відповіді.
+  </div>
+</div>
+
+<!-- RULE 4 -->
+<div class="card" id="rule4">
+  <div class="section-title"><span class="dot"></span> Правило 4</div>
+  <h2>🎯 Використання прикладів (Few-Shot Prompting)</h2>
+
+  <div class="info-box">
+    <strong>Few-Shot Prompting</strong> — це техніка, коли ти даєш ШІ кілька прикладів того, як має виглядати відповідь, і потім просиш зробити те саме для нового випадку. ШІ «вчиться» на твоїх прикладах і повторює стиль, формат або логіку.
+  </div>
+
+  <h3>Як це працює?</h3>
+  <p>Уяви, що ти вчиш друга грати в гру. Спочатку ти показуєш 2–3 приклади: «Ось так треба робити». Потім даєш нове завдання: «А тепер зроби так само». Саме так працює few-shot prompting — ти показуєш ШІ зразки, і він копіює стиль.</p>
+
+  <h3>📊 Порівняння: без прикладів vs із прикладами</h3>
+  <table>
+    <tr><th>Критерій</th><th>Без прикладів (Zero-Shot)</th><th>З прикладами (Few-Shot)</th></tr>
+    <tr><td><strong>Точність формату</strong></td><td>ШІ обирає формат самостійно — може бути не так, як тобі потрібно</td><td>ШІ точно повторює формат прикладів</td></tr>
+    <tr><td><strong>Стиль</strong></td><td>Загальний, стандартний</td><td>Такий, як у твоїх прикладах</td></tr>
+    <tr><td><strong>Складність</strong></td><td>Простіше для написання</td><td>Вимагає підготовки прикладів</td></tr>
+    <tr><td><strong>Коли використовувати</strong></td><td>Для простих, зрозумілих завдань</td><td>Для складних, специфічних форматів</td></tr>
+  </table>
+
+  <h3>✅ Переваги використання прикладів</h3>
+  <ul>
+    <li>🎯 <strong>Точність формату</strong> — ШІ повторює структуру, яку ти показав</li>
+    <li>🎨 <strong>Контроль стилю</strong> — можеш задати тон (гумор, серйозність, поезія)</li>
+    <li>📉 <strong>Менше пояснень</strong> — не потрібно довго описувати, що ти хочеш</li>
+    <li>🔄 <strong>Універсальність</strong> — працює для перекладів, класифікацій, таблиць, віршів</li>
+  </ul>
+
+  <h3>❌ Недоліки</h3>
+  <ul>
+    <li>⏱️ <strong>Час на підготовку</strong> — потрібно придумати 2–3 якісних приклади</li>
+    <li>📏 <strong>Довгий запит</strong> — приклади займають багато місця</li>
+    <li>🧩 <strong>Ризик помилки</strong> — якщо приклади неправильні, ШІ повторить помилку</li>
+    <li>🔄 <strong>Надмірна копія</strong> — ШІ може занадто буквально копіювати приклади</li>
+  </ul>
+
+  <h3>❌ Помилкові промпти та їх аналіз</h3>
+
+  <div class="prompt-bad">«Напиши мені вірш у стилі хокку.»</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ може не точно знати, що таке хокку (5-7-5 складів, природа, сезонне слово). Відповідь може бути просто коротким віршем, а не справжнім хокку.<br>
+    <strong>✅ Як виправити:</strong><br>
+    <em>«Ось приклади хокку:<br>
+    1. Старий ставок — / жаба стрибнула в воду: / плеснуво тиша.<br>
+    2. Вітер осінній — / листя пожовкле кружляє / до холодної землі.<br>
+    Напиши хокку на тему 'перший сніг' у тому самому форматі (3 рядки, 5-7-5 складів, про природу).»</em>
+  </div>
+
+  <div class="prompt-bad">«Переклади ці речення на французьку.» (без прикладів перекладу)</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ не знає, який рівень складності потрібен: для туриста, для школяра чи для перекладача. Відповідь може бути занадто складною або занадто простою.<br>
+    <strong>✅ Як виправити:</strong><br>
+    <em>«Переклади речення на французьку. Ось приклади стилю:<br>
+    Англійська: 'Hello, how are you?' → Французька: 'Bonjour, comment allez-vous?'<br>
+    Англійська: 'I like apples.' → Французька: 'J'aime les pommes.'<br>
+    Тепер переклади: 'Where is the library?'»</em>
+  </div>
+
+  <div class="prompt-good">«Класифікуй речення за настроєм (позитивний / негативний / нейтральний).<br>
+    Приклади:<br>
+    Речення: 'Цей фільм був неймовірним!' → Настрій: позитивний<br>
+    Речення: 'Я розчарований у цій покупці.' → Настрій: негативний<br>
+    Речення: 'Сьогодні вівторок.' → Настрій: нейтральний<br>
+    Тепер класифікуй: 'Мені сподобалася подорож, але готель був жахливим.'»</div>
+  <div class="prompt-analysis">
+    <strong>✅ Чому це добре:</strong> Три чіткі приклади показують формат (Речення → Настрій) та критерії класифікації. ШІ точно повторить цей формат для нового речення.
+  </div>
+
+  <h3>📝 Практичні завдання</h3>
+
+  <div class="task-box">
+    <span class="num">1</span>
+    <strong>Завдання: «Навчи ШІ свого стилю»</strong><br><br>
+    <strong>Інструкція:</strong> Придумай 3 приклади коротких описів тварин у своєму унікальному стилі. Потім попроси ШІ написати опис нової тварини в тому самому стилі.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Обери 3 тварини (наприклад: лев, пінгвін, мураха).<br>
+    2. Напиши для кожної короткий опис (2–3 речення) у своєму стилі (наприклад, гумористичному, поетичному або науковому).<br>
+    3. Склади запит: спочатку приклади, потім прохання описати нову тварину.<br>
+    4. Відправ у ChatGPT.<br>
+    5. Проаналізуй: чи повторив ШІ твій стиль? Що співпало, а що ні?<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Ось мої описи тварин:<br>
+    1. Лев — це такий пухнастий цар з гривою, яка схожа на старомодну перуку. Він дуже грізно рикає, але насправді просто хоче, щоб його погладили по голові.<br>
+    2. Пінгвін — це маленький джентльмен у смокінгу, який не вміє літати, але зате чудово плаває. Його життєве кредо: 'Якщо не можеш летіти — плавай краще за всіх!'<br>
+    3. Мураха — це мініатюрний бодібілдер, який може підняти вантаж, що важить у 50 разів більше за неї саму. Вона ніколи не ходить у спортзал — природа подбала.<br><br>
+    Тепер опиши ведмедя у ТОЧНО такому самому стилі.»</em><br><br>
+    <strong>Пояснення:</strong> Це завдання показує, як приклади передають не лише формат, а й <strong>тон, гумор та індивідуальність</strong>. ШІ «вчиться» на твоєму стилі і намагається його повторити.
+  </div>
+
+  <div class="task-box">
+    <span class="num">2</span>
+    <strong>Завдання: «Створи свій шаблон»</strong><br><br>
+    <strong>Інструкція:</strong> Створи шаблон для генерації коротких історій за формулою: «Хто + Де + Що сталося + Чим закінчилося». Дай 2 приклади, а потім попроси ШІ написати 3 нові історії за цим шаблоном.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Придумай 2 короткі історії за шаблоном.<br>
+    2. Напиши запит: спочатку поясни шаблон, потім дай приклади, потім прохання.<br>
+    3. Відправ у ChatGPT.<br>
+    4. Перевір: чи всі 3 нові історії дотримуються шаблону? Чи є відхилення?<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>«Напиши короткі історії за шаблоном: Хто + Де + Що сталося + Чим закінчилося. Кожна історія не більше 40 слів.<br><br>
+    Приклад 1:<br>
+    Хто: Кіт Барсик<br>
+    Де: На горищі<br>
+    Що сталося: Знайшов старий чемодан із картами скарбів<br>
+    Чим закінчилося: Виявилося, скарб — це банка тунця, яку він і з'їв<br><br>
+    Приклад 2:<br>
+    Хто: Школярка Маша<br>
+    Де: У шкільній бібліотеці<br>
+    Що сталося: Відкрила книгу, з якої вилетів справжній дракончик<br>
+    Чим закінчилося: Дракончик став її домашнім улюбленцем і допомагає з уроками<br><br>
+    Тепер напиши 3 нові історії за цим шаблоном.»</em><br><br>
+    <strong>Пояснення:</strong> Це завдання демонструє, як приклади задають <strong>структуру</strong> та <strong>обсяг</strong>. ШІ бачить, що історія має бути короткою (40 слів), мати 4 частини та гумористичне завершення.
+  </div>
+</div>
+
+<!-- RULE 5 -->
+<div class="card" id="rule5">
+  <div class="section-title"><span class="dot"></span> Правило 5</div>
+  <h2>🔄 Експериментування та ітерації</h2>
+
+  <div class="info-box">
+    <strong>Ітерація</strong> — це повторення з покращенням. Ти пишеш запит, отримуєш відповідь, аналізуєш, що не так, і пишеш <strong>новий, покращений запит</strong>. Рідко хтось одразу пише ідеальний промпт — це нормально!
+  </div>
+
+  <h3>Чому важливо експериментувати?</h3>
+  <p>ШІ — це не людина. Він не «зрозуміє» тебе з першого разу. Кожен новий запит — це крок до кращого результату. Професійні промпт-інженери пишуть по 10–20 версій запиту, доки не отримають ідеальну відповідь.</p>
+
+  <div class="fun-fact">
+    <span class="fun-fact-icon">🧪</span>
+    <p><strong>Цікавий факт:</strong> Найкращі промпти в світі створюються не за один раз, а через десятки ітерацій. Це як малювання: спочатку ескіз, потім деталі, потім кольори.</p>
+  </div>
+
+  <h3>📊 Порівняння: одна спроба vs ітерації</h3>
+  <table>
+    <tr><th>Критерій</th><th>Одна спроба</th><th>З ітераціями</th></tr>
+    <tr><td><strong>Якість</strong></td><td>Зазвичай середня — ШІ не вгадав, чого ти хотів</td><td>Висока — кожна ітерація наближає до ідеалу</td></tr>
+    <tr><td><strong>Час</strong></td><td>Швидше написати один запит</td><td>Довше, але результат вартий того</td></tr>
+    <tr><td><strong>Навчання</strong></td><td>Мінімальне — не зрозуміло, що впливає на результат</td><td>Максимальне — ти бачиш, що працює, а що ні</td></tr>
+    <tr><td><strong>Контроль</strong></td><td>Мінімальний</td><td>Повний — ти керуєш кожною деталлю</td></tr>
+  </table>
+
+  <h3>✅ Переваги ітераційного підходу</h3>
+  <ul>
+    <li>📈 <strong>Покращення якості</strong> — кожна версія краща за попередню</li>
+    <li>🧠 <strong>Розуміння ШІ</strong> — ти вчишся, як ШІ «думає»</li>
+    <li>💎 <strong>Унікальність</strong> — результат стає саме твоїм, а не шаблонним</li>
+    <li>🎯 <strong>Точність</strong> — досягаєш саме того, що хотів</li>
+  </ul>
+
+  <h3>❌ Недоліки</h3>
+  <ul>
+    <li>⏱️ <strong>Час</strong> — потрібно 3–10 спроб</li>
+    <li>😤 <strong>Фрустрація</strong> — коли відповідь знову не та</li>
+    <li>💰 <strong>Вартість</strong> — у платних моделях кожен запит коштує грошей</li>
+    <li>🔄 <strong>Ризик зациклення</strong> — можна нескінченно покращувати, не зупинившись</li>
+  </ul>
+
+  <h3>❌ Помилкові промпти та їх аналіз</h3>
+
+  <div class="prompt-bad">«Ні, це не те. Зроби краще.» (після першої відповіді)</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ не пам'ятає, про що йшлося в попередній розмові (якщо це не чат-режим із контекстом). Фраза «це не те» без пояснення, що саме не так, — марна.<br>
+    <strong>✅ Як виправити:</strong> «Попередня відповідь була занадто складною. Напиши те саме, але: 1) простіше, як для 10-річного; 2) без наукових термінів; 3) додай приклад.»
+  </div>
+
+  <div class="prompt-bad">«Напиши вірш.» → «Ні.» → «Напиши краще.» → «Ні.» → «Ще раз.»</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> Ти кажеш ШІ «ні» і «краще», але не пояснюєш, що саме не влаштовує. ШІ не читає твої думки — він не знає, чи це ритм, тема, довжина чи стиль.<br>
+    <strong>✅ Як виправити:</strong><br>
+    <em>Ітерація 1: «Напиши вірш про осінь.»</em> (отримуєш результат)<br>
+    <em>Ітерація 2: «Гарно, але занадто довго. Напиши те саме, але не більше 6 рядків.»</em><br>
+    <em>Ітерація 3: «Чудово! А тепер додай риму в кінці кожного рядка.»</em><br>
+    <em>Ітерація 4: «Ідеально! Заміни слово 'жовтий' на більш поетичне.»</em>
+  </div>
+
+  <div class="prompt-good">«Ітерація 1: 'Опиши кота.' → Відповідь: загальний опис.<br>
+    Ітерація 2: 'Опиши кота, але зосередься на його поведінці, а не на зовнішності.' → Відповідь: про поведінку, але без емоцій.<br>
+    Ітерація 3: 'Додай емоційності — уяви, що це твій улюбленець, якого ти не бачив 2 тижні.' → Відповідь: емоційний, але занадто довгий.<br>
+    Ітерація 4: 'Чудово! Скороти до 50 слів, зберігши емоції.' → Відповідь: ідеальна.»</div>
+  <div class="prompt-analysis">
+    <strong>✅ Чому це добре:</strong> Кожна ітерація додає <strong>одне конкретне покращення</strong>. Не «краще», а «зосередься на поведінці» → «додай емоційності» → «скороти до 50 слів». Конкретика — ключ до успіху.
+  </div>
+
+  <h3>📝 Практичні завдання</h3>
+
+  <div class="task-box">
+    <span class="num">1</span>
+    <strong>Завдання: «Чотири ітерації»</strong><br><br>
+    <strong>Інструкція:</strong> Постав одне й те саме завдання ШІ чотири рази, кожного разу покращуючи запит на основі попередньої відповіді.<br><br>
+    <strong>Кроки:</strong><br>
+    1. <strong>Ітерація 1:</strong> Напиши простий запит (наприклад: «Опиши мою кімнату.»). Отримай відповідь.<br>
+    2. <strong>Ітерація 2:</strong> Проаналізуй, що не так (занадто загально? бракує деталей? не той стиль?). Напиши уточнення.<br>
+    3. <strong>Ітерація 3:</strong> Ще раз уточни — додай нове обмеження або деталь.<br>
+    4. <strong>Ітерація 4:</strong> Фінальне уточнення — «доточи» результат.<br>
+    5. Порівняй 4 відповіді. Яка найкраща? Чому?<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>1. «Опиши мою кімнату.» → Загальний опис типової кімнати.<br>
+    2. «Опиши мою кімнату. Вона маленька, з блакитними шторами та полицею з книгами. Зосередься на затишній атмосфері.» → Краще, але без емоцій.<br>
+    3. «Додай емоцій — уяви, що це твоє улюблене місце після школи. Використай теплі слова.» → Емоційно, але занадто довго.<br>
+    4. «Скороти до 60 слів, але залиш усі емоції та деталі.» → Ідеально!</em><br><br>
+    <strong>Пояснення:</strong> Це завдання навчає <strong>поступового покращення</strong>. Кожна ітерація додає один шар точності. Важливо не кидатися з крайності в крайність, а рухатися крок за кроком.
+  </div>
+
+  <div class="task-box">
+    <span class="num">2</span>
+    <strong>Завдання: «A/B тестування промптів»</strong><br><br>
+    <strong>Інструкція:</strong> Напиши <strong>два різні запити</strong> на одну й ту саму тему. Порівняй відповіді та визнач, який запит ефективніший.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Обери тему (наприклад: «Поясни, чому небо блакитне»).<br>
+    2. Напиши <strong>Запит А</strong> — короткий, простий (1 речення).<br>
+    3. Напиши <strong>Запит Б</strong> — детальний, з контекстом, обмеженнями та прикладами.<br>
+    4. Відправ обидва в ChatGPT (у різних вікнах або з перервою).<br>
+    5. Порівняй відповіді за критеріями: точність, зрозумілість, обсяг, цікавість.<br>
+    6. Зроби висновок: який підхід кращий для цієї задачі?<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>Запит А: «Чому небо блакитне?»<br>
+    Запит Б: «Поясни, чому небо блакитне, як для учня 5 класу. Використай аналогію (порівняй із чимось знайомим). Не більше 80 слів. Додай цікавий факт наприкінці.»</em><br><br>
+    <strong>Пояснення:</strong> Це завдання демонструє, як <strong>інвестиція в промпт</strong> (детальний запит Б) дає кращий результат, ніж «швидкий» запит А. Відзнач різницю в якості — це мотивує писати кращі промпти!
+  </div>
+</div>
+
+<!-- RULE 6 -->
+<div class="card" id="rule6">
+  <div class="section-title"><span class="dot"></span> Правило 6</div>
+  <h2>🔎 Інтерпретація та аналіз відповідей</h2>
+
+  <div class="info-box">
+    <strong>Інтерпретація</strong> — це вміння зрозуміти, що ШІ насправді сказав. <strong>Аналіз</strong> — це перевірка, чи відповідь правильна, повна та корисна. Не вір ШІ на слово — перевіряй!
+  </div>
+
+  <h3>Чому відповідь ШІ потрібно аналізувати?</h3>
+  <p>ШІ може:</p>
+  <ul>
+    <li>✅ Дати правильну та корисну відповідь</li>
+    <li>⚠️ Дати частково правильну відповідь із помилками</li>
+    <li>❌ Вигадати факти (галюцинація)</li>
+    <li>🔄 Повторити твої упередження (бо навчався на інтернеті)</li>
+    <li>📏 Надати занадто багато або занадто мало інформації</li>
+    <li>🎭 Змінити тон або стиль посеред відповіді</li>
+  </ul>
+
+  <h3>📊 Як аналізувати відповідь ШІ?</h3>
+  <table>
+    <tr><th>Критерій</th><th>Що перевіряти</th><th>Що робити, якщо проблема</th></tr>
+    <tr><td><strong>Фактична точність</strong></td><td>Чи всі дати, імена, цифри правильні?</td><td>Перевір у Вікіпедії або підручнику. Попроси ШІ вказати джерела.</td></tr>
+    <tr><td><strong>Повнота</strong></td><td>Чи відповідає ШІ на ВСЕ, що ти питав?</td><td>Уточни запит: «Ти не відповів на друге питання. Додай інформацію про...»</td></tr>
+    <tr><td><strong>Логіка</strong></td><td>Чи немає протиріч у самій відповіді?</td><td>Вкажи на протиріччя: «У першому реченні ти сказав А, а в третьому — Б. Як це узгоджується?»</td></tr>
+    <tr><td><strong>Формат</strong></td><td>Чи дотримався ШІ обмежень (кількість слів, список, таблиця)?</td><td>Нагадай: «Ти написав 150 слів, а я просив не більше 100. Скороти.»</td></tr>
+    <tr><td><strong>Безпека</strong></td><td>Чи немає в відповіді небезпечних або образливих порад?</td><td>Ігноруй небезпечну частину. Попередь ШІ: «Не давай порад, які можуть нашкодити.»</td></tr>
+    <tr><td><strong>Упередження</strong></td><td>Чи відповідь упереджена (наприклад, стереотипи про професії чи країни)?</td><td>Вкажи: «Ця відповідь містить стереотип. Надай збалансовану точку зору.»</td></tr>
+  </table>
+
+  <h3>✅ Переваги критичного аналізу</h3>
+  <ul>
+    <li>🛡️ <strong>Захист від помилок</strong> — не використаєш неправильну інформацію</li>
+    <li>🧠 <strong>Розвиток критичного мислення</strong> — ти вчишся не вірити всьому на слово</li>
+    <li>📈 <strong>Покращення наступних запитів</strong> — розумієш, що ШІ робить не так</li>
+    <li>💎 <strong>Якість результату</strong> — фінальний текст буде набагато кращим</li>
+  </ul>
+
+  <h3>❌ Недоліки (якщо аналізувати занадто багато)</h3>
+  <ul>
+    <li>⏱️ <strong>Час</strong> — глибокий аналіз займає час</li>
+    <li>😰 <strong>Параноя</strong> — можна почати сумніватися в кожному слові</li>
+    <li>🔄 <strong>Нескінченні виправлення</strong> — іноді «достатньо добре» — це нормально</li>
+  </ul>
+
+  <h3>❌ Помилкові промпти та їх аналіз</h3>
+
+  <div class="prompt-bad">«Чи правильна ця відповідь?» (після отримання відповіді від ШІ)</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> Ти питаєш ШІ, чи правильна його ж відповідь. Це як питати брехуна, чи він бреше — він завжди скаже, що все правильно! ШІ не може об'єктивно оцінити власну відповідь.<br>
+    <strong>✅ Як виправити:</strong> Перевір факти самостійно у Вікіпедії, підручнику або запитай іншу модель (наприклад, якщо перша відповідь від ChatGPT — перевір у Gemini).
+  </div>
+
+  <div class="prompt-bad">«Поясни, чому ти так відповів.» (очікуючи об'єктивне пояснення)</div>
+  <div class="prompt-analysis">
+    <strong>❌ Проблема:</strong> ШІ не «думав», коли писав відповідь. Він просто передбачав наступні слова. Тому його «пояснення» — це не справжня причина, а лише текст, який <em>звучить</em> переконливо.<br>
+    <strong>✅ Як виправити:</strong> Замість «чому ти так відповів» краще сказати: «Перепиши відповідь, додавши джерела для кожного факту.» Це дасть конкретику, а не вигадані пояснення.
+  </div>
+
+  <div class="prompt-good">«Проаналізуй цю відповідь і вкажи: 1) які факти потрібно перевірити; 2) чи є протиріччя; 3) чи всі мої обмеження дотримано. Будь чесним — якщо є помилки, скажи про них.»</div>
+  <div class="prompt-analysis">
+    <strong>✅ Чому це добре:</strong> Ти не просиш ШІ «оцінити себе» абстрактно, а даєш <strong>конкретні критерії аналізу</strong>. ШІ може перевірити, чи дотримано обмеження (кількість слів, формат), навіть якщо не може перевірити факти.
+  </div>
+
+  <h3>📝 Практичні завдання</h3>
+
+  <div class="task-box">
+    <span class="num">1</span>
+    <strong>Завдання: «Детектив помилок»</strong><br><br>
+    <strong>Інструкція:</strong> Попроси ШІ написати короткий текст на історичну тему. Потім знайди в ньому мінімум 3 помилки або підозрілі моменти.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Напиши запит: «Напиши 5 речень про подорож Христофора Колумба. Включи дати, назви кораблів та місця.»<br>
+    2. Отримай відповідь.<br>
+    3. Прочитай уважно і знайди: а) дати — перевір у підручнику; б) назви кораблів — чи правильні?; в) місця — чи існують?<br>
+    4. Запиши знайдені помилки або сумнівні моменти.<br>
+    5. Попроси ШІ виправити помилки, вказавши конкретно, що не так.<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>ШІ написав: «Колумб відплив у 1493 році на кораблях 'Нінья', 'Пінта' та 'Санта-Марія'. Він відкрив Америку і назвав її на честь короля Індією.»<br><br>
+    Помилки для пошуку:<br>
+    • Дата: 1492, а не 1493.<br>
+    • Назви кораблів: перевірити правильність написання.<br>
+    • «Назвав її на честь короля Індією» — це нісенітниця. Колумб думав, що відкрив Індію, але не називав континент на честь короля.<br><br>
+    Запит на виправлення: «Виправ помилки: 1) рік відплиття був 1492, а не 1493; 2) Колумб думав, що відкрив шлях до Індії, але не називав континент на честь короля. Перепиши текст із правильними фактами.»</em><br><br>
+    <strong>Пояснення:</strong> Це завдання навчає <strong>не вірити ШІ на слово</strong>. Навіть якщо текст звучить переконливо, факти потрібно перевіряти. Це найважливіша навичка для роботи зі ШІ.
+  </div>
+
+  <div class="task-box">
+    <span class="num">2</span>
+    <strong>Завдання: «Оцінювач якості»</strong><br><br>
+    <strong>Інструкція:</strong> Створи власну шкалу оцінювання відповідей ШІ та протестуй її на 3 різних відповідях.<br><br>
+    <strong>Кроки:</strong><br>
+    1. Придумай 5 критеріїв оцінювання (наприклад: точність, зрозумілість, повнота, цікавість, дотримання формату).<br>
+    2. Для кожного критерія придумай шкалу (1–5 балів).<br>
+    3. Постав ШІ 3 різні запитання на одну тему, але з різною складністю.<br>
+    4. Оціни кожну відповідь за своїми критеріями.<br>
+    5. Зроби висновок: який запит дав найкращу відповідь? Чому?<br><br>
+    <strong>Приклад виконання:</strong><br>
+    <em>Моя шкала оцінювання:<br>
+    1. Точність фактів (1-5)<br>
+    2. Зрозумілість для мого віку (1-5)<br>
+    3. Повнота відповіді (1-5)<br>
+    4. Цікавість / оригінальність (1-5)<br>
+    5. Дотримання обмежень (1-5)<br><br>
+    Запит 1 (простий): «Що таке вулкан?» → Оцінка: 4+3+3+2+3 = 15/25<br>
+    Запит 2 (середній): «Поясни, що таке вулкан, як для 10-річного. Не більше 100 слів. Додай приклад відомого вулкана.» → Оцінка: 5+5+4+3+4 = 21/25<br>
+    Запит 3 (складний): «Поясни, що таке вулкан, як для 10-річного. Не більше 100 слів. Додай приклад. Використай аналогію з кухонною плитою. Напиши у формі діалогу між учителем і учнем.» → Оцінка: 5+5+5+5+5 = 25/25<br><br>
+    Висновок: чим детальніший запит, тим краща відповідь!</em><br><br>
+    <strong>Пояснення:</strong> Це завдання навчає <strong>систематично оцінювати</strong> якість відповідей ШІ. Коли ти маєш чіткі критерії, легко побачити, який підхід працює краще.
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="card" id="summary">
+  <div class="section-title"><span class="dot"></span> Підсумок</div>
+  <h2>📋 Пам'ятка промпт-інженера</h2>
+
+  <div class="green-box">
+    <strong>🎉 Вітаємо!</strong> Ти пройшов курс із основ промпт-інжинірингу. Тепер ти знаєш, як розмовляти зі ШІ так, щоб він розумів тебе з півслова.
+  </div>
+
+  <h3>🧠 6 правил успішного промпту</h3>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; margin:12px 0;">
+    <h4 style="margin-top:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--accent);color:white;border-radius:50%;font-size:14px;font-weight:700;margin-right:10px;">1</span>Відкритий та закритий запит</h4>
+    <p style="margin-bottom:0;">🔓 <strong>Відкритий</strong> — для творчості, brainstorming, ідей.<br>🔒 <strong>Закритий</strong> — для фактів, списків, інструкцій.<br>💡 <strong>Порада:</strong> Якщо потрібна точність — закривай запит. Якщо потрібна креативність — відкривай.</p>
+  </div>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; margin:12px 0;">
+    <h4 style="margin-top:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--green);color:white;border-radius:50%;font-size:14px;font-weight:700;margin-right:10px;">2</span>Контекст та обмеження</h4>
+    <p style="margin-bottom:0;">🗺️ <strong>Контекст:</strong> хто ти, для кого текст, навіщо.<br>📏 <strong>Обмеження:</strong> скільки слів, який формат, що включати/виключати.<br>💡 <strong>Порада:</strong> Чим більше контексту — тим точніша відповідь.</p>
+  </div>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; margin:12px 0;">
+    <h4 style="margin-top:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--purple);color:white;border-radius:50%;font-size:14px;font-weight:700;margin-right:10px;">3</span>База даних ШІ</h4>
+    <p style="margin-bottom:0;">📚 ШІ знає те, на чому навчався. Новини — ні.<br>🔧 <strong>Рішення:</strong> давай ШІ текст самостійно.<br>💡 <strong>Порада:</strong> «Відповідай ТІЛЬКИ на основі наданого тексту» — магічна фраза.</p>
+  </div>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; margin:12px 0;">
+    <h4 style="margin-top:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--orange);color:white;border-radius:50%;font-size:14px;font-weight:700;margin-right:10px;">4</span>Використання прикладів</h4>
+    <p style="margin-bottom:0;">🎯 Дай 2–3 приклади — ШІ повторить стиль і формат.<br>✍️ Працює для: перекладів, класифікацій, таблиць, віршів.<br>💡 <strong>Порада:</strong> Приклади економлять час краще, ніж довгі пояснення.</p>
+  </div>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; margin:12px 0;">
+    <h4 style="margin-top:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--teal);color:white;border-radius:50%;font-size:14px;font-weight:700;margin-right:10px;">5</span>Експериментування та ітерації</h4>
+    <p style="margin-bottom:0;">🔄 Не очікуй ідеалу з першого разу.<br>📈 Кожна ітерація додає один шар точності.<br>💡 <strong>Порада:</strong> Змінюй по одному параметру за раз — так легше зрозуміти, що працює.</p>
+  </div>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; margin:12px 0;">
+    <h4 style="margin-top:0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--pink);color:white;border-radius:50%;font-size:14px;font-weight:700;margin-right:10px;">6</span>Інтерпретація та аналіз</h4>
+    <p style="margin-bottom:0;">🔎 Не вір ШІ на слово — перевіряй факти.<br>⚠️ ШІ може помилятися, вигадувати, бути упередженим.<br>💡 <strong>Порада:</strong> Завжди перевіряй факти в трьох незалежних джерелах.</p>
+  </div>
+
+  <h3>⚖️ Етичні нагадування</h3>
+  <ul>
+    <li>✅ Завжди вказуй, якщо використав ШІ для створення тексту</li>
+    <li>✅ Не використовуй ШІ для шкоди (булінг, фейки, обман)</li>
+    <li>✅ Не вводь особисті дані у публічні чати</li>
+    <li>✅ Поважай авторські права інших людей</li>
+    <li>✅ Пам'ятай: ШІ — інструмент, а не заміна твоєму мозку</li>
+  </ul>
+
+  <h3>🔍 Медіаграмотність — золоте правило</h3>
+  <div class="warning-box">
+    <strong>«Золотий трикутник» перевірки:</strong><br>
+    Перед тим як використати інформацію від ШІ, перевір її <strong>мінімум у трьох незалежних джерелах</strong>. Це стосується: історичних фактів, наукових даних, новин, медичних порад, рецептів.
+  </div>
+
+  <h3>🚀 Куди рухатися далі?</h3>
+  <div class="grid-2">
+    <div class="grid-card">
+      <div class="icon">🎮</div>
+      <h4>Практикуйся</h4>
+      <p>Щодня став 3 запитання різної складності. Аналізуй відповіді.</p>
+    </div>
+    <div class="grid-card">
+      <div class="icon">📚</div>
+      <h4>Вчися</h4>
+      <p>Спробуй курси: Elements of AI, Machine Learning for Kids, Teachable Machine.</p>
+    </div>
+    <div class="grid-card">
+      <div class="icon">🧪</div>
+      <h4>Експериментуй</h4>
+      <p>Тестуй різні моделі: ChatGPT, Gemini, Claude. Порівнюй результати.</p>
+    </div>
+    <div class="grid-card">
+      <div class="icon">🤝</div>
+      <h4>Ділися</h4>
+      <p>Покажи друзям, як писати хороші промпти. Навчання інших — найкращий спосіб закріпити знання.</p>
+    </div>
+  </div>
+
+  <div class="purple-box" style="text-align:center; margin-top:24px;">
+    <strong>💬 «Промпт-інжиніринг — це не магія. Це мистецтво спілкування.»</strong><br>
+    <span style="color:var(--text-muted);">Бажаємо успіхів у подорожі світом ШІ!</span>
+  </div>
+</div>
+
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  window.addEventListener('scroll', function() {
+    const btn = document.getElementById('scrollTop');
+    if (window.scrollY > 400) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+</script>
+
+</body>
+</html>
