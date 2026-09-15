@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Центр Управління Маскотом "Байт" | AI Lab</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #38bdf8;
+      --accent-purple: #a855f7;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --success: #22c55e;
+      --danger: #f43f5e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 950px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    /* Card styling */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    h1, h2, h3, h4, h5 { color: var(--text-main); margin-bottom: 10px; }
+
+    /* Mascot Panel */
+    .mascot-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .mascot-avatar-container {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,0.2) 0%, rgba(15,23,42,0.8) 70%);
+      border: 3px solid var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 12px 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .mascot-avatar-container:hover { transform: scale(1.03); }
+
+    .mascot-img {
+      max-width: 85%;
+      max-height: 85%;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+    }
+
+    .speech-bubble {
+      background: #334155;
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+      position: relative;
+      border-left: 4px solid var(--accent-color);
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .level-badge {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-purple));
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 14px;
+      background: #0f172a;
+      border-radius: 7px;
+      overflow: hidden;
+      margin: 10px 0 5px 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-color), var(--accent-purple));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Controls & Buttons */
+    .btn {
+      background: var(--accent-color);
+      color: #0f172a;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary { background: #475569; color: #fff; }
+    .btn-purple { background: var(--accent-purple); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-sm { padding: 4px 8px; font-size: 0.8em; }
+
+    input[type="text"], input[type="number"] {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      width: 100%;
+    }
+
+    input:focus { outline: none; border-color: var(--accent-color); }
+
+    /* Student List */
+    .student-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+      max-height: 580px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .student-item {
+      background: #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .student-info { display: flex; flex-direction: column; gap: 2px; }
+    .student-name { font-weight: bold; font-size: 1em; }
+    .student-xp { font-size: 0.85em; color: var(--accent-color); }
+    .student-xp.negative { color: var(--danger); }
+
+    .xp-buttons { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+    /* Level Management Settings Panel */
+    .settings-panel {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #334155;
+      width: 100%;
+      text-align: left;
+    }
+
+    .level-list-container {
+      max-height: 220px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+
+    .level-config-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.82em;
+    }
+
+    .file-input-label {
+      background: #334155;
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+
+    .file-input-label input { display: none; }
+    .add-level-box {
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Left Column: Mascot Status & Level Management -->
+    <div class="card mascot-card">
+      <h3>🤖 Цифровий Маскот</h3>
+      
+      <div class="speech-bubble" id="mascotSpeech">
+        "Привіт! Я Байт. Навчіть мене АІ-магії разом з класом!"
+      </div>
+
+      <div class="mascot-avatar-container" onclick="pokeMascot()">
+        <img id="mascotImage" class="mascot-img" src="" alt="Mascot">
+      </div>
+
+      <span class="level-badge" id="mascotLevelBadge">Рівень 1</span>
+      <h2 id="mascotTitle" style="margin-top: 5px;">Початковий Піксель</h2>
+
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="xpProgressBar"></div>
+      </div>
+      <div style="font-size: 0.85em; color: var(--text-sub); width: 100%; display: flex; justify-content: space-between;">
+        <span>Загальний XP Класу:</span>
+        <span id="xpProgressText">0 / 100 XP</span>
+      </div>
+
+      <!-- Mascot Level Creator & Settings -->
+      <div class="settings-panel">
+        <h4>⚙️ Налаштування рівнів маскота</h4>
+        
+        <div class="level-list-container" id="levelImagesConfig">
+          <!-- Level items generated by JS -->
+        </div>
+
+        <!-- Add New Level Form -->
+        <div class="add-level-box">
+          <h5 style="margin-bottom: 6px;">➕ Додати новий рівень:</h5>
+          <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+            <input type="text" id="newLevelTitle" placeholder="Назва (напр. AI-Архітектор)">
+            <input type="number" id="newLevelXP" placeholder="XP" style="width: 90px;">
+          </div>
+          <button class="btn btn-purple btn-sm" style="width: 100%;" onclick="addNewLevel()">Зберегти рівень</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px; display: flex; gap: 10px; width: 100%;">
+        <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="exportData()">💾 Експорт</button>
+        <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="document.getElementById('importFile').click()">📂 Імпорт</button>
+        <input type="file" id="importFile" style="display:none;" onchange="importData(event)">
+      </div>
+    </div>
+
+    <!-- Right Column: Student Management -->
+    <div class="card">
+      <h2>🎓 Учні курсу "Цифрова лабораторія АІ"</h2>
+      
+      <form onsubmit="addStudent(event)" style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="studentNameInput" placeholder="Ім'я та прізвище учня..." required>
+        <button type="submit" class="btn btn-purple" style="white-space: nowrap;">+ Додати учня</button>
+      </form>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-sub); font-size: 0.9em; margin-bottom: 10px;">
+        <span>Сортування за рейтингом XP</span>
+        <span id="totalStudentsCount">Всього: 0 учнів</span>
+      </div>
+
+      <div class="student-list" id="studentList">
+        <!-- Student items rendered by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Default Data with 10 Levels for Full Academic Year
+    const defaultData = {
+      mascot: {
+        name: "Байт",
+        levels: [
+          { level: 1, reqXP: 0, title: "Збійний Піксель", img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2338bdf8'/><circle cx='35' cy='40' r='8' fill='%230f172a'/><circle cx='65' cy='40' r='8' fill='%230f172a'/><path d='M 30 70 Q 50 50 70 70' stroke='%230f172a' stroke-width='5' fill='none'/></svg>" },
+          { level: 2, reqXP: 100, title: "Нейро-Студент", img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23a855f7'/><circle cx='35' cy='40' r='10' fill='%23fff'/><circle cx='65' cy='40' r='10' fill='%23fff'/><circle cx='35' cy='40' r='4' fill='%230f172a'/><circle cx='65' cy='40' r='4' fill='%230f172a'/><path d='M 30 65 Q 50 85 70 65' stroke='%23fff' stroke-width='6' fill='none'/></svg>" },
+          { level: 3, reqXP: 250, title: "Промпт-Майстер", img: "" },
+          { level: 4, reqXP: 500, title: "Генератор Ідей", img: "" },
+          { level: 5, reqXP: 1000, title: "Кібер-Експерт", img: "" },
+          { level: 6, reqXP: 1750, title: "Код-Алхімік", img: "" },
+          { level: 7, reqXP: 2500, title: "Нейро-Архітектор", img: "" },
+          { level: 8, reqXP: 3500, title: "AI-Стратег", img: "" },
+          { level: 9, reqXP: 5000, title: "Володар Алгоритмів", img: "" },
+          { level: 10, reqXP: 7000, title: "Суперінтелект AI", img: "" }
+        ]
+      },
+      students: []
+    };
+
+    let appData = JSON.parse(localStorage.getItem('ai_lab_mascot_data')) || defaultData;
+
+    const phrases = [
+      "Ого! Новий промпт спрацював чудовіше, ніж я думав!",
+      "Дякую за нові знання! Мої алгоритми радіють!",
+      "Сьогодні чудовий день, щоб навчити нейромережу малювати!",
+      "Хто розгадав бос-галюцинацію? Ви просто генії!",
+      "Не забувайте перевіряти факти за мною, я ж можу й пофантазувати!"
+    ];
+
+    function sortAndReindexLevels() {
+      appData.mascot.levels.sort((a, b) => a.reqXP - b.reqXP);
+      appData.mascot.levels.forEach((lvl, idx) => {
+        lvl.level = idx + 1;
+      });
+    }
+
+    function calculateTotalXP() {
+      return appData.students.reduce((sum, s) => sum + s.xp, 0);
+    }
+
+    function getCurrentMascotState() {
+      const totalXP = calculateTotalXP();
+      sortAndReindexLevels();
+      
+      let currentState = appData.mascot.levels[0];
+      let nextState = appData.mascot.levels[1] || null;
+
+      for (let i = appData.mascot.levels.length - 1; i >= 0; i--) {
+        if (totalXP >= appData.mascot.levels[i].reqXP) {
+          currentState = appData.mascot.levels[i];
+          nextState = appData.mascot.levels[i + 1] || null;
+          break;
+        }
+      }
+      return { currentState, nextState, totalXP };
+    }
+
+    function saveData() {
+      sortAndReindexLevels();
+      localStorage.setItem('ai_lab_mascot_data', JSON.stringify(appData));
+      render();
+    }
+
+    function render() {
+      const { currentState, nextState, totalXP } = getCurrentMascotState();
+
+      // Mascot Render
+      document.getElementById('mascotLevelBadge').innerText = `Рівень ${currentState.level}`;
+      document.getElementById('mascotTitle').innerText = currentState.title;
+      
+      const imgElem = document.getElementById('mascotImage');
+      if (currentState.img) {
+        imgElem.src = currentState.img;
+      } else {
+        imgElem.src = appData.mascot.levels[0].img; // Fallback to Level 1
+      }
+
+      // Progress Bar Calculations
+      let progressPct = 100;
+      let progressText = `${totalXP} XP (Максимальний рівень!)`;
+
+      if (nextState) {
+        const currentReq = currentState.reqXP;
+        const nextReq = nextState.reqXP;
+        const needed = nextReq - currentReq;
+        const gained = totalXP - currentReq;
+        progressPct = Math.min(100, Math.max(0, (gained / needed) * 100));
+        progressText = `${totalXP} / ${nextReq} XP`;
+      }
+
+      document.getElementById('xpProgressBar').style.width = `${progressPct}%`;
+      document.getElementById('xpProgressText').innerText = progressText;
+
+      // Render Level Settings
+      const configContainer = document.getElementById('levelImagesConfig');
+      configContainer.innerHTML = '';
+      appData.mascot.levels.forEach((lvl, idx) => {
+        const div = document.createElement('div');
+        div.className = 'level-config-item';
+        div.innerHTML = `
+          <div>
+            <strong>Lvl ${lvl.level}</strong> (${lvl.reqXP} XP): <em>${lvl.title}</em>
+          </div>
+          <div style="display:flex; gap:5px; align-items:center;">
+            <label class="file-input-label">
+              ${lvl.img ? '📷' : '➕ Фото'}
+              <input type="file" accept="image/*" onchange="uploadMascotImage(${lvl.level}, event)">
+            </label>
+            ${appData.mascot.levels.length > 1 ? `<button class="btn btn-danger btn-sm" style="padding:2px 6px;" onclick="deleteLevel(${idx})">✕</button>` : ''}
+          </div>
+        `;
+        configContainer.appendChild(div);
+      });
+
+      // Student List Render
+      const studentList = document.getElementById('studentList');
+      studentList.innerHTML = '';
+      document.getElementById('totalStudentsCount').innerText = `Всього: ${appData.students.length} учнів`;
+
+      // Sort students by XP (descending)
+      const sortedStudents = [...appData.students].sort((a,b) => b.xp - a.xp);
+
+      sortedStudents.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'student-item';
+        item.innerHTML = `
+          <div class="student-info">
+            <span class="student-name">${s.name}</span>
+            <span class="student-xp ${s.xp < 0 ? 'negative' : ''}">⚡ ${s.xp} XP</span>
+          </div>
+          <div class="xp-buttons">
+            <button class="btn btn-sm btn-danger" title="Штраф" onclick="addXP(${s.id}, -5)">-5</button>
+            <button class="btn btn-sm" onclick="addXP(${s.id}, 5)">+5</button>
+            <button class="btn btn-sm" onclick="addXP(${s.id}, 10)">+10</button>
+            <button class="btn btn-sm btn-purple" onclick="addXP(${s.id}, 25)">+25</button>
+            <button class="btn btn-sm btn-secondary" title="Редагувати точно" onclick="customXP(${s.id})">✏️</button>
+            <button class="btn btn-sm btn-danger" style="padding: 4px 6px;" onclick="deleteStudent(${s.id})">🗑️</button>
+          </div>
+        `;
+        studentList.appendChild(item);
+      });
+    }
+
+    // Actions
+    function addStudent(e) {
+      e.preventDefault();
+      const input = document.getElementById('studentNameInput');
+      const name = input.value.trim();
+      if (!name) return;
+
+      appData.students.push({
+        id: Date.now(),
+        name: name,
+        xp: 0
+      });
+
+      input.value = '';
+      saveData();
+    }
+
+    function addXP(studentId, amount) {
+      const student = appData.students.find(s => s.id === studentId);
+      if (student) {
+        const oldState = getCurrentMascotState();
+        
+        // Directly apply difference without floor clamp
+        student.xp += amount;
+        
+        saveData();
+
+        const newState = getCurrentMascotState();
+
+        // Level UP / DOWN triggers
+        if (newState.currentState.level < oldState.currentState.level) {
+          pokeMascot(`⚠️ Увага! Через штрафи рівень Байта знизився до Рівня ${newState.currentState.level} (${newState.currentState.title})! 📉`);
+        } else if (newState.currentState.level > oldState.currentState.level) {
+          pokeMascot(`🎉 УРА! Клас набрав достатньо XP! Байт піднявся до Рівня ${newState.currentState.level} (${newState.currentState.title})! 🚀✨`);
+        } else if (amount < 0) {
+          pokeMascot(`Штраф ${amount} XP для ${student.name}. Загальний XP класу: ${newState.totalXP}! 📉`);
+        } else {
+          pokeMascot(`+${amount} XP для ${student.name}! Байт радіє і стає розумнішим! 🚀`);
+        }
+      }
+    }
+
+    function customXP(studentId) {
+      const student = appData.students.find(s => s.id === studentId);
+      if (!student) return;
+      const val = prompt(`Вкажіть зміну балів (наприклад: 50 або -15) для ${student.name}:`, "10");
+      if (val !== null) {
+        const num = parseInt(val, 10);
+        if (!isNaN(num)) {
+          const oldState = getCurrentMascotState();
+          student.xp += num;
+          saveData();
+          
+          const newState = getCurrentMascotState();
+          if (newState.currentState.level < oldState.currentState.level) {
+            pokeMascot(`⚠️ Рівень Байта знизився до Рівня ${newState.currentState.level} (${newState.currentState.title})!`);
+          } else if (newState.currentState.level > oldState.currentState.level) {
+            pokeMascot(`🎉 ВІТАЄМО! Байт досяг Рівня ${newState.currentState.level} (${newState.currentState.title})! 🚀`);
+          }
+        }
+      }
+    }
+
+    function deleteStudent(studentId) {
+      if (confirm("Видалити учня зі списку?")) {
+        appData.students = appData.students.filter(s => s.id !== studentId);
+        saveData();
+      }
+    }
+
+    function addNewLevel() {
+      const titleInput = document.getElementById('newLevelTitle');
+      const xpInput = document.getElementById('newLevelXP');
+      
+      const title = titleInput.value.trim();
+      const reqXP = parseInt(xpInput.value, 10);
+
+      if (!title || isNaN(reqXP) || reqXP < 0) {
+        alert("Будь ласка, введіть коректну назву рівня та поріг XP!");
+        return;
+      }
+
+      appData.mascot.levels.push({
+        level: appData.mascot.levels.length + 1,
+        reqXP: reqXP,
+        title: title,
+        img: ""
+      });
+
+      titleInput.value = '';
+      xpInput.value = '';
+      saveData();
+    }
+
+    function deleteLevel(index) {
+      if (appData.mascot.levels.length <= 1) {
+        alert("Мінімум один рівень повинен залишатися!");
+        return;
+      }
+      if (confirm("Видалити цей рівень розвитку?")) {
+        appData.mascot.levels.splice(index, 1);
+        saveData();
+      }
+    }
+
+    function uploadMascotImage(levelNum, event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Img = e.target.result;
+        const targetLvl = appData.mascot.levels.find(l => l.level === levelNum);
+        if (targetLvl) {
+          targetLvl.img = base64Img;
+          saveData();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function pokeMascot(customText = null) {
+      const bubble = document.getElementById('mascotSpeech');
+      if (customText) {
+        bubble.innerText = customText;
+      } else {
+        const rand = phrases[Math.floor(Math.random() * phrases.length)];
+        bubble.innerText = rand;
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `mascot_ai_lab_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.students && parsed.mascot) {
+            appData = parsed;
+            saveData();
+            alert("Дані успішно відновлено!");
+          } else {
+            alert("Помилка: Невірний формат файлу.");
+          }
+        } catch (err) {
+          alert("Помилка читання JSON файлу.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Initial Setup
+    saveData();
+  </script>
+</body>
+</html>
