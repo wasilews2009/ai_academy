@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Методичні рекомендації. Урок 4 — Основи промпт-інжинірингу — II</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7;
+  --bg-hero:#FFF6E4;
+  --surface:#FFFFFF;
+  --ink:#20222E;
+  --ink-soft:#555A6E;
+  --ink-faint:#8D91A6;
+  --line:#ECE6D6;
+  --accent:#1E88E5;
+  --accent-ink:#0F5FA8;
+  --accent-soft:#E1F0FE;
+  --violet:#8B5CF6;
+  --violet-soft:#F1EAFE;
+  --warn:#FFB020;
+  --warn-soft:#FFF1D2;
+  --bad:#F2495C;
+  --bad-soft:#FDE3E7;
+  --good:#22B573;
+  --good-soft:#DDF7EC;
+  --teal:#12B3A0;
+  --teal-soft:#DBF7F2;
+  --pink:#EC4899;
+  --pink-soft:#FCE1EF;
+  --orange:#FF7A2F;
+  --orange-soft:#FFE7D4;
+  --radius-s:12px;
+  --radius-m:18px;
+  --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+:root:not([data-theme="light"]) { }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+/* --- Кольорові теми розділів --- */
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+/* NAV */
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:13px; padding:8px 12px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+/* HERO */
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(26px,4vw,40px); max-width:18ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:60ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:320px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+/* SECTIONS */
+section.block{padding:56px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(21px,2.8vw,28px); max-width:26ch;}
+.block > p.intro{color:var(--ink-soft); max-width:64ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+
+/* GOAL / WHALE-STYLE CARDS */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* ACCORDION (rule-card reused for difficulties / question bank) */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.rc-body-in{padding:0 18px 18px 67px; font-size:14px; color:var(--ink-soft);}
+.rc-body-in ul{margin:0; padding-left:18px;}
+.rc-body-in li{margin-bottom:5px;}
+.rule-card.open .rc-body{max-height:420px;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--surface);}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good);}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+
+/* LESSON ALGORITHM (flow reused) */
+.flow{display:flex; flex-direction:column; align-items:stretch; gap:0; margin:30px 0;}
+.flow-node{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:15px 20px; font-weight:700; font-size:14.5px; box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center; gap:14px; transition:.15s;}
+.flow-node:hover{border-color:var(--fn-color,var(--accent));}
+.flow-node.active{border-color:var(--fn-color,var(--accent)); background:var(--accent-soft);}
+.flow-node .fn-ico{width:40px; height:40px; border-radius:50%; background:var(--fn-color,var(--accent)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex:none; box-shadow:var(--shadow-pop);}
+.flow-node .fn-title{flex:1;}
+.flow-node .fn-time{font-family:'JetBrains Mono'; font-weight:700; font-size:12.5px; color:var(--ink-faint); background:var(--bg); padding:4px 10px; border-radius:999px; flex:none;}
+.flow-arrow{width:2px; height:20px; background:var(--line); margin-left:39px; position:relative;}
+.flow-arrow::after{content:"";position:absolute; bottom:-1px; left:-3px; border:4px solid transparent; border-top-color:var(--line);}
+
+/* STAGE DETAIL (rule-detail reused) */
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:18px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-essence{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px;}
+.rd-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:640px){.rd-cols{grid-template-columns:1fr;}}
+.rd-example{border-radius:var(--radius-s); padding:14px 16px; font-size:14px;}
+.rd-example.good{background:var(--good-soft); border:1px solid rgba(47,158,91,.25);}
+.rd-example.bad{background:var(--bad-soft); border:1px solid rgba(224,87,106,.25);}
+.rd-example .lab{font-weight:800; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; display:block;}
+.rd-example.good .lab{color:#1E7A45;} .rd-example.bad .lab{color:#B23A4C;}
+.rd-analysis{margin-top:14px; font-size:13.8px; color:var(--accent-ink); background:var(--accent-soft); border-radius:var(--radius-s); padding:12px 14px; font-style:italic;}
+.rd-proscons{display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;}
+.rd-proscons div{flex:1; min-width:200px; font-size:13.3px;}
+.rd-proscons .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; margin-bottom:4px; display:block; color:var(--ink-faint);}
+.rd-tasks{margin-top:16px; border-top:1px dashed var(--line); padding-top:14px; font-size:13.6px; color:var(--ink-soft);}
+.rd-tasks .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; display:block;}
+
+/* TIME BUDGET BAR */
+.timebar{display:flex; height:34px; border-radius:999px; overflow:hidden; margin:24px 0 6px; box-shadow:var(--shadow);}
+.timebar span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; font-family:'JetBrains Mono';}
+.timebar-legend{display:flex; flex-wrap:wrap; gap:10px 16px; font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;}
+.timebar-legend span{display:flex; align-items:center; gap:6px;}
+.timebar-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+/* RUBRIC TABLE */
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:14px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:12px 16px; font-family:'Unbounded'; font-size:12.5px; font-weight:600;}
+table.crit td{padding:12px 16px; border-bottom:1px solid var(--line);}
+table.crit tr:last-child td{border-bottom:none; font-weight:800;}
+table.crit td:last-child, table.crit th:last-child{text-align:right; white-space:nowrap;}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:56ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+
+@media(max-width:640px){
+  .rd-cols{grid-template-columns:1fr;}
+  table.crit td, table.crit th{padding:10px 12px; font-size:13px;}
+  .flow-node{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">🍎 Методичні рекомендації</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#meta">Мета уроку</a>
+      <a href="#pidhotovka">Підготовка</a>
+      <a href="#hid-uroku">Хід уроку</a>
+      <a href="#trudnoshi">Труднощі</a>
+      <a href="#dyferentsiatsiya">Диференціація</a>
+      <a href="#otsinyuvannya">Оцінювання</a>
+      <a href="#dovidnyk">Довідник</a>
+      <a href="#refleksiya">Рефлексія</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Для вчителя · Курс «Цифрова лабораторія AI» · Урок 4</div>
+    <h1>Методичні рекомендації до уроку</h1>
+    <p class="lede">Покроковий сценарій, хронометраж, орієнтовні репліки, типові труднощі й поради для проведення уроку «Основи промпт‑інжинірингу — II» (45 хв, учні 10+ років).</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">🎯</span> Мета і завдання</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">⏱️</span> Хронометраж 45 хв</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">🗺️</span> Хід уроку крок за кроком</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">📋</span> Оцінювання та рефлексія</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= META ================= -->
+<section class="block c-blue" id="meta">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎯</span><span class="label">МЕТА УРОКУ</span></div>
+    <h2>Навчальна, розвивальна й виховна мета</h2>
+    <p class="intro">Тримайте ці три акценти в полі зору протягом усього уроку — вони визначають, на що звертати увагу під час обговорень.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">📘</div><h4>Навчальна</h4><p>Ознайомити учнів із правилами етики роботи зі ШІ, поняттям «галюцинація» та правилами 7–12 промпт-інжинірингу.</p></div>
+      <div class="whale"><div class="whale-ico">🧩</div><h4>Розвивальна</h4><p>Розвивати критичне мислення, вміння формулювати чіткі інструкції та аналізувати якість тексту.</p></div>
+      <div class="whale"><div class="whale-ico">🤝</div><h4>Виховна</h4><p>Формувати відповідальне й чесне ставлення до використання штучного інтелекту в навчанні та творчості.</p></div>
+    </div>
+    <div class="callout">📌 <b>Тип уроку:</b> комбінований (засвоєння нових знань + практика). <b>Вік учнів:</b> 10+ років. <b>Тривалість:</b> 45 хв. <b>Формат:</b> фронтальна робота, робота в парах, індивідуальна практика з посібником.</div>
+  </div>
+</section>
+
+<!-- ================= PIDHOTOVKA ================= -->
+<section class="block c-orange" id="pidhotovka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧰</span><span class="label">ПІДГОТОВКА</span></div>
+    <h2>Що підготувати заздалегідь</h2>
+    <p class="intro">Позначте пункти в міру готовності — прогрес-бар покаже, наскільки урок готовий до старту.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarPrep"></div></div>
+      <div id="clListPrep"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HID UROKU ================= -->
+<section class="block c-purple" id="hid-uroku">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🗺️</span><span class="label">ХІД УРОКУ</span></div>
+    <h2>Алгоритм уроку та хронометраж (45 хв)</h2>
+    <p class="intro">Натисни на будь-який етап, щоб розгорнути методичні поради: що робити, які репліки використати та на що звернути увагу.</p>
+
+    <div class="timebar-legend" id="timebarLegend"></div>
+    <div class="timebar" id="timebar"></div>
+
+    <div class="flow" id="stageFlow"></div>
+    <div class="rule-detail" id="stageDetail"></div>
+  </div>
+</section>
+
+<!-- ================= TRUDNOSHI ================= -->
+<section class="block c-teal" id="trudnoshi">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚡</span><span class="label">ТИПОВІ ТРУДНОЩІ</span></div>
+    <h2>З чим найчастіше стикаються вчителі на цьому уроці</h2>
+    <p class="intro">Клацни на картку, щоб побачити пораду щодо подолання труднощі.</p>
+    <div class="rule-grid" id="difficultyGrid"></div>
+  </div>
+</section>
+
+<!-- ================= DYFERENTSIATSIYA ================= -->
+<section class="block c-pink" id="dyferentsiatsiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🌈</span><span class="label">ДИФЕРЕНЦІАЦІЯ</span></div>
+    <h2>Як адаптувати завдання під різний рівень класу</h2>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">🌱</div><h4>Учням, яким потрібна підтримка</h4><p>Дайте шаблон промпту із пропусками для заповнення; обмежтесь трьома правилами (7, 10, 12) замість шести; об'єднайте в пару з упевненішим однокласником для фінального завдання.</p></div>
+      <div class="whale"><div class="whale-ico">🚀</div><h4>Учням, готовим до виклику</h4><p>Запропонуйте застосувати всі шість правил до незнайомої теми та представити результат класу; дайте оцінити промпт однокласника за критеріями рубрики; порівняти один запит у двох різних стилях.</p></div>
+    </div>
+    <div class="callout violet">💡 Диференціація стосується <b>складності завдання</b>, а не кількості етичних правил — усі учні мають однаково засвоїти межі чесного використання ШІ.</div>
+  </div>
+</section>
+
+<!-- ================= OTSINYUVANNYA ================= -->
+<section class="block c-green" id="otsinyuvannya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📊</span><span class="label">ОЦІНЮВАННЯ</span></div>
+    <h2>Формативне оцінювання під час уроку та рубрика проєкту</h2>
+    <p class="intro">Основне оцінювання на цьому уроці — спостереження за участю в обговоренні. Рубрику нижче застосовуйте до фінального вірша, коли учні його здадуть.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">👀</div><h4>Спостереження</h4><p>Хто бере участь у голосуванні щодо дилеми? Хто пропонує власні приклади промптів?</p></div>
+      <div class="whale"><div class="whale-ico">✋</div><h4>Швидкі опитування</h4><p>Голосування «так/ні» піднятою рукою — миттєвий зріз розуміння всього класу без оцінок.</p></div>
+      <div class="whale"><div class="whale-ico">📝</div><h4>Самооцінка учня</h4><p>Чек-лист критичного читача та чек-лист самоперевірки вірша (Крок 5) з учнівського посібника.</p></div>
+    </div>
+    <table class="crit">
+      <tr><th>Критерій (фінальний вірш)</th><th>Бал</th></tr>
+      <tr><td>Промпт містить роль, обмеження, форматування</td><td>0–3</td></tr>
+      <tr><td>Якість і стильова відповідність обраному поету</td><td>0–3</td></tr>
+      <tr><td>Застосовано мінімум 2 уточнення (ітерації)</td><td>0–2</td></tr>
+      <tr><td>Вірш оригінальний (без копіювання) і тематично цілісний</td><td>0–2</td></tr>
+      <tr><td>Разом</td><td>10</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= DOVIDNYK ================= -->
+<section class="block c-yellow" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Банк додаткових запитань для обговорення</h2>
+    <p class="intro">Використовуйте, якщо в класі виникла пауза або лишився час — розподілені за темами уроку.</p>
+    <div class="rule-grid" id="questionBankGrid"></div>
+  </div>
+</section>
+
+<!-- ================= REFLECTION ================= -->
+<section class="block c-blue" id="refleksiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🪞</span><span class="label">РЕФЛЕКСІЯ ВЧИТЕЛЯ</span></div>
+    <h2>Самоперевірка після уроку</h2>
+    <p class="intro">Пройдіться чек-листом одразу після уроку, поки враження свіжі — це допоможе скоригувати наступне заняття.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarReflect"></div></div>
+      <div id="clListReflect"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Методичні рекомендації · Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 4 <span class="heart">✨</span><br>Хороший урок — це не той, де вчитель усе сказав, а той, де учні самі дійшли висновку.</p>
+</footer>
+
+<script>
+/* ---------- NAV active link on scroll ---------- */
+const sections = ["meta","pidhotovka","hid-uroku","trudnoshi","dyferentsiatsiya","otsinyuvannya","dovidnyk","refleksiya"].map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- GENERIC CHECKLIST BUILDER ---------- */
+function buildChecklist(items, listElId, barElId){
+  const listEl = document.getElementById(listElId);
+  const barEl = document.getElementById(barElId);
+  items.forEach((t,i)=>{
+    const row = document.createElement("div"); row.className="cl-item";
+    row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${t}</span>`;
+    row.addEventListener("click", ()=>{
+      row.classList.toggle("checked");
+      const done = listEl.querySelectorAll(".cl-item.checked").length;
+      barEl.style.width = (done/items.length*100)+"%";
+    });
+    listEl.appendChild(row);
+  });
+}
+buildChecklist([
+  "Проєктор або великий екран для показу учнівського інтерактивного посібника",
+  "Відкрита вкладка з посібником уроку 4 (розділи Тема 1–3, Симулятор, Проєкт)",
+  "Дошка та маркери для фіксації прикладів промптів разом із класом",
+  "Роздруковані картки з дилемою про Марічку (за потреби, якщо немає екрана на всіх)",
+  "Доступ до ChatGPT або аналога — опційно, для живої демонстрації (не обов'язково, симулятор компенсує)",
+  "Таймер або годинник на видноті для контролю хронометражу",
+], "clListPrep", "clBarPrep");
+
+buildChecklist([
+  "Чи всі учні взяли участь у голосуванні щодо дилеми Марічки?",
+  "Чи вдалося опрацювати щонайменше 4 з 6 правил Теми 3?",
+  "Чи спробував хтось із учнів симулятор промпту самостійно?",
+  "Чи учні зрозуміли різницю між «використати ШІ» і «видати за своє»?",
+  "Чи зрозумілі критерії фінального завдання всім учням?",
+  "Чи залишився час на підсумкову рефлексію наприкінці уроку?",
+], "clListReflect", "clBarReflect");
+
+/* ---------- STAGE FLOW (хід уроку) ---------- */
+const stages = [
+  {ico:"🔔", time:"2 хв", title:"Оргмомент і актуалізація",
+   essence:"Налаштувати клас на роботу та пригадати правила 1–6 промпт-інжинірингу з попереднього уроку.",
+   good:"Одне яскраве запитання: «Хто цього тижня використовував ШІ для домашнього завдання — і чи чесно про це сказав?»",
+   bad:"Довге сухе опитування «що ми вчили минулого разу» по пунктах — забирає час і губить увагу класу.",
+   quote:"«Сьогодні поговоримо, де межа між „скористатися ШІ“ і „обманути“ — і навчимося ще шести хитрощам для сильніших запитів.»",
+   expect:"Учні одразу згадують життєві приклади й активно включаються в розмову.",
+   watch:"Не дати вступному обговоренню розтягнутися — тримати в межах 2 хвилин.",
+   materials:"Дошка/екран з темою уроку, увімкнений проєктор."},
+  {ico:"⚖️", time:"9 хв", title:"Тема 1. Етика зі ШІ",
+   essence:"Обговорити 7 правил етики та дилему про Марічку, сформувати особисту етичну позицію учнів.",
+   good:"Розділити 7 правил на 2 блоки, обговорити в парах 1 хв, потім зібрати відповіді фронтально.",
+   bad:"Просто зачитати всі 7 правил самостійно, без діалогу — клас швидко відключається.",
+   quote:"«Уявіть, що Марічка — ваша однокласниця. Підніміть руку, хто вважає її вчинок чесним?» (голосування до пояснення)",
+   expect:"Частина учнів спочатку виправдовуватиме Марічку («вона ж не списала у людини»).",
+   watch:"Учні можуть плутати «використання ШІ» з «шахрайством» — чітко розведіть ці поняття.",
+   materials:"Розділ «Тема 1» посібника, за потреби — роздруковані картки з дилемою."},
+  {ico:"🔎", time:"9 хв", title:"Тема 2. Медіаграмотність",
+   essence:"Навчити розпізнавати «галюцинації» ШІ та застосовувати три кити медіаграмотності.",
+   good:"Провести вправу «Детектив» наживо: прочитати текст уголос, дати 30 секунд на пошук помилки.",
+   bad:"Одразу назвати хибне речення — учні втрачають шанс потренувати критичне мислення.",
+   quote:"«Уявіть, що ви — детективи. У цьому тексті ШІ навмисно щось наплутав. Хто знайде?»",
+   expect:"Більшість спершу обере навмання перше «дивне» речення, а не найбільш перевірюваний факт.",
+   watch:"Учні можуть не знати самого факту (рік появи ELIZA) — суть у ході міркування, а не в конкретній даті.",
+   materials:"Проєктор із відкритою вправою «Детектив», чек-лист критичного читача на екрані."},
+  {ico:"🧠", time:"14 хв", title:"Тема 3. Правила 7–12",
+   essence:"Опрацювати шість правил промпт-інжинірингу через ментальну карту та приклади «хороший/поганий» промпт.",
+   good:"Рухатися ментальною картою разом із класом: відкрити правило → приклад → одразу спробувати застосувати усно на новій темі.",
+   bad:"Пройти всі 6 правил підряд без пауз на практику — інформація «зіллється» в одне ціле.",
+   quote:"«Перепишімо простий запит „Розкажи про космос“, додаючи по одному правилу — дивимось, як міняється результат.»",
+   expect:"Правила 7 (конкретність) і 10 (ролі) засвоюються швидко; правило 11 (обмеження ролі) — складніше, потребує прикладу.",
+   watch:"6 правил поспіль — забагато для одного заходу; за нестачі часу розбийте на 3+3 із короткою зміною діяльності.",
+   materials:"Ментальна карта з розділу «Тема 3» посібника, дошка для фіксації прикладів класу."},
+  {ico:"🧪", time:"5 хв", title:"Симулятор промпту",
+   essence:"Дати учням наочно побачити, як комбінація прийомів впливає на якість відповіді ШІ.",
+   good:"Викликати 1–2 учнів до екрана — нехай самі клацають перемикачі й коментують, що змінюється.",
+   bad:"Демонструвати самостійно, не залучаючи учнів — інтерактивність втрачається.",
+   quote:"«Що станеться, якщо ввімкнути одразу всі перемикачі? А якщо лишити тільки один?»",
+   expect:"Учні швидко помічають: поєднання прийомів дає кращий результат, ніж один прийом окремо.",
+   watch:"Немає проєктора? Використайте роздруковані скріншоти трьох варіантів відповіді (слабкий/середній/сильний).",
+   materials:"Розділ «Симулятор» посібника, увімкнений на екрані."},
+  {ico:"🎭", time:"3 хв", title:"Постановка фінального завдання",
+   essence:"Пояснити завдання «Вірш за допомогою ШІ» та критерії оцінювання.",
+   good:"Показати конструктор промпту наживо й зібрати один приклад промпту разом із класом.",
+   bad:"Роздати завдання лише текстом без демонстрації конструктора — частина учнів не зрозуміє формат.",
+   quote:"«Головне — не готовий вірш, а вміння скласти сильний промпт і покращити його щонайменше двічі.»",
+   expect:"Типове запитання учнів: «А можна взяти улюбленого співака, а не поета?»",
+   watch:"Учні можуть спробувати скопіювати вірш ШІ без жодних правок — нагадайте про застереження щодо чесності.",
+   materials:"Таблиця критеріїв оцінювання та конструктор промпту з посібника."},
+  {ico:"🏁", time:"3 хв", title:"Підсумок і рефлексія",
+   essence:"Закріпити головну ідею уроку та перевірити розуміння класу.",
+   good:"Швидке «коло рефлексії»: кожен учень одним словом каже, що запам'ятав.",
+   bad:"Ставити наприкінці складне комплексне запитання — часу на відповідь уже немає.",
+   quote:"«Закінчіть речення: „Сьогодні я зрозумів(ла), що ШІ...“»",
+   expect:"Відповіді різноманітні, часто про чесність і потребу перевіряти факти.",
+   watch:"Якщо часу не залишилось — перенесіть рефлексію на початок наступного уроку.",
+   materials:"—"},
+];
+const totalMinutes = stages.reduce((s,x)=>s+parseInt(x.time),0);
+const flowEl = document.getElementById("stageFlow");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  if(i>0){ const ar=document.createElement("div"); ar.className="flow-arrow"; flowEl.appendChild(ar); }
+  const node = document.createElement("div"); node.className="flow-node"; node.dataset.idx=i;
+  node.style.setProperty("--fn-color", color);
+  node.innerHTML = `<div class="fn-ico">${s.ico}</div><div class="fn-title">${s.title}</div><div class="fn-time">${s.time}</div>`;
+  node.addEventListener("click", ()=>selectStage(i));
+  flowEl.appendChild(node);
+});
+function selectStage(i){
+  document.querySelectorAll(".flow-node").forEach(n=>n.classList.remove("active"));
+  flowEl.querySelector(`[data-idx="${i}"]`).classList.add("active");
+  const s = stages[i]; const color = rainbow[i%rainbow.length];
+  const rd = document.getElementById("stageDetail");
+  rd.style.setProperty("--rd-color", color);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${s.ico}</div><div class="rd-title">${s.title} <span style="color:var(--ink-faint); font-family:'JetBrains Mono'; font-size:13px;">· ${s.time}</span></div></div>
+    <div class="rd-essence">${s.essence}</div>
+    <div class="rd-cols">
+      <div class="rd-example good"><span class="lab">✅ Що варто робити</span>${s.good}</div>
+      <div class="rd-example bad"><span class="lab">❌ Чого уникати</span>${s.bad}</div>
+    </div>
+    <div class="rd-analysis">💬 ${s.quote}</div>
+    <div class="rd-proscons">
+      <div><span class="lab2">Очікувані реакції учнів</span>${s.expect}</div>
+      <div><span class="lab2">На що звернути увагу</span>${s.watch}</div>
+    </div>
+    <div class="rd-tasks"><span class="lab2">Матеріали до етапу</span>${s.materials}</div>
+  `;
+  rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+selectStage(0);
+
+/* time budget bar */
+const timebar = document.getElementById("timebar");
+const legend = document.getElementById("timebarLegend");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  const pct = (parseInt(s.time)/totalMinutes*100);
+  const seg = document.createElement("span"); seg.style.width=pct+"%"; seg.style.background=color;
+  seg.textContent = pct>7? s.time : "";
+  timebar.appendChild(seg);
+  const leg = document.createElement("span"); leg.innerHTML = `<i style="background:${color}"></i>${s.title} (${s.time})`;
+  legend.appendChild(leg);
+});
+
+/* ---------- GENERIC ACCORDION BUILDER ---------- */
+function buildAccordion(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((e,i)=>{
+    const card = document.createElement("div"); card.className="rule-card";
+    card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+    card.innerHTML = `<button class="rc-head"><span class="rc-num">${e.ico}</span><span class="rc-title">${e.title}</span><span class="rc-arrow">▾</span></button>
+    <div class="rc-body"><div class="rc-body-in">${e.body}</div></div>`;
+    card.querySelector(".rc-head").addEventListener("click", ()=>card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
+}
+
+buildAccordion([
+  {ico:"🙊", title:"Учні соромляться визнати помилку в дилемі", body:"<b>Порада:</b> наголосіть, що це вправа на роздуми, а не тест із миттєвою «правильною/неправильною» відповіддю — думка може змінитись під час обговорення, і це нормально."},
+  {ico:"🔀", title:"Плутанина «не можна користуватись ШІ» і «не можна видавати за своє»", body:"<b>Порада:</b> проведіть чітку лінію: інструмент використовувати можна, обманювати — ні. Повторіть цю фразу кілька разів протягом уроку."},
+  {ico:"📶", title:"Немає доступу до інтернету чи ChatGPT у класі", body:"<b>Порада:</b> симулятор і всі приклади промптів в учнівському посібнику повністю замінюють живу демонстрацію — інтернет не обов'язковий."},
+  {ico:"⏳", title:"Не вистачає часу на всі 6 правил Теми 3", body:"<b>Порада:</b> правила 7, 10 і 12 — обов'язковий мінімум; правила 8, 9 і 11 можна дати учням опрацювати вдома за посібником."},
+  {ico:"🥱", title:"Втома уваги в середині уроку", body:"<b>Порада:</b> змінюйте формат діяльності що 8–10 хвилин: фронтально → у парах → самостійна робота з посібником."},
+], "difficultyGrid");
+
+buildAccordion([
+  {ico:"⚖️", title:"Додаткові запитання: Етика", body:"<ul><li>Чи змінилася б відповідь, якби Марічка чесно вказала джерело?</li><li>Хто несе відповідальність, якщо ШІ сам написав образливий жарт без прохання?</li><li>Чи можна попросити ШІ «просто перевірити граматику» у чужому творі — це теж етичне питання?</li></ul>"},
+  {ico:"🔎", title:"Додаткові запитання: Медіаграмотність", body:"<ul><li>Як перевірити дату чи цифру, якщо немає підручника під рукою?</li><li>Чим небезпечна довіра до посилань, які наводить ШІ?</li><li>Наведіть приклад, коли навіть людина-експерт може «галюцинувати» факт.</li></ul>"},
+  {ico:"🧠", title:"Додаткові запитання: Промпт-інжиніринг", body:"<ul><li>Яке з шести правил найбільше змінює тон відповіді?</li><li>Чому обмеження ролі (правило 11) особливо важливе для навчальних чат-ботів?</li><li>Наведіть приклад промпту, де форматування (правило 12) критично важливе.</li></ul>"},
+], "questionBankGrid");
+</script>
+</body>
+</html>
