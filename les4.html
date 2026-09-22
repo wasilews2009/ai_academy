@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 4. Основи промпт-інжинірингу — II</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7;
+  --bg-hero:#FFF6E4;
+  --surface:#FFFFFF;
+  --ink:#20222E;
+  --ink-soft:#555A6E;
+  --ink-faint:#8D91A6;
+  --line:#ECE6D6;
+  --accent:#1E88E5;
+  --accent-ink:#0F5FA8;
+  --accent-soft:#E1F0FE;
+  --violet:#8B5CF6;
+  --violet-soft:#F1EAFE;
+  --warn:#FFB020;
+  --warn-soft:#FFF1D2;
+  --bad:#F2495C;
+  --bad-soft:#FDE3E7;
+  --good:#22B573;
+  --good-soft:#DDF7EC;
+  --teal:#12B3A0;
+  --teal-soft:#DBF7F2;
+  --pink:#EC4899;
+  --pink-soft:#FCE1EF;
+  --orange:#FF7A2F;
+  --orange-soft:#FFE7D4;
+  --radius-s:12px;
+  --radius-m:18px;
+  --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+:root:not([data-theme="light"]) { }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+/* --- Кольорові теми розділів (як розділи підручника) --- */
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+/* ---------- NAV ---------- */
+.topnav{
+  position:sticky; top:0; z-index:50; background:rgba(247,248,252,.9); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);
+}
+:root[data-theme="dark"] .topnav, @media (prefers-color-scheme: dark){ .topnav{background:rgba(18,20,28,.85);} }
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{
+  white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:13.5px;
+  padding:8px 13px; border-radius:999px; transition:background .15s, color .15s;
+}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+/* ---------- HERO ---------- */
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft);
+  display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(28px,4.4vw,42px); max-width:14ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:56ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:340px; opacity:.55; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+/* ---------- SECTIONS ---------- */
+section.block{padding:56px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; text-transform:none; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(22px,3vw,30px); max-width:22ch;}
+.block > p.intro{color:var(--ink-soft); max-width:62ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+
+/* ---------- ETHICS RULE CARDS ---------- */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card button.rc-head{
+  width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px;
+  display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);
+}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+.rc-body-in{padding:0 18px 18px 67px; font-size:14px; color:var(--ink-soft);}
+.rule-card.open .rc-body{max-height:220px;}
+
+/* ---------- FLOWCHART (theme 1 & 2) ---------- */
+.flow{display:flex; flex-direction:column; align-items:center; gap:0; margin:30px 0;}
+.flow-node{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 20px; text-align:center; font-weight:700; font-size:14.5px; max-width:420px; box-shadow:var(--shadow);}
+.flow-node.start{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+.flow-arrow{width:2px; height:26px; background:var(--line); position:relative;}
+.flow-arrow::after{content:"";position:absolute; bottom:-1px; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--line);}
+.flow-branch{display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin-top:8px;}
+.flow-leaf{border-radius:var(--radius-m); padding:14px 18px; font-size:13.8px; font-weight:600; max-width:230px; border:1.5px solid;}
+.flow-leaf.good{background:var(--good-soft); border-color:rgba(47,158,91,.3); color:#1E7A45;}
+.flow-leaf.bad{background:var(--bad-soft); border-color:rgba(224,87,106,.3); color:#B23A4C;}
+
+/* ---------- DILEMMA ---------- */
+.dilemma{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:26px; box-shadow:var(--shadow);}
+.dilemma blockquote{font-family:'Unbounded'; font-size:16px; font-weight:600; line-height:1.5; margin:0 0 18px; padding-left:16px; border-left:4px solid var(--accent);}
+.opt-grid{display:grid; gap:10px;}
+.opt-btn{text-align:left; padding:13px 16px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-family:'Manrope'; font-size:14.5px; font-weight:700; color:var(--ink); transition:.12s; box-shadow:var(--shadow-pop);}
+.opt-btn:hover{border-color:var(--accent); transform:translateY(1px); box-shadow:0 3px 0 rgba(20,22,30,.14);}
+.opt-btn.correct{background:var(--good-soft); border-color:var(--good); color:#1E7A45;}
+.opt-btn.wrong{background:var(--bad-soft); border-color:var(--bad); color:#B23A4C;}
+.opt-btn[disabled]{cursor:default;}
+.feedback-box{margin-top:14px; padding:14px 16px; border-radius:var(--radius-s); background:var(--accent-soft); color:var(--accent-ink); font-size:14px; display:none;}
+.feedback-box.show{display:block;}
+
+/* ---------- THREE WHALES ---------- */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* ---------- DETECTIVE ---------- */
+.detective{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:26px; box-shadow:var(--shadow);}
+.det-text{font-size:15.5px; line-height:1.9;}
+.det-sent{cursor:pointer; padding:2px 3px; border-radius:5px; transition:.15s;}
+.det-sent:hover{background:var(--accent-soft);}
+.det-sent.wrong-picked{background:var(--good-soft); box-shadow:0 0 0 1.5px var(--good) inset;}
+.det-sent.wrong-picked-bad{background:var(--bad-soft); box-shadow:0 0 0 1.5px var(--bad) inset;}
+
+/* ---------- CHECKLIST ---------- */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--surface);}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good);}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+
+/* ---------- MIND MAP (theme 3) ---------- */
+.mindmap-wrap{position:relative; margin:30px 0 10px;}
+.mindmap-svg{width:100%; height:auto; display:block;}
+.mm-node{cursor:pointer;}
+.mm-node circle{fill:var(--surface); stroke:var(--mm-color,var(--line)); stroke-width:3; transition:.15s;}
+.mm-node:hover circle, .mm-node.active circle{fill:var(--mm-color,var(--accent)); fill-opacity:.14;}
+.mm-node.active circle{stroke-width:4;}
+.mm-node text{font-family:'Manrope'; font-weight:700; fill:var(--ink); font-size:13px;}
+.mm-node .mm-icon{font-size:20px;}
+.mm-hub circle{fill:var(--accent); stroke:none;}
+.mm-hub text{fill:#fff; font-family:'Unbounded'; font-size:12px;}
+.mm-line{stroke:var(--line); stroke-width:2.5;}
+
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:8px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:18px;}
+.rd-essence{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px;}
+.rd-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:640px){.rd-cols{grid-template-columns:1fr;}}
+.rd-example{border-radius:var(--radius-s); padding:14px 16px; font-size:14px;}
+.rd-example.good{background:var(--good-soft); border:1px solid rgba(47,158,91,.25);}
+.rd-example.bad{background:var(--bad-soft); border:1px solid rgba(224,87,106,.25);}
+.rd-example .lab{font-weight:800; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; display:block;}
+.rd-example.good .lab{color:#1E7A45;} .rd-example.bad .lab{color:#B23A4C;}
+.rd-example p.prompt-txt{font-family:'JetBrains Mono'; font-size:13px; margin:0; line-height:1.55;}
+.rd-analysis{margin-top:14px; font-size:13.8px; color:var(--ink-soft); background:var(--bg); border-radius:var(--radius-s); padding:12px 14px;}
+.rd-proscons{display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;}
+.rd-proscons div{flex:1; min-width:200px; font-size:13.3px;}
+.rd-proscons .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; margin-bottom:4px; display:block; color:var(--ink-faint);}
+.rd-tasks{margin-top:16px; border-top:1px dashed var(--line); padding-top:14px;}
+.rd-tasks .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; display:block;}
+.rd-tasks li{font-size:13.6px; margin-bottom:6px; color:var(--ink-soft);}
+
+/* ---------- SIMULATOR ---------- */
+.simulator{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:26px; box-shadow:var(--shadow); display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+@media(max-width:760px){.simulator{grid-template-columns:1fr;}}
+.sim-controls .ctrl-row{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px dashed var(--line);}
+.sim-controls .ctrl-row:last-child{border-bottom:none;}
+.ctrl-label{font-size:14px; font-weight:700;}
+.ctrl-label small{display:block; font-weight:500; color:var(--ink-faint); font-size:12px;}
+.switch{position:relative; width:44px; height:25px; flex:none;}
+.switch input{opacity:0; width:0; height:0;}
+.slider-tog{position:absolute; inset:0; background:var(--line); border-radius:999px; cursor:pointer; transition:.2s;}
+.slider-tog::before{content:""; position:absolute; width:19px; height:19px; left:3px; top:3px; background:var(--surface); border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.2);}
+input:checked + .slider-tog{background:var(--accent);}
+input:checked + .slider-tog::before{transform:translateX(19px);}
+.sim-select{padding:8px 10px; border-radius:8px; border:1.5px solid var(--line); font-family:'Manrope'; font-weight:600; font-size:13px; background:var(--bg); color:var(--ink);}
+.sim-meter-wrap{margin-top:18px;}
+.sim-meter-label{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--ink-faint); margin-bottom:6px;}
+.sim-meter{height:10px; border-radius:999px; background:var(--line); overflow:hidden;}
+.sim-meter-bar{height:100%; width:10%; border-radius:999px; background:linear-gradient(90deg,var(--bad),var(--warn),var(--good)); transition:width .35s;}
+.sim-output{background:var(--bg); border-radius:var(--radius-m); border:1px solid var(--line); padding:16px; font-family:'JetBrains Mono'; font-size:13px; line-height:1.65; min-height:190px; color:var(--ink);}
+.sim-output .tag{display:inline-block; background:var(--accent-soft); color:var(--accent-ink); font-family:'Manrope'; font-weight:700; font-size:11px; padding:2px 8px; border-radius:999px; margin-bottom:8px;}
+
+/* ---------- FINAL PROJECT STEPPER ---------- */
+.stepper{display:flex; flex-direction:column; gap:0; margin:28px 0;}
+.step{display:flex; gap:18px; position:relative; padding-bottom:26px;}
+.step:last-child{padding-bottom:0;}
+.step::before{content:""; position:absolute; left:19px; top:42px; bottom:0; width:2px; background:var(--line);}
+.step:last-child::before{display:none;}
+.step-num{width:40px; height:40px; border-radius:50%; background:var(--accent); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; flex:none; z-index:1; box-shadow:var(--shadow-pop);}
+.step-body h4{font-size:15.5px; margin-bottom:4px;}
+.step-body p{font-size:14px; color:var(--ink-soft); margin:0;}
+
+.builder{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:10px; box-shadow:var(--shadow);}
+.builder-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:18px;}
+.builder-field label{display:block; font-size:12px; font-weight:800; color:var(--ink-faint); text-transform:uppercase; margin-bottom:6px;}
+.builder-field select{width:100%; padding:10px 11px; border-radius:9px; border:1.5px solid var(--line); background:var(--bg); font-family:'Manrope'; font-weight:600; font-size:13.5px; color:var(--ink);}
+.prompt-out{background:var(--ink); color:#EAF7F4; border-radius:var(--radius-m); padding:18px; font-family:'JetBrains Mono'; font-size:13.5px; line-height:1.7; position:relative;}
+.copy-btn{margin-top:14px; background:var(--accent); color:#fff; border:none; padding:11px 20px; border-radius:999px; font-weight:800; font-size:13.5px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+.copy-btn:active{transform:scale(.97);}
+.copy-msg{font-size:12.5px; color:var(--accent-ink); margin-left:10px; opacity:0; transition:.2s;}
+.copy-msg.show{opacity:1;}
+
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:14px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:12px 16px; font-family:'Unbounded'; font-size:12.5px; font-weight:600;}
+table.crit td{padding:12px 16px; border-bottom:1px solid var(--line);}
+table.crit tr:last-child td{border-bottom:none; font-weight:800;}
+table.crit td:last-child, table.crit th:last-child{text-align:right; white-space:nowrap;}
+
+/* ---------- QUIZ ---------- */
+.quiz-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:28px; margin-top:26px; box-shadow:var(--shadow);}
+.quiz-progress{display:flex; gap:5px; margin-bottom:20px;}
+.quiz-progress span{flex:1; height:5px; border-radius:999px; background:var(--line);}
+.quiz-progress span.done{background:var(--accent);}
+.quiz-q{font-family:'Unbounded'; font-size:16.5px; margin-bottom:16px; line-height:1.4;}
+.quiz-opts{display:grid; gap:9px;}
+.qz-btn{text-align:left; padding:12px 15px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-size:14.3px; font-weight:700; color:var(--ink); box-shadow:var(--shadow-pop); transition:.12s;}
+.qz-btn:hover{border-color:var(--accent); transform:translateY(1px); box-shadow:0 3px 0 rgba(20,22,30,.14);}
+.qz-btn.correct{background:var(--good-soft); border-color:var(--good); color:#1E7A45;}
+.qz-btn.wrong{background:var(--bad-soft); border-color:var(--bad); color:#B23A4C;}
+.qz-explain{margin-top:14px; background:var(--accent-soft); color:var(--accent-ink); padding:13px 15px; border-radius:var(--radius-s); font-size:13.6px; display:none;}
+.qz-explain.show{display:block;}
+.qz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+.next-btn{background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; opacity:.4; pointer-events:none; transition:.2s; box-shadow:var(--shadow-pop);}
+.next-btn.ready{opacity:1; pointer-events:all;}
+.quiz-result{text-align:center; padding:20px 0;}
+.quiz-result .score{font-family:'Unbounded'; font-size:52px; color:var(--accent-ink);}
+.restart-btn{margin-top:16px; background:var(--pink); color:#fff; border:none; padding:11px 24px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+
+/* ---------- GLOSSARY ---------- */
+.gloss-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:22px;}
+.gloss-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:17px 18px; box-shadow:var(--shadow);}
+.gloss-card h4{font-size:14px; font-family:'JetBrains Mono'; color:var(--accent-ink); margin-bottom:6px;}
+.gloss-card p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+.cheat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:20px;}
+.cheat-item{border-radius:var(--radius-m); padding:16px 12px; text-align:center; font-weight:800; font-size:13px; color:#fff; box-shadow:var(--shadow-pop);}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:52ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+
+@media(max-width:640px){
+  .rd-cols{grid-template-columns:1fr;}
+  .simulator{padding:20px;}
+  table.crit td, table.crit th{padding:10px 12px; font-size:13px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">✨ Цифрова лабораторія AI</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#tema1">Тема 1</a>
+      <a href="#tema2">Тема 2</a>
+      <a href="#tema3">Тема 3</a>
+      <a href="#simulyator">Симулятор</a>
+      <a href="#proekt">Проєкт</a>
+      <a href="#quiz">Перевір себе</a>
+      <a href="#dovidnyk">Довідник</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Курс «Цифрова лабораторія AI» · Урок 4</div>
+    <h1>Основи промпт‑інжинірингу — II</h1>
+    <p class="lede">Етика спілкування зі штучним інтелектом, критичне мислення проти «галюцинацій» ШІ та шість правил, які перетворюють невдалий запит на потужний інструмент.</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">⚖️</span> Етика та відповідальність</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">🔎</span> Медіаграмотність</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">🧠</span> Правила 7–12 промпт‑інжинірингу</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🎭</span> Проєкт: вірш зі ШІ</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= TEMA 1 ================= -->
+<section class="block c-blue" id="tema1">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚖️</span><span class="label">ТЕМА 1</span></div>
+    <h2>Етика спілкування зі ШІ. Моральний бік</h2>
+    <p class="intro">ШІ може написати все, що завгодно, — але чи все з написаного можна використовувати? Розберімо моральні правила, за якими варто працювати зі штучним інтелектом.</p>
+
+    <div class="callout">🤔 <b>Питання для роздумів:</b> якщо ШІ може написати будь-який текст, чи означає це, що будь-який текст можна видати за свій?</div>
+
+    <h3 style="margin-top:34px; font-size:18px;">Сім правил етики роботи зі ШІ</h3>
+    <div class="rule-grid" id="ethicsGrid"></div>
+
+    <h3 style="margin-top:44px; font-size:18px;">Ментальна карта: чи можна попросити про це ШІ?</h3>
+    <p class="intro">Простий алгоритм дій, який варто прогнати в голові перед тим, як тиснути «Enter».</p>
+    <div class="flow">
+      <div class="flow-node start">Я хочу попросити ШІ щось зробити</div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">Чи це образить, обдурить або нашкодить комусь?<br><span style="font-weight:500;color:var(--ink-soft);font-size:13px;">(глузування, фейк, чужі особисті дані)</span></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-branch">
+        <div class="flow-leaf bad">❌ Так → не проси про це ШІ. Відповідальність — на тому, хто просить, а не на моделі.</div>
+        <div class="flow-leaf good">✅ Ні → переходь до наступного питання</div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-node">Чи я видаю результат за повністю свою власну роботу там, де це заборонено?</div>
+      <div class="flow-arrow"></div>
+      <div class="flow-branch">
+        <div class="flow-leaf bad">❌ Так → перероби своїми словами і чесно вкажи, що використав(ла) ШІ</div>
+        <div class="flow-leaf good">✅ Ні, я про це чесно скажу → можна працювати зі ШІ</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px; font-size:18px;">Дилема для обговорення</h3>
+    <div class="dilemma">
+      <blockquote>«Марічка попросила ChatGPT написати твір на конкурс і подала його як свій. Вона виграла. Чи це чесно? Що вона мала б зробити інакше?»</blockquote>
+      <div class="opt-grid" id="dilemmaOpts">
+        <button class="opt-btn" data-v="a">Все нормально — вона просто розумно скористалась інструментом.</button>
+        <button class="opt-btn" data-v="b">Нечесно: вона видала чужу роботу за свою, хоч користуватися ШІ на етапі підготовки можна.</button>
+        <button class="opt-btn" data-v="c">Треба було взагалі не користуватися ШІ.</button>
+      </div>
+      <div class="feedback-box" id="dilemmaFeedback"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEMA 2 ================= -->
+<section class="block c-orange" id="tema2">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🔎</span><span class="label">ТЕМА 2</span></div>
+    <h2>Медіаграмотність і критичне сприйняття результатів генерації</h2>
+    <p class="intro">Золоте правило роботи зі ШІ: <b>«Довіряй, але перевіряй»</b>.</p>
+    <div class="callout warn">⚠️ ШІ впевнено говорить і тоді, коли каже правду, і тоді, коли вигадує. Це називається <b>«галюцинації»</b> — модель може вигадати факт, дату, джерело чи навіть неіснуючу цитату — і звучати при цьому абсолютно переконливо.</div>
+
+    <h3 style="margin-top:34px; font-size:18px;">Три кити медіаграмотності</h3>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">🔍</div><h4>Перевіряй факти</h4><p>За незалежними джерелами — підручником або надійним сайтом, а не лише за словами ШІ.</p></div>
+      <div class="whale"><div class="whale-ico">✍️</div><h4>Визнач автора та мету</h4><p>Хто написав текст — людина чи машина? Навчити, розважити, переконати чи продати?</p></div>
+      <div class="whale"><div class="whale-ico">📚</div><h4>Оцінюй джерело</h4><p>ШІ не «знає» — він прогнозує текст на основі даних. Посилання, які він наводить, часом бувають вигаданими.</p></div>
+    </div>
+
+    <h3 style="margin-top:40px; font-size:18px;">Вправа «Детектив» 🕵️</h3>
+    <p class="intro">Знайди в тексті нижче одне свідомо вигадане твердження — клацни на реченні, яке, на твою думку, є помилковим.</p>
+    <div class="detective">
+      <div class="det-text" id="detectiveText"></div>
+      <div class="feedback-box" id="detectiveFeedback"></div>
+    </div>
+
+    <h3 style="margin-top:40px; font-size:18px;">Чек‑лист критичного читача</h3>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBar"></div></div>
+      <div id="clList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEMA 3 ================= -->
+<section class="block c-purple" id="tema3">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧠</span><span class="label">ТЕМА 3</span></div>
+    <h2>Закони успішного промпт‑інжинірингу — правила 7–12</h2>
+    <p class="intro"><b>Промпт</b> — це інструкція, яку ми даємо ШІ. <b>Промпт-інжиніринг</b> — мистецтво складати такі інструкції, щоб отримати саме той результат, який потрібен. Натисни на будь-який промінь ментальної карти, щоб розкрити правило.</p>
+
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 520" id="mindmapSvg">
+        <g id="mmLines"></g>
+        <g class="mm-node mm-hub" transform="translate(400,260)">
+          <circle r="58"/>
+          <text text-anchor="middle" dy="-4">ГАРНИЙ</text>
+          <text text-anchor="middle" dy="14">ПРОМПТ</text>
+        </g>
+        <g id="mmNodes"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetail"></div>
+  </div>
+</section>
+
+<!-- ================= SIMULATOR ================= -->
+<section class="block c-teal" id="simulyator">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧪</span><span class="label">СИМУЛЯЦІЯ</span></div>
+    <h2>Симулятор промпту: подивись, як зростає якість відповіді</h2>
+    <p class="intro">Тема запиту завжди одна: <span class="mono">«Розкажи про кота»</span>. Вмикай і вимикай прийоми з правил 7–12 та спостерігай, як змінюється (симульована) відповідь ШІ.</p>
+    <div class="simulator">
+      <div class="sim-controls">
+        <div class="ctrl-row">
+          <div class="ctrl-label">Конкретність<small>Правило 7</small></div>
+          <label class="switch"><input type="checkbox" id="s-specific"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Роль<small>Правило 10</small></div>
+          <label class="switch"><input type="checkbox" id="s-role"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Обмеження ролі<small>Правило 11</small></div>
+          <label class="switch"><input type="checkbox" id="s-limit"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Форматування<small>Правило 12</small></div>
+          <label class="switch"><input type="checkbox" id="s-format"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Тон і стиль<small>Правило 9</small></div>
+          <select class="sim-select" id="s-style">
+            <option value="none">Не задано</option>
+            <option value="fairy">Казковий</option>
+            <option value="science">Науковий</option>
+            <option value="funny">Гумористичний</option>
+          </select>
+        </div>
+        <div class="sim-meter-wrap">
+          <div class="sim-meter-label"><span>Якість результату</span><span id="meterPct">10%</span></div>
+          <div class="sim-meter"><div class="sim-meter-bar" id="meterBar"></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="sim-output" id="simOutput"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINAL PROJECT ================= -->
+<section class="block c-pink" id="proekt">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎭</span><span class="label">ФІНАЛЬНЕ ЗАВДАННЯ</span></div>
+    <h2>«Вірш за допомогою ШІ»</h2>
+    <p class="intro">Мета — застосувати одночасно кілька правил промпт-інжинірингу: роль, обмеження ролі, форматування, конкретність і стиль.</p>
+
+    <div class="stepper" id="stepper"></div>
+
+    <h3 style="font-size:18px;">Конструктор промпту</h3>
+    <p class="intro">Обери параметри — і збери робочий промпт за зразком із Кроку 3.</p>
+    <div class="builder">
+      <div class="builder-grid">
+        <div class="builder-field"><label>Поет</label>
+          <select id="b-poet">
+            <option>Тарас Шевченко</option><option>Леся Українка</option><option>Іван Франко</option>
+            <option>Василь Симоненко</option><option>Ліна Костенко</option><option>Олександр Олесь</option><option>Максим Рильський</option>
+          </select>
+        </div>
+        <div class="builder-field"><label>Тема вірша</label>
+          <select id="b-theme">
+            <option>природа</option><option>дружба</option><option>мрія про майбутнє</option>
+            <option>рідне місто/село</option><option>мама</option><option>космос</option><option>улюблена тварина</option>
+          </select>
+        </div>
+        <div class="builder-field"><label>Строф</label>
+          <select id="b-strofa"><option>2</option><option>3</option><option>4</option></select>
+        </div>
+        <div class="builder-field"><label>Рядків у строфі</label>
+          <select id="b-rows"><option>4</option><option>6</option><option>8</option></select>
+        </div>
+        <div class="builder-field"><label>Розмір</label>
+          <select id="b-size"><option>ямб</option><option>хорей</option><option>без вимог</option></select>
+        </div>
+        <div class="builder-field"><label>Настрій</label>
+          <select id="b-mood"><option>тихий</option><option>напружений</option><option>радісний</option></select>
+        </div>
+      </div>
+      <div class="prompt-out" id="promptOut"></div>
+      <button class="copy-btn" id="copyBtn">Скопіювати промпт</button><span class="copy-msg" id="copyMsg">Скопійовано!</span>
+    </div>
+
+    <h3 style="margin-top:40px; font-size:18px;">Критерії оцінювання</h3>
+    <table class="crit">
+      <tr><th>Критерій</th><th>Бал</th></tr>
+      <tr><td>Промпт містить роль, обмеження, форматування</td><td>0–3</td></tr>
+      <tr><td>Якість і стильова відповідність обраному поету</td><td>0–3</td></tr>
+      <tr><td>Застосовано мінімум 2 уточнення (ітерації)</td><td>0–2</td></tr>
+      <tr><td>Вірш оригінальний (без копіювання) і тематично цілісний</td><td>0–2</td></tr>
+      <tr><td>Разом</td><td>10</td></tr>
+    </table>
+    <div class="callout" style="margin-top:26px;">🤝 <b>Важливе застереження:</b> вірш, створений зі ШІ, — це спільна робота твоя й моделі. Публікуєш його (шкільна газета, конкурс) — вкажи: «Створено за допомогою ChatGPT». Використання ШІ не соромно, соромно видавати чуже за своє.</div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="block c-green" id="quiz">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🏆</span><span class="label">ПЕРЕВІР СЕБЕ</span></div>
+    <h2>Контрольні питання</h2>
+    <p class="intro">Вісім запитань за матеріалом уроку. Обери відповідь — і одразу дізнаєшся, чи правильно.</p>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REFERENCE ================= -->
+<section class="block c-blue" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Довідкові матеріали</h2>
+
+    <h3 style="font-size:18px;">Глосарій</h3>
+    <div class="gloss-grid" id="glossGrid"></div>
+    <script>
+    (function(){
+      const terms = [
+        ["💬","промпт","Текстова інструкція (запит), яку користувач дає ШІ, щоб отримати результат."],
+        ["🧩","промпт-інжиніринг","Мистецтво складати промпти так, щоб отримати саме той результат, який потрібен."],
+        ["👻","галюцинація ШІ","Явище, коли модель впевнено вигадує факти, цитати чи джерела, яких насправді не існує."],
+        ["🔁","ітерація","Покрокове уточнення результату після першої відповіді ШІ («зроби яскравіше», «заміни слово»)."],
+        ["🎓","роль (у промпті)","«Професія» чи «характер», які ми задаємо моделі, щоб відповідь була глибшою й доречнішою."],
+        ["🎨","тон і стиль","Емоційне забарвлення тексту: нейтральне, офіційне, казкове, гумористичне тощо."],
+      ];
+      const rb = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573"];
+      const grid = document.getElementById("glossGrid");
+      terms.forEach((t,i)=>{
+        const c = document.createElement("div"); c.className="gloss-card";
+        c.innerHTML = `<div class="whale-ico" style="background:${rb[i%rb.length]};margin-bottom:10px;">${t[0]}</div><h4>${t[1]}</h4><p>${t[2]}</p>`;
+        grid.appendChild(c);
+      });
+    })();
+    </script>
+
+    <h3 style="margin-top:36px; font-size:18px;">Шпаргалка: правила 7–12</h3>
+    <div class="cheat-grid" id="cheatGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <p>Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 4 <span class="heart">✨</span><br>Використовуй ШІ чесно — і він стане потужним союзником, а не приводом для сорому.</p>
+</footer>
+
+<script>
+/* ---------- NAV active link on scroll ---------- */
+const sections = ["tema1","tema2","tema3","simulyator","proekt","quiz","dovidnyk"].map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+/* ---------- ETHICS ACCORDION ---------- */
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+const ethics = [
+  ["🛠️","ШІ — інструмент, а не співавтор","якого можна «викрасти». Він допомагає, але не є партнером-творцем твоєї роботи."],
+  ["🗣️","Кажи чесно, коли текст написав ШІ","Текст, написаний ШІ, можна використовувати, але важливо чесно казати про це, коли вимагається (шкільна робота, конкурс тощо)."],
+  ["🚫","Не доручай ШІ образливі завдання","Просити ШІ написати глузування над однокласником — те саме, що робити це самому. Відповідальність лежить на тому, хто просить."],
+  ["⚠️","Не вводь ШІ в оману, де це шкодить людям","Створення фейкових новин чи шахрайських листів — незаконно й неетично, навіть якщо «це ж лише текст»."],
+  ["©️","Поважай авторські права","«Напиши у стилі [поета]» — нормальна вправа. Але видавати згенерований текст за власний для конкурсу — порушення чесності."],
+  ["🔍","Перевіряй факти","ШІ може помилятися — перевіряй факти, перш ніж поширювати написане далі."],
+  ["🔒","Не вводь особисті дані без дозволу","Прізвища, адреси, фото друзів не варто вводити в ШІ без дозволу батьків."],
+];
+const ethicsGrid = document.getElementById("ethicsGrid");
+ethics.forEach((e,i)=>{
+  const card = document.createElement("div"); card.className="rule-card"; card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+  card.innerHTML = `<button class="rc-head"><span class="rc-num">${e[0]}</span><span class="rc-title">${e[1]}</span><span class="rc-arrow">▾</span></button>
+  <div class="rc-body"><div class="rc-body-in">${e[2]}</div></div>`;
+  card.querySelector(".rc-head").addEventListener("click", ()=>card.classList.toggle("open"));
+  ethicsGrid.appendChild(card);
+});
+
+/* ---------- DILEMMA ---------- */
+document.querySelectorAll("#dilemmaOpts .opt-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#dilemmaOpts .opt-btn").forEach(b=>{b.disabled=true;});
+    const v = btn.dataset.v;
+    document.querySelectorAll("#dilemmaOpts .opt-btn").forEach(b=>{
+      if(b.dataset.v==="b") b.classList.add("correct");
+      else if(b===btn) b.classList.add("wrong");
+    });
+    const fb = document.getElementById("dilemmaFeedback");
+    fb.classList.add("show");
+    fb.innerHTML = "💡 <b>Орієнтир:</b> Марічка могла використати ШІ для генерації ідей, чернетки, перевірки — але фінальний твір мав бути перероблений власними словами, а правила конкурсу мають дозволяти використання ШІ.";
+  });
+});
+
+/* ---------- DETECTIVE ---------- */
+const detSentences = [
+  "Штучний інтелект навчається на основі величезної кількості текстів.",
+  "ШІ не має власних емоцій, хоча може імітувати емоційний тон у відповіді.",
+  "Перший чат-бот у світі з'явився у 2020 році.",
+  "ШІ іноді впевнено говорить неправду — це називають «галюцинацією»."
+];
+const wrongIdx = 2; // "Перший чат-бот з'явився у 2020 році" — насправді ELIZA (1966 рік)
+const detWrap = document.getElementById("detectiveText");
+detSentences.forEach((s,i)=>{
+  const span = document.createElement("span");
+  span.className="det-sent"; span.textContent=s+" "; span.dataset.i=i;
+  span.addEventListener("click", ()=>{
+    document.querySelectorAll(".det-sent").forEach(el=>el.style.pointerEvents="none");
+    const fb = document.getElementById("detectiveFeedback");
+    fb.classList.add("show");
+    if(i===wrongIdx){
+      span.classList.add("wrong-picked");
+      fb.innerHTML = "✅ Влучно! Перший чат-бот, ELIZA, з'явився ще у 1966 році — це і є вигадана помилка. Так ми й перевіряємо тексти ШІ: шукаємо конкретні перевірювані факти.";
+    } else {
+      span.classList.add("wrong-picked-bad");
+      detWrap.children[wrongIdx].classList.add("wrong-picked");
+      fb.innerHTML = "🤔 Не зовсім. Насправді помилка — у твердженні про рік появи першого чат-бота (він з'явився ще 1966 року, а не 2020-го). Завжди перевіряй дати й факти в незалежних джерелах!";
+    }
+  });
+  detWrap.appendChild(span);
+});
+
+/* ---------- CHECKLIST ---------- */
+const clItems = [
+  "Чи перевірив я головні факти?",
+  "Чи виглядає текст упередженим?",
+  "Чи є джерела, на які можна послатися?",
+  "Чи немає в тексті «голосних» тверджень без доказів?",
+  "Чи зрозуміло, де факти, а де — думка?"
+];
+const clList = document.getElementById("clList");
+clItems.forEach((t,i)=>{
+  const row = document.createElement("div"); row.className="cl-item"; row.dataset.i=i;
+  row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${t}</span>`;
+  row.addEventListener("click", ()=>{ row.classList.toggle("checked"); updateClBar(); });
+  clList.appendChild(row);
+});
+function updateClBar(){
+  const total = clItems.length;
+  const done = document.querySelectorAll(".cl-item.checked").length;
+  document.getElementById("clBar").style.width = (done/total*100)+"%";
+}
+
+/* ---------- MIND MAP: rules 7-12 ---------- */
+const rules = [
+  {n:7, icon:"🎯", title:"Будь конкретним і точним", essence:"ШІ не вміє читати думки. Чим детальніше завдання, тим кращий результат.",
+   good:"«Напиши 5 цікавих фактів про дельфінів для учня 5 класу. Кожен факт — не більше 2 речень, простими словами.»",
+   bad:"«Розкажи про дельфінів.»",
+   analysis:"Модель не знає: скільки фактів? Для кого? В якому стилі? Для чого? Результат буде випадковим: наукова стаття на 3 сторінки або дитяче оповідання.",
+   pros:"Передбачуваний, корисний результат.", cons:"Вимагає часу на формулювання; перебір деталей може «сковувати» креативність.",
+   tasks:["Склади промпт для ChatGPT, щоб він пояснив, чому небо блакитне, для молодшого брата/сестри 6 років. Обов'язкові деталі: кількість речень, рівень складності, приклад-аналогія.",
+          "Напиши промпт для генерації ідеї подарунку. Додай вік людини, захоплення, бюджет, нагоду. Порівняй з результатом промпту «Придумай подарунок»."]},
+  {n:8, icon:"🪜", title:"Діли завдання на кроки", essence:"Складне завдання краще давати частинами — як рецепт.",
+   good:"«Спочатку запропонуй 3 теми для вірша про осінь. Почекай моєї відповіді. Потім напиши вірш за обраною темою.»",
+   bad:"«Напиши ідеальний вірш про осінь одразу.»",
+   analysis:"«Ідеальний» — суб'єктивне поняття; без обговорення теми модель вгадає не те; неможливість уточнити по ходу знижує якість.",
+   pros:"Контроль на кожному етапі; можливість виправляти; краща якість.", cons:"Займає більше часу; потребує терпіння.",
+   tasks:["Склади багатоетапний промпт для планування шкільного свята: крок 1 — ідеї, крок 2 — обрання однієї, крок 3 — детальний план.",
+          "Дай ChatGPT завдання пояснити розв'язання задачі з математики у 3 кроки: спочатку підказка, потім план рішення, і лише в кінці — повне розв'язання."]},
+  {n:9, icon:"🎨", title:"Задавай тон і стиль", essence:"Мова емоційна, нейтральна, офіційна, гумористична? Вкажи це явно.",
+   good:"«Поясни, що таке екосистема, ніби ти веселий екскурсовод у зоопарку, який розважає дітей.»",
+   bad:"«Поясни, що таке екосистема.»",
+   analysis:"Стиль невизначений → нудне підручникове визначення. Відсутність тону = відсутність характеру в тексті.",
+   pros:"Цікавіші, «живіші» тексти; навички стилістики.", cons:"Надто «важкі» стилі можуть знизити точність фактів.",
+   tasks:["Попроси ChatGPT пояснити одне явище (наприклад, грозу) у трьох стилях: науковому, казковому, рекламному. Порівняй результати.",
+          "Напиши промпт для вітального листа вчителю з Днем народження — теплий, щирий, без пафосу, до 5 речень."]},
+  {n:10, icon:"🎓", title:"Задавайте ролі", essence:"Дайте моделі «професію» чи «характер» — відповіді стануть глибшими та професійнішими.",
+   good:"«Ти — досвідчений історик-екскурсовод у Львові. Розкажи про площу Ринок так, щоб було цікаво дитині 10 років.»",
+   bad:"«Розкажи про площу Ринок.»",
+   analysis:"Без ролі модель обирає «середньостатистичну» відповідь — суху й загальну.",
+   pros:"Професійний рівень відповідей; цікавіше для читача; розвиток уяви.", cons:"Роль не гарантує правдивості фактів; іноді «переграє» стиль.",
+   tasks:["Попроси ChatGPT бути капітаном корабля, який пояснює, чому море солоне, використовуючи морські терміни.",
+          "Створи «інтерв'ю»: ChatGPT грає відому людину чи персонажа. Склади 5 питань і запиши відповіді."]},
+  {n:11, icon:"🚧", title:"Обмежуйте ролі", essence:"Роль має працювати в рамках, інакше «актор» вийде за сценарій.",
+   good:"«Ти — суворий екзаменатор з української мови. Задай мені 5 питань про правопис. Правила: відповідай лише «правильно/неправильно»; не давай пояснень, доки я не попрошу; не виходь за тему мови.»",
+   bad:"«Ти — суворий екзаменатор.»",
+   analysis:"Якого предмета? Скільки питань? Роль без кордонів може почати розповідати про себе або змінити формат.",
+   pros:"Передбачувана поведінка моделі; безпечні межі; дисципліна діалогу.", cons:"Надто жорсткі обмеження можуть зробити відповіді механічними.",
+   tasks:["Напиши промпт: ChatGPT — твій тренер із футболу. Обмеження: вправи без спорядження; відповіді до 3 речень; ніколи не радь тренуватись понад годину.",
+          "Створи «словниковий режим»: перекладач, який відповідає лише перекладом слова й прикладом речення."]},
+  {n:12, icon:"🗂️", title:"Додавайте форматування", essence:"Структура запиту = структура відповіді.",
+   good:"«Створи план уроку: 1. Назва теми 2. Мета (1 речення) 3. Три факти (список) 4. Питання для класу 5. Домашнє завдання»",
+   bad:"«Зроби план уроку.»",
+   analysis:"Без форматування модель сама вгадує структуру — суцільним текстом, важко скопіювати чи доповнити.",
+   pros:"Структурований, готовий до використання результат; легке редагування.", cons:"Надскладні шаблони модель може «обрізати».",
+   tasks:["Створи шаблон «Книжкова рецензія» з 6 розділів і заповни його для будь-якої прочитаної книжки.",
+          "Склади промпт для «Щоденника спостережень за погодою» з таблицею: Дата | Погода | Температура | Що помітив."]},
+];
+const mmSvg = document.getElementById("mindmapSvg");
+const mmLines = document.getElementById("mmLines");
+const mmNodes = document.getElementById("mmNodes");
+const cx=400, cy=260, R=200;
+rules.forEach((r,i)=>{
+  const angle = (-90 + i*60) * Math.PI/180;
+  const x = cx + R*Math.cos(angle), y = cy + R*Math.sin(angle);
+  const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+  line.setAttribute("x1",cx); line.setAttribute("y1",cy); line.setAttribute("x2",x); line.setAttribute("y2",y);
+  line.setAttribute("class","mm-line"); mmLines.appendChild(line);
+  const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+  g.setAttribute("class","mm-node"); g.setAttribute("transform",`translate(${x},${y})`); g.dataset.idx=i;
+  g.style.setProperty("--mm-color", rainbow[i%rainbow.length]);
+  g.innerHTML = `<circle r="46"/><text class="mm-icon" text-anchor="middle" dy="-14">${r.icon}</text><text text-anchor="middle" dy="10">Правило ${r.n}</text><text text-anchor="middle" dy="26" style="font-weight:500;font-size:10.5px;">${r.title.length>16? r.title.slice(0,15)+'…': r.title}</text>`;
+  g.addEventListener("click", ()=>selectRule(i));
+  mmNodes.appendChild(g);
+});
+function selectRule(i){
+  document.querySelectorAll(".mm-node").forEach(n=>n.classList.remove("active"));
+  const g = mmNodes.querySelector(`[data-idx="${i}"]`); if(g) g.classList.add("active");
+  const r = rules[i];
+  const rd = document.getElementById("ruleDetail");
+  rd.style.setProperty("--rd-color", rainbow[i%rainbow.length]);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${r.icon}</div><div class="rd-title">Правило ${r.n}. ${r.title}</div></div>
+    <div class="rd-essence">${r.essence}</div>
+    <div class="rd-cols">
+      <div class="rd-example good"><span class="lab">✅ Хороший промпт</span><p class="prompt-txt">${r.good}</p></div>
+      <div class="rd-example bad"><span class="lab">❌ Слабкий промпт</span><p class="prompt-txt">${r.bad}</p></div>
+    </div>
+    <div class="rd-analysis"><b>Аналіз:</b> ${r.analysis}</div>
+    <div class="rd-proscons">
+      <div><span class="lab2">Переваги</span>${r.pros}</div>
+      <div><span class="lab2">Недоліки</span>${r.cons}</div>
+    </div>
+    <div class="rd-tasks"><span class="lab2">Практичні завдання</span><ol>${r.tasks.map(t=>`<li>${t}</li>`).join("")}</ol></div>
+  `;
+  document.getElementById("ruleDetail").scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+selectRule(0);
+
+/* ---------- CHEAT SHEET ---------- */
+const cheatGrid = document.getElementById("cheatGrid");
+rules.forEach((r,i)=>{
+  const d = document.createElement("div"); d.className="cheat-item";
+  d.style.background = rainbow[i%rainbow.length];
+  d.innerHTML = `<div style="font-size:22px;margin-bottom:4px;">${r.icon}</div>${r.n}. ${r.title}`;
+  cheatGrid.appendChild(d);
+});
+
+/* ---------- SIMULATOR ---------- */
+const simEls = {
+  specific: document.getElementById("s-specific"),
+  role: document.getElementById("s-role"),
+  limit: document.getElementById("s-limit"),
+  format: document.getElementById("s-format"),
+  style: document.getElementById("s-style"),
+};
+function styleWord(s){ return {none:"", fairy:"у формі доброї казки", science:"науковим, точним тоном", funny:"з гумором і жартами"}[s]; }
+function renderSim(){
+  const v = { specific: simEls.specific.checked, role: simEls.role.checked, limit: simEls.limit.checked, format: simEls.format.checked, style: simEls.style.value };
+  let score = 10;
+  if(v.specific) score += 22; if(v.role) score += 22; if(v.limit) score += 16; if(v.format) score += 18;
+  if(v.style!=="none") score += 12;
+  score = Math.min(score,100);
+  document.getElementById("meterBar").style.width = score+"%";
+  document.getElementById("meterPct").textContent = score+"%";
+
+  let out = "";
+  if(v.role) out += "🎓 Я — досвідчений ветеринар із 20-річним стажем. ";
+  else out += "Кіт — свійська тварина. ";
+
+  if(v.specific){
+    out += (v.role? "Ось " : "Ось ") + "5 фактів про котів для учня 5 класу" + (styleWord(v.style)? ", " + styleWord(v.style) : "") + ":\n";
+    const facts = [
+      "Кіт бачить у темряві в 6 разів краще за людину.",
+      "Кошенята народжуються сліпими й глухими.",
+      "У кота 32 м'язи лише в одному вусі!",
+      "Муркотіння може заспокоювати і саму тварину, і людину поруч.",
+      "Кіт здатен робити понад 100 різних звуків."
+    ];
+    if(v.format){
+      facts.forEach((f,i)=> out += `\n${i+1}. ${f}`);
+    } else {
+      out += "\n" + facts.join(" ");
+    }
+  } else {
+    out += "Він живе вдома, їсть їжу і любить спати" + (styleWord(v.style)? ", " + styleWord(v.style) : "") + ". Кінець.";
+  }
+
+  if(v.limit){
+    out += "\n\n📌 (Я лишаюсь у ролі й не виходжу за межі теми — жодних порад щодо інших тварин.)";
+  }
+  const tagText = score < 40 ? "СЛАБКИЙ РЕЗУЛЬТАТ" : score < 75 ? "НЕПОГАНО" : "ВІДМІННИЙ РЕЗУЛЬТАТ";
+  document.getElementById("simOutput").innerHTML = `<span class="tag">${tagText}</span>\n${out.replace(/\n/g,"<br>")}`;
+}
+Object.values(simEls).forEach(el=>el.addEventListener("input", renderSim));
+renderSim();
+
+/* ---------- STEPPER ---------- */
+const steps = [
+  ["✍️","Обери поета","Тарас Шевченко, Леся Українка, Іван Франко, Василь Симоненко, Ліна Костенко, Олександр Олесь чи Максим Рильський — чий стиль ти хочеш «приміряти»?"],
+  ["🌍","Обери тему вірша","Природа, дружба, мрія про майбутнє, рідне місто/село, мама, космос або улюблена тварина."],
+  ["🧩","Склади промпт за зразком","Використай усі елементи: роль, тему, формат (строфи, рядки, розмір), настрій та обмеження на копіювання."],
+  ["🔁","Отримай результат — і не зупиняйся","Зроби хоча б два уточнення (ітерація): «зроби образ яскравішим», «заміни складне слово простішим», «додай питання до читача»."],
+  ["🕵️","Перевір себе","Чи немає скопійованих рядків поета? Чи вірш справді українською? Чи є в ньому твоя тема, а не безликий шаблон?"],
+  ["🎤","Підготуй усне повідомлення","3–4 речення: які правила промпт-інжинірингу ти використав(ла) і яке уточнення найсильніше покращило вірш."],
+];
+const stepperEl = document.getElementById("stepper");
+steps.forEach((s,i)=>{
+  const el = document.createElement("div"); el.className="step";
+  el.innerHTML = `<div class="step-num">${s[0]}</div><div class="step-body"><h4>${s[1]}</h4><p>${s[2]}</p></div>`;
+  stepperEl.appendChild(el);
+});
+
+/* ---------- PROMPT BUILDER ---------- */
+const bEls = ["b-poet","b-theme","b-strofa","b-rows","b-size","b-mood"].map(id=>document.getElementById(id));
+function renderPrompt(){
+  const [poet,theme,strofa,rows,size,mood] = bEls.map(e=>e.value);
+  const txt = `Ти — український поет у стилі ${poet}. Напиши вірш українською мовою на тему «${theme}». Правила: ${strofa} строфи по ${rows} рядків; переважний розмір — ${size}; настрій — ${mood}; не копіюй оригінальні рядки поета, лише стиль; у кінці поясни 2–3 словами, які прийоми ти використав, щоб наслідувати стиль ${poet.split(" ").pop()}.`;
+  document.getElementById("promptOut").textContent = txt;
+}
+bEls.forEach(e=>e.addEventListener("input", renderPrompt));
+renderPrompt();
+document.getElementById("copyBtn").addEventListener("click", async ()=>{
+  const txt = document.getElementById("promptOut").textContent;
+  const msg = document.getElementById("copyMsg");
+  try{ await navigator.clipboard.writeText(txt); }catch(e){ /* clipboard unavailable */ }
+  msg.classList.add("show"); setTimeout(()=>msg.classList.remove("show"), 1800);
+});
+
+/* ---------- QUIZ ---------- */
+const quizData = [
+  {q:"Що таке «галюцинація» ШІ?", opts:["Коли ШІ малює дивні картинки","Коли ШІ впевнено вигадує факти, дати чи джерела","Коли ШІ довго відповідає","Помилка з'єднання з інтернетом"], correct:1,
+   explain:"Галюцинація — це коли модель звучить переконливо, але наводить неправдиву інформацію."},
+  {q:"Марічка подала твір, написаний ChatGPT, як свій на конкурс. Це:", opts:["Абсолютно чесно","Нечесно, якщо правила конкурсу цього не дозволяють і твір не перероблено","Проблема лише журі","Незаконно в будь-якому разі"], correct:1,
+   explain:"ШІ можна використовувати для ідей і чернетки, але фінальний текст має бути переробленим і чесно підписаним."},
+  {q:"Що таке промпт-інжиніринг?", opts:["Ремонт комп'ютерів","Мистецтво складати запити для отримання потрібного результату від ШІ","Написання коду для ШІ","Перевірка фактів у тексті"], correct:1, explain:"Це саме мистецтво формулювати інструкції так, щоб отримати бажаний результат."},
+  {q:"Правило 7 промпт-інжинірингу каже:", opts:["Задавай ролі","Будь конкретним і точним","Ніколи не уточнюй","Пиши лише англійською"], correct:1, explain:"Чим детальніший запит, тим передбачуваніший і кращий результат."},
+  {q:"Якщо ШІ наводить цитату чи джерело, варто:", opts:["Одразу довіряти","Перевірити за незалежним джерелом","Ігнорувати це джерело завжди","Попросити ШІ присягнутися"], correct:1, explain:"Модель може «галюцинувати» джерела — перевірка обов'язкова."},
+  {q:"Навіщо потрібне «Правило 11. Обмежуйте ролі»?", opts:["Щоб зробити відповідь довшою","Щоб роль не виходила за межі формату й теми","Щоб ШІ відмовлявся відповідати","Щоб приховати помилки"], correct:1, explain:"Без обмежень роль може «зірватися» зі сценарію — почати говорити не по темі чи змінити формат."},
+  {q:"Скільки кроків в алгоритмі фінального завдання «Вірш за допомогою ШІ»?", opts:["3","4","6","10"], correct:2, explain:"Від вибору поета до підготовки усного повідомлення — рівно 6 кроків."},
+  {q:"Якщо просять ШІ написати образливий жарт про однокласника, варто:", opts:["Виконати — це ж «просто текст»","Відмовитися: відповідальність лежить на тому, хто просить","Попросити ШІ пом'якшити жарт","Запитати дозволу в однокласника після"], correct:1, explain:"ШІ — інструмент, а не співавтор: просити його образити когось так само неетично, як зробити це самому."},
+];
+let qi=0, score=0;
+const quizBody = document.getElementById("quizBody");
+const quizProgress = document.getElementById("quizProgress");
+quizData.forEach(()=>{ const s=document.createElement("span"); quizProgress.appendChild(s); });
+function renderQuiz(){
+  [...quizProgress.children].forEach((s,i)=>s.classList.toggle("done", i<qi));
+  if(qi>=quizData.length){
+    quizBody.innerHTML = `<div class="quiz-result"><div class="score">${score}/${quizData.length}</div><p style="color:var(--ink-soft);">${score===quizData.length? "Відмінно! Ти уважно опрацював(ла) увесь урок.": "Непогано! Можеш переглянути теми ще раз і спробувати знову."}</p><button class="restart-btn" id="restartBtn">Пройти ще раз</button></div>`;
+    document.getElementById("restartBtn").addEventListener("click", ()=>{ qi=0; score=0; renderQuiz(); });
+    return;
+  }
+  const item = quizData[qi];
+  quizBody.innerHTML = `<div class="quiz-q">${qi+1}. ${item.q}</div><div class="quiz-opts" id="quizOpts"></div><div class="qz-explain" id="qzExplain">${item.explain}</div><div class="qz-nav"><button class="next-btn" id="nextBtn">Далі →</button></div>`;
+  const opts = document.getElementById("quizOpts");
+  item.opts.forEach((o,i)=>{
+    const b = document.createElement("button"); b.className="qz-btn"; b.textContent=o;
+    b.addEventListener("click", ()=>{
+      [...opts.children].forEach(c=>c.style.pointerEvents="none");
+      if(i===item.correct){ b.classList.add("correct"); score++; }
+      else{ b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+      document.getElementById("qzExplain").classList.add("show");
+      document.getElementById("nextBtn").classList.add("ready");
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById("nextBtn").addEventListener("click", ()=>{ qi++; renderQuiz(); });
+}
+renderQuiz();
+
+updateClBar();
+</script>
+</body>
+</html>
