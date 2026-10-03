@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Методичні рекомендації. Урок 5 — Геймдизайн і тексти: AI-квест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7;
+  --bg-hero:#FFF6E4;
+  --surface:#FFFFFF;
+  --ink:#20222E;
+  --ink-soft:#555A6E;
+  --ink-faint:#8D91A6;
+  --line:#ECE6D6;
+  --accent:#1E88E5;
+  --accent-ink:#0F5FA8;
+  --accent-soft:#E1F0FE;
+  --violet:#8B5CF6;
+  --violet-soft:#F1EAFE;
+  --warn:#FFB020;
+  --warn-soft:#FFF1D2;
+  --bad:#F2495C;
+  --bad-soft:#FDE3E7;
+  --good:#22B573;
+  --good-soft:#DDF7EC;
+  --teal:#12B3A0;
+  --teal-soft:#DBF7F2;
+  --pink:#EC4899;
+  --pink-soft:#FCE1EF;
+  --orange:#FF7A2F;
+  --orange-soft:#FFE7D4;
+  --radius-s:12px;
+  --radius-m:18px;
+  --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+:root:not([data-theme="light"]) { }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+/* --- Кольорові теми розділів --- */
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+/* NAV */
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:13px; padding:8px 12px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+/* HERO */
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(26px,4vw,40px); max-width:18ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:60ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:320px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+/* SECTIONS */
+section.block{padding:56px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(21px,2.8vw,28px); max-width:26ch;}
+.block > p.intro{color:var(--ink-soft); max-width:64ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+.callout.pink{background:var(--pink-soft); color:#9A2A66; border-color:rgba(236,72,153,.25);}
+
+/* GOAL / WHALE CARDS */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* ACCORDION (difficulties / question bank) */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.rc-body-in{padding:0 18px 18px 67px; font-size:14px; color:var(--ink-soft);}
+.rc-body-in ul{margin:0; padding-left:18px;}
+.rc-body-in li{margin-bottom:5px;}
+.rule-card.open .rc-body{max-height:420px;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--surface);}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good);}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+
+/* LESSON ALGORITHM */
+.flow{display:flex; flex-direction:column; align-items:stretch; gap:0; margin:30px 0;}
+.flow-node{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:15px 20px; font-weight:700; font-size:14.5px; box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center; gap:14px; transition:.15s;}
+.flow-node:hover{border-color:var(--fn-color,var(--accent));}
+.flow-node.active{border-color:var(--fn-color,var(--accent)); background:var(--accent-soft);}
+.flow-node .fn-ico{width:40px; height:40px; border-radius:50%; background:var(--fn-color,var(--accent)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex:none; box-shadow:var(--shadow-pop);}
+.flow-node .fn-title{flex:1;}
+.flow-node .fn-time{font-family:'JetBrains Mono'; font-weight:700; font-size:12.5px; color:var(--ink-faint); background:var(--bg); padding:4px 10px; border-radius:999px; flex:none;}
+.flow-arrow{width:2px; height:20px; background:var(--line); margin-left:39px; position:relative;}
+.flow-arrow::after{content:"";position:absolute; bottom:-1px; left:-3px; border:4px solid transparent; border-top-color:var(--line);}
+
+/* STAGE DETAIL */
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:18px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-essence{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px;}
+.rd-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:640px){.rd-cols{grid-template-columns:1fr;}}
+.rd-example{border-radius:var(--radius-s); padding:14px 16px; font-size:14px;}
+.rd-example.good{background:var(--good-soft); border:1px solid rgba(47,158,91,.25);}
+.rd-example.bad{background:var(--bad-soft); border:1px solid rgba(224,87,106,.25);}
+.rd-example .lab{font-weight:800; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; display:block;}
+.rd-example.good .lab{color:#1E7A45;} .rd-example.bad .lab{color:#B23A4C;}
+.rd-analysis{margin-top:14px; font-size:13.8px; color:var(--accent-ink); background:var(--accent-soft); border-radius:var(--radius-s); padding:12px 14px; font-style:italic;}
+.rd-proscons{display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;}
+.rd-proscons div{flex:1; min-width:200px; font-size:13.3px;}
+.rd-proscons .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; margin-bottom:4px; display:block; color:var(--ink-faint);}
+.rd-tasks{margin-top:16px; border-top:1px dashed var(--line); padding-top:14px; font-size:13.6px; color:var(--ink-soft);}
+.rd-tasks .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; display:block;}
+
+/* TIME BUDGET BAR */
+.timebar{display:flex; height:34px; border-radius:999px; overflow:hidden; margin:24px 0 6px; box-shadow:var(--shadow);}
+.timebar span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; font-family:'JetBrains Mono';}
+.timebar-legend{display:flex; flex-wrap:wrap; gap:10px 16px; font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;}
+.timebar-legend span{display:flex; align-items:center; gap:6px;}
+.timebar-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+/* RUBRIC TABLE */
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:14px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:12px 16px; font-family:'Unbounded'; font-size:12.5px; font-weight:600;}
+table.crit td{padding:12px 16px; border-bottom:1px solid var(--line);}
+table.crit tr:last-child td{border-bottom:none; font-weight:800;}
+table.crit td:last-child, table.crit th:last-child{text-align:right; white-space:nowrap;}
+
+/* PROMPT BOX */
+.promptbox{background:var(--ink); color:#EAF7F4; border-radius:var(--radius-m); padding:16px 18px; font-family:'JetBrains Mono'; font-size:12.6px; line-height:1.65; white-space:pre-wrap; margin:14px 0;}
+.promptbox .lab{display:block; font-family:'Manrope'; font-weight:800; color:#9ADCCB; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:56ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+
+@media(max-width:640px){
+  .rd-cols{grid-template-columns:1fr;}
+  table.crit td, table.crit th{padding:10px 12px; font-size:13px;}
+  .flow-node{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">🍎 Методичні рекомендації</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#meta">Мета уроку</a>
+      <a href="#pidhotovka">Підготовка</a>
+      <a href="#hid-uroku">Хід уроку</a>
+      <a href="#trudnoshi">Труднощі</a>
+      <a href="#dyferentsiatsiya">Диференціація</a>
+      <a href="#otsinyuvannya">Оцінювання</a>
+      <a href="#dovidnyk">Довідник</a>
+      <a href="#refleksiya">Рефлексія</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Для вчителя · Курс «Цифрова лабораторія AI» · Урок 5</div>
+    <h1>Методичні рекомендації до уроку</h1>
+    <p class="lede">Покроковий сценарій, хронометраж, орієнтовні репліки, типові труднощі й поради для проведення уроку «Геймдизайн і тексти: створюємо AI-квест» (90 хв або 2×45 хв, учні 8–14 років).</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">🎯</span> Мета і завдання</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">⏱️</span> Хронометраж 90 хв</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">🗺️</span> Хід уроку крок за кроком</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🎲</span> Підтримка через генератор ідей</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= META ================= -->
+<section class="block c-blue" id="meta">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎯</span><span class="label">МЕТА УРОКУ</span></div>
+    <h2>Навчальна, розвивальна й виховна мета</h2>
+    <p class="intro">Фінальний результат заняття: готовий текстовий сценарій гри-квесту мінімум на 5 взаємопов'язаних сцен (дерево виборів), створений за допомогою промпт-інжинірингу й протестований у режимі AI-плейтесту.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">📘</div><h4>Навчальна</h4><p>Ознайомити учнів із механікою текстового квесту (сцена, дерево рішень, умови перемоги/поразки) та формулою промпту для сценариста.</p></div>
+      <div class="whale"><div class="whale-ico">🧩</div><h4>Розвивальна</h4><p>Розвивати логічне мислення під час побудови дерева рішень, навички структурування запитів і вміння тестувати власний продукт.</p></div>
+      <div class="whale"><div class="whale-ico">🎨</div><h4>Виховна</h4><p>Формувати наполегливість у доопрацюванні своєї творчої роботи та відповідальне ставлення до перевірки результату перед тим, як вважати його готовим.</p></div>
+    </div>
+    <div class="callout">📌 <b>Тип уроку:</b> комбінований (теорія + масштабна практика). <b>Вік учнів:</b> 8–14 років. <b>Тривалість:</b> 90 хв (або 2 уроки по 45 хв — природний поділ: Теорія+Формула / Практика+Рефлексія). <b>Формат:</b> фронтальна робота, демонстрація, самостійна практика з ШІ.</div>
+  </div>
+</section>
+
+<!-- ================= PIDHOTOVKA ================= -->
+<section class="block c-orange" id="pidhotovka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧰</span><span class="label">ПІДГОТОВКА</span></div>
+    <h2>Що підготувати заздалегідь</h2>
+    <p class="intro">Позначте пункти в міру готовності — прогрес-бар покаже, наскільки урок готовий до старту.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarPrep"></div></div>
+      <div id="clListPrep"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HID UROKU ================= -->
+<section class="block c-purple" id="hid-uroku">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🗺️</span><span class="label">ХІД УРОКУ</span></div>
+    <h2>Алгоритм уроку та хронометраж (90 хв)</h2>
+    <p class="intro">Натисни на будь-який етап, щоб розгорнути методичні поради: що робити, які репліки використати та на що звернути увагу. За потреби розділіть лінію навпіл після етапу «Формула промпту» — отримаєте два уроки по 45 хв.</p>
+
+    <div class="timebar-legend" id="timebarLegend"></div>
+    <div class="timebar" id="timebar"></div>
+
+    <div class="flow" id="stageFlow"></div>
+    <div class="rule-detail" id="stageDetail"></div>
+  </div>
+</section>
+
+<!-- ================= TRUDNOSHI ================= -->
+<section class="block c-teal" id="trudnoshi">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚡</span><span class="label">ТИПОВІ ТРУДНОЩІ</span></div>
+    <h2>З чим найчастіше стикаються вчителі на цьому уроці</h2>
+    <p class="intro">Клацни на картку, щоб побачити пораду щодо подолання труднощі.</p>
+    <div class="rule-grid" id="difficultyGrid"></div>
+  </div>
+</section>
+
+<!-- ================= DYFERENTSIATSIYA ================= -->
+<section class="block c-pink" id="dyferentsiatsiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🌈</span><span class="label">ДИФЕРЕНЦІАЦІЯ</span></div>
+    <h2>Як адаптувати завдання під різний рівень і вік класу</h2>
+    <p class="intro">Вік 8–14 років — широкий діапазон. Різницю варто закривати не кількістю правил, а підтримкою у творчому етапі.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">🌱</div><h4>Молодшим учням і тим, кому бракує фантазії</h4><p>Одразу запропонуйте учнівський генератор сеттингу з посібника — одне натискання дає готовий сеттинг, героя, мету й небезпеку. Дозвольте скоротити карту до 3–4 сцен без другої розвилки.</p></div>
+      <div class="whale"><div class="whale-ico">🚀</div><h4>Старшим і впевненим учням</h4><p>Запропонуйте додати 6-ту сцену (альтернативний «відкритий фінал») або розширити дерево рішень до двох розвилок підряд. Нехай самі придумають сеттинг без генератора.</p></div>
+    </div>
+    <div class="callout violet">💡 Генератор сеттингу (у розділі «Немає ідеї?» учнівського посібника) — це саме інструмент диференціації: він знімає бар'єр «не знаю, про що писати» без спрощення самої механіки квесту.</div>
+  </div>
+</section>
+
+<!-- ================= OTSINYUVANNYA ================= -->
+<section class="block c-green" id="otsinyuvannya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📊</span><span class="label">ОЦІНЮВАННЯ</span></div>
+    <h2>Формативне оцінювання під час уроку та критерії готового квесту</h2>
+    <p class="intro">Основне оцінювання — спостереження за процесом побудови дерева рішень. Критерії нижче застосовуйте до фінального текстового сценарію гри.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">👀</div><h4>Спостереження</h4><p>Чи учень розуміє різницю між лінійною та розгалуженою історією? Чи самостійно формулює обмеження в промпті?</p></div>
+      <div class="whale"><div class="whale-ico">🕵️</div><h4>AI-плейтест як самооцінка</h4><p>Якщо ШІ-тестувальник знаходить «глухий кут» у грі учня — це природний і цінний момент навчання, а не провал.</p></div>
+      <div class="whale"><div class="whale-ico">📝</div><h4>Чек-лист готовності</h4><p>Чек-лист до Заняття №2 з учнівського посібника — учні самостійно перевіряють повноту своєї роботи.</p></div>
+    </div>
+    <table class="crit">
+      <tr><th>Критерій (готовий сценарій квесту)</th><th>Бал</th></tr>
+      <tr><td>Є рівно 5 сцен за структурою «Ромб із двома фіналами»</td><td>0–3</td></tr>
+      <tr><td>Кожна сцена має опис (2–4 речення) і правильну розмітку [[ -> ]]</td><td>0–3</td></tr>
+      <tr><td>Є дві різні кінцівки (перемога і поразка), логічно пов'язані з вибором</td><td>0–2</td></tr>
+      <tr><td>Квест пройшов AI-плейтест хоча б одним шляхом без логічних дірок</td><td>0–2</td></tr>
+      <tr><td>Разом</td><td>10</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= DOVIDNYK ================= -->
+<section class="block c-yellow" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Банк додаткових запитань для обговорення</h2>
+    <p class="intro">Використовуйте, якщо в класі виникла пауза, лишився час або потрібно повторити матеріал наступного уроку.</p>
+    <div class="rule-grid" id="questionBankGrid"></div>
+  </div>
+</section>
+
+<!-- ================= REFLECTION ================= -->
+<section class="block c-blue" id="refleksiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🪞</span><span class="label">РЕФЛЕКСІЯ ВЧИТЕЛЯ</span></div>
+    <h2>Самоперевірка після уроку</h2>
+    <p class="intro">Пройдіться чек-листом одразу після уроку, поки враження свіжі — це допоможе підготуватися до Заняття №2 (генерація візуалу).</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarReflect"></div></div>
+      <div id="clListReflect"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Методичні рекомендації · Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 5 <span class="heart">✨</span><br>Гра стає справжньою грою тільки тоді, коли в ній можна помилитися — і побачити інший фінал.</p>
+</footer>
+
+<script>
+/* ---------- NAV active link on scroll ---------- */
+const sections = ["meta","pidhotovka","hid-uroku","trudnoshi","dyferentsiatsiya","otsinyuvannya","dovidnyk","refleksiya"].map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- GENERIC CHECKLIST BUILDER ---------- */
+function buildChecklist(items, listElId, barElId){
+  const listEl = document.getElementById(listElId);
+  const barEl = document.getElementById(barElId);
+  items.forEach((t,i)=>{
+    const row = document.createElement("div"); row.className="cl-item";
+    row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${t}</span>`;
+    row.addEventListener("click", ()=>{
+      row.classList.toggle("checked");
+      const done = listEl.querySelectorAll(".cl-item.checked").length;
+      barEl.style.width = (done/items.length*100)+"%";
+    });
+    listEl.appendChild(row);
+  });
+}
+buildChecklist([
+  "Проєктор або великий екран для показу учнівського інтерактивного посібника (Урок 5)",
+  "Відкрита вкладка з посібником: розділи «Теорія», «Формула», «Практика», «Генератор сеттингу»",
+  "Доступ до ChatGPT або аналога на вчительському пристрої — для живої демонстрації Кроків 1–4",
+  "Документ (Google Docs / Блокнот), куди учні зберігатимуть текст своїх 5 сцен",
+  "Маркери або виділення кольором для домашнього бонусу (3 візуальні об'єкти)",
+  "Таймер або годинник на видноті — практичний блок займає більшість уроку і легко «розтягується»",
+], "clListPrep", "clBarPrep");
+
+buildChecklist([
+  "Чи всі учні зафіксували назву гри та умову перемоги після Кроку 1?",
+  "Чи в кожного вийшла логічна схема саме на 5 сцен (а не 3 чи 7)?",
+  "Чи встигли учні провести AI-плейтест хоча б одним шляхом?",
+  "Чи розуміють учні різницю між «дірою в сюжеті» та «цікавим поворотом»?",
+  "Чи скористався генератором сеттингу хоча б один учень, якому бракувало ідей?",
+  "Чи залишився час на підсумкову рефлексію і домашній бонус наприкінці уроку?",
+], "clListReflect", "clBarReflect");
+
+/* ---------- STAGE FLOW (хід уроку) ---------- */
+const stages = [
+  {ico:"🔔", time:"5 хв", title:"Оргмомент і актуалізація",
+   essence:"Налаштувати клас на творчу роботу та пояснити фінальний результат уроку — готова гра-квест.",
+   good:"Почати з прикладу: прочитати уголос СЦЕНУ 1 з Довідника посібника й запитати «Що б ви обрали?»",
+   bad:"Почати з сухого озвучення плану уроку по пунктах — творчий настрій губиться одразу.",
+   quote:"«Сьогодні кожен(на) з вас стане автором власної гри. У кінці уроку у вас буде готовий текстовий квест, який можна буде дати зіграти другу.»",
+   expect:"Учні одразу починають пропонувати свої ідеї ігор ще до пояснення теорії.",
+   watch:"Дайте 1–2 ідеям прозвучати, але не затягуйте — теорія структурує ці ідеї далі.",
+   materials:"Проєктор з відкритим посібником, приклад сцени з розділу «Довідник»."},
+  {ico:"📖", time:"15 хв", title:"Теоретичний блок: анатомія історії",
+   essence:"Пояснити, що таке текстовий квест, і розібрати ментальну карту: сцена, дерево рішень, перемога/поразка/відкритий фінал.",
+   good:"Рухатися ментальною картою разом із класом: відкрити вузол → приклад → одне запитання до класу перед переходом далі.",
+   bad:"Диктувати визначення в зошит — для 8–14 років це швидко втомлює увагу.",
+   quote:"«Уявіть, що ви зайшли в темну кімнату. Що там має бути, щоб гра була цікавою? Небезпека? Підказка? Вибір?»",
+   expect:"Молодші учні легко розуміють «перемогу/поразку»; складніше з «відкритим фіналом» — поясніть через приклад кіно чи книги з продовженням.",
+   watch:"Не плутайте «лінійну» і «розгалужену» історію в поясненні — дайте учням самим назвати різницю після прикладу.",
+   materials:"Розділ «Теорія» посібника (ментальна карта + схема «Ромб із двома фіналами»)."},
+  {ico:"🧮", time:"5 хв", title:"Формула промпту",
+   essence:"Познайомити з формулою: Роль + Контекст/Сеттинг + Завдання + Обмеження + Формат виводу.",
+   good:"Візьміть один простий запит («Розкажи про космос») і на очах класу «докручуйте» його елементом формули за елементом.",
+   bad:"Подати всі 5 елементів формули одним складним прикладом без покрокового наростання.",
+   quote:"«Що станеться, якщо не сказати ШІ, скільки речень писати? Він може видати цілу книжку!»",
+   expect:"Учні швидко запам'ятовують «Обмеження» і «Формат виводу» — саме ці два найбільше впливають на результат гри.",
+   watch:"Якщо клас втомився від двох теоретичних блоків підряд — тут природна межа для поділу на 2 уроки по 45 хв.",
+   materials:"Розділ «Формула» посібника — друга ментальна карта."},
+  {ico:"💡", time:"10 хв", title:"Крок 1. Генерація концепту та сеттингу",
+   essence:"Учні обирають сеттинг і мету гри — або просять ШІ запропонувати 3 варіанти.",
+   good:"Дозволити частині класу одразу скористатися генератором сеттингу з посібника, якщо вагаються довше 1–2 хвилин.",
+   bad:"Наполягати, щоб усі вигадали сеттинг самостійно — частина учнів «застрягне» і втратить решту уроку.",
+   quote:"«Немає ідеї? Не біда — натисни кнопку генератора, і світ гри з'явиться сам. Твоя робота — зробити його цікавим.»",
+   expect:"Типовий вибір — космос, магія або тварини-детективи; це нормально, головне — чітка мета і небезпека.",
+   watch:"Перевірте, що в кожного зафіксовано саме умову перемоги, а не просто «назва гри».",
+   materials:"Шаблон промпту Кроку 1 і генератор сеттингу з посібника."},
+  {ico:"🗺️", time:"15 хв", title:"Крок 2. Побудова карти 5 сцен",
+   essence:"Сформувати логічний кістяк гри без деталей тексту — лише схему переходів.",
+   good:"Намалюйте на дошці порожній «Ромб» і попросіть 1–2 учнів усно заповнити його своїм прикладом — решта повторює письмово.",
+   bad:"Дозволити одразу писати повний текст сцен без схеми — дерево рішень почне «розсипатися».",
+   quote:"«Спершу — тільки скелет гри: куди веде кожен вибір. М'ясо на кістки наростимо в наступному кроці.»",
+   expect:"Найчастіша помилка — обидві розвилки (2 і 3) випадково ведуть до однакового наслідку; саме тут потрібна перевірка.",
+   watch:"Пройдіться між партами й перевірте, що Сцена 4 справді приймає шляхи і від Сцени 2, і від Сцени 3.",
+   materials:"Шаблон промпту Кроку 2; схема «Ромб» на дошці або проєкторі."},
+  {ico:"✍️", time:"20 хв", title:"Крок 3. Генерація детального тексту сцен",
+   essence:"Наповнити кожну сцену атмосферним описом і розміткою [[Дія -> Сцена X]].",
+   good:"Покажіть приклад СЦЕНИ 1 з Довідника як зразок формату перед тим, як учні почнуть власну генерацію.",
+   bad:"Пропустити показ зразка — частина учнів забуде розмітку подвійних дужок або формат викладу.",
+   quote:"«Зверніть увагу: рівно 2–4 речення, теперішній час, і рівно 2 варіанти вибору. Це не забаганка — це правило жанру.»",
+   expect:"У сценах 5A/5B учні іноді за звичкою додають варіанти вибору — нагадайте, що там лише фінальний статус.",
+   watch:"Найдовший крок уроку — слідкуйте за хронометражем, щоб лишилося 10–15 хв на плейтест.",
+   materials:"Шаблон промпту Кроку 3 (few-shot) з прикладом сцени з Довідника."},
+  {ico:"🕵️", time:"12 хв", title:"Крок 4. AI-плейтест",
+   essence:"Учні просять ШІ зіграти в їхню гру, щоб знайти сюжетні дірки чи нестиковки.",
+   good:"Продемонструйте симулятор плейтесту з посібника: вимкніть одну з вимог і покажіть, як «вердикт» одразу змінюється на провал.",
+   bad:"Пропустити цей крок через нестачу часу — саме він навчає учнів перевіряти власну роботу, а не лише створювати її.",
+   quote:"«Тепер ШІ — не помічник, а суворий тестувальник. Подивимось, чи знайде він дірку у вашій грі.»",
+   expect:"Багато учнів вперше стикаються з ситуацією, коли власна «готова» робота виявляється нелогічною — це нормальна й цінна реакція.",
+   watch:"Якщо часу зовсім не лишилось, цей крок можна перенести на початок наступного уроку як «розігрів».",
+   materials:"Шаблон промпту Кроку 4; симулятор плейтесту з посібника."},
+  {ico:"🏁", time:"8 хв", title:"Рефлексія, чек-лист і домашній бонус",
+   essence:"Закріпити результат і підготувати місток до Заняття №2 (генерація візуалу).",
+   good:"Пройдіть чек-лист готовності разом із класом пункт за пунктом, щоб кожен подивився на свій текст ще раз.",
+   bad:"Назвати домашній бонус побіжно наприкінці — учні забудуть виділити 3 візуальні об'єкти.",
+   quote:"«Виділіть маркером три речі з вашої гри, які варто було б намалювати. На наступному занятті ми це зробимо зі ШІ.»",
+   expect:"Учні з задоволенням діляться назвами своїх ігор одна з одною — природний момент для короткого показу 1–2 робіт.",
+   watch:"Якщо часу мало — домашній бонус (виділення 3 об'єктів) можна залишити справді домашнім завданням.",
+   materials:"Чек-лист готовності з розділу «Рефлексія» учнівського посібника."},
+];
+const totalMinutes = stages.reduce((s,x)=>s+parseInt(x.time),0);
+const flowEl = document.getElementById("stageFlow");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  if(i>0){ const ar=document.createElement("div"); ar.className="flow-arrow"; flowEl.appendChild(ar); }
+  const node = document.createElement("div"); node.className="flow-node"; node.dataset.idx=i;
+  node.style.setProperty("--fn-color", color);
+  node.innerHTML = `<div class="fn-ico">${s.ico}</div><div class="fn-title">${s.title}</div><div class="fn-time">${s.time}</div>`;
+  node.addEventListener("click", ()=>selectStage(i));
+  flowEl.appendChild(node);
+});
+function selectStage(i){
+  document.querySelectorAll(".flow-node").forEach(n=>n.classList.remove("active"));
+  flowEl.querySelector(`[data-idx="${i}"]`).classList.add("active");
+  const s = stages[i]; const color = rainbow[i%rainbow.length];
+  const rd = document.getElementById("stageDetail");
+  rd.style.setProperty("--rd-color", color);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${s.ico}</div><div class="rd-title">${s.title} <span style="color:var(--ink-faint); font-family:'JetBrains Mono'; font-size:13px;">· ${s.time}</span></div></div>
+    <div class="rd-essence">${s.essence}</div>
+    <div class="rd-cols">
+      <div class="rd-example good"><span class="lab">✅ Що варто робити</span>${s.good}</div>
+      <div class="rd-example bad"><span class="lab">❌ Чого уникати</span>${s.bad}</div>
+    </div>
+    <div class="rd-analysis">💬 ${s.quote}</div>
+    <div class="rd-proscons">
+      <div><span class="lab2">Очікувані реакції учнів</span>${s.expect}</div>
+      <div><span class="lab2">На що звернути увагу</span>${s.watch}</div>
+    </div>
+    <div class="rd-tasks"><span class="lab2">Матеріали до етапу</span>${s.materials}</div>
+  `;
+  rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+selectStage(0);
+
+/* time budget bar */
+const timebar = document.getElementById("timebar");
+const legend = document.getElementById("timebarLegend");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  const pct = (parseInt(s.time)/totalMinutes*100);
+  const seg = document.createElement("span"); seg.style.width=pct+"%"; seg.style.background=color;
+  seg.textContent = pct>6? s.time : "";
+  timebar.appendChild(seg);
+  const leg = document.createElement("span"); leg.innerHTML = `<i style="background:${color}"></i>${s.title} (${s.time})`;
+  legend.appendChild(leg);
+});
+
+/* ---------- GENERIC ACCORDION BUILDER ---------- */
+function buildAccordion(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((e,i)=>{
+    const card = document.createElement("div"); card.className="rule-card";
+    card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+    card.innerHTML = `<button class="rc-head"><span class="rc-num">${e.ico}</span><span class="rc-title">${e.title}</span><span class="rc-arrow">▾</span></button>
+    <div class="rc-body"><div class="rc-body-in">${e.body}</div></div>`;
+    card.querySelector(".rc-head").addEventListener("click", ()=>card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
+}
+
+buildAccordion([
+  {ico:"🙅", title:"«У мене немає ідеї для гри»", body:"<b>Порада:</b> не вмовляйте придумати щось «своє» силою — одразу запропонуйте генератор сеттингу з посібника. Творчість учня проявиться в деталях сцен, а не обов'язково у виборі сеттингу."},
+  {ico:"🔀", title:"Дерево рішень «розсипається» — шляхи не сходяться", body:"<b>Порада:</b> це типово на Кроці 2. Поверніть учня до схеми «Ромб» і попросіть пальцем провести обидва шляхи до Сцени 4 — помилка стає видимою одразу."},
+  {ico:"📏", title:"ШІ пише занадто довгі сцени, незважаючи на обмеження", body:"<b>Порада:</b> нагадайте формулу промпту — найчастіша причина це відсутність чіткого числа речень у запиті. Попросіть переписати обмеження конкретніше: «рівно 3 речення», а не «коротко»."},
+  {ico:"⏳", title:"Не вистачає часу на всі 4 кроки за 90 хв", body:"<b>Порада:</b> Крок 4 (AI-плейтест) можна скоротити до перевірки лише одного шляху замість двох, або перенести на початок наступного заняття."},
+  {ico:"🧩", title:"Учень видає ідеальну схему, але сцени виходять «сухими»", body:"<b>Порада:</b> поверніться до формули промпту й перевірте, чи є в запиті слово про атмосферу («напружена, таємнича»). Без цього ШІ пише нейтральний, безбарвний текст."},
+], "difficultyGrid");
+
+buildAccordion([
+  {ico:"📖", title:"Додаткові запитання: анатомія історії", body:"<ul><li>Наведіть приклад гри чи книги з розгалуженим сюжетом, яку ви знаєте.</li><li>Чим «відкритий фінал» відрізняється від звичайної поразки?</li><li>Чому в хорошому квесті завжди є і перемога, і поразка, а не лише один варіант?</li></ul>"},
+  {ico:"🧮", title:"Додаткові запитання: формула промпту", body:"<ul><li>Який з п'яти елементів формули найбільше впливає на довжину відповіді?</li><li>Чому «Формат виводу» особливо важливий саме для ігрового тексту?</li><li>Наведіть приклад, коли відсутність «Ролі» зіпсує результат.</li></ul>"},
+  {ico:"🕵️", title:"Додаткові запитання: плейтест і тестування", body:"<ul><li>Чому важливо пройти гру різними шляхами, а не лише одним?</li><li>Що робити, якщо ШІ-тестувальник знайшов «глухий кут»?</li><li>Чи може людина сама знайти всі помилки без допомоги ШІ? Чому плейтест усе одно корисний?</li></ul>"},
+], "questionBankGrid");
+</script>
+</body>
+</html>
