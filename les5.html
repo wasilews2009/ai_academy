@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 5. Геймдизайн і тексти: AI-квест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7;
+  --bg-hero:#FFF6E4;
+  --surface:#FFFFFF;
+  --ink:#20222E;
+  --ink-soft:#555A6E;
+  --ink-faint:#8D91A6;
+  --line:#ECE6D6;
+  --accent:#1E88E5;
+  --accent-ink:#0F5FA8;
+  --accent-soft:#E1F0FE;
+  --violet:#8B5CF6;
+  --violet-soft:#F1EAFE;
+  --warn:#FFB020;
+  --warn-soft:#FFF1D2;
+  --bad:#F2495C;
+  --bad-soft:#FDE3E7;
+  --good:#22B573;
+  --good-soft:#DDF7EC;
+  --teal:#12B3A0;
+  --teal-soft:#DBF7F2;
+  --pink:#EC4899;
+  --pink-soft:#FCE1EF;
+  --orange:#FF7A2F;
+  --orange-soft:#FFE7D4;
+  --radius-s:12px;
+  --radius-m:18px;
+  --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+:root:not([data-theme="light"]) { }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+/* --- Кольорові теми розділів --- */
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+/* NAV */
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:13px; padding:8px 12px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+/* HERO */
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(26px,4.2vw,42px); max-width:16ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:58ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:320px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+/* SECTIONS */
+section.block{padding:56px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(22px,3vw,30px); max-width:24ch;}
+.block > p.intro{color:var(--ink-soft); max-width:62ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+.callout.pink{background:var(--pink-soft); color:#9A2A66; border-color:rgba(236,72,153,.25);}
+
+/* WHALE CARDS */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* DIAMOND / FLOW DIAGRAM */
+.flow{display:flex; flex-direction:column; align-items:center; gap:0; margin:30px 0;}
+.flow-node{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 20px; text-align:center; font-weight:700; font-size:14.5px; max-width:420px; box-shadow:var(--shadow);}
+.flow-node.start{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+.flow-arrow{width:2px; height:26px; background:var(--line); position:relative;}
+.flow-arrow::after{content:"";position:absolute; bottom:-1px; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--line);}
+.flow-branch{display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin-top:8px;}
+.flow-leaf{border-radius:var(--radius-m); padding:14px 18px; font-size:13.8px; font-weight:600; max-width:230px; border:1.5px solid;}
+.flow-leaf.good{background:var(--good-soft); border-color:rgba(47,158,91,.3); color:#1E7A45;}
+.flow-leaf.bad{background:var(--bad-soft); border-color:rgba(224,87,106,.3); color:#B23A4C;}
+.flow-leaf.neutral{background:var(--accent-soft); border-color:rgba(30,136,229,.3); color:var(--accent-ink);}
+
+/* ACCORDION */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card.wide{grid-column:1/-1;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-time{font-family:'JetBrains Mono'; font-size:11.5px; color:var(--ink-faint); padding-top:9px; flex:none;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none; padding-top:6px;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+.rc-body-in{padding:0 18px 20px 18px; font-size:14px; color:var(--ink-soft);}
+.rc-body-in .rc-goal{font-weight:700; color:var(--ink); margin-bottom:10px;}
+.rule-card.open .rc-body{max-height:900px;}
+.promptbox{background:var(--ink); color:#EAF7F4; border-radius:var(--radius-m); padding:16px 18px; font-family:'JetBrains Mono'; font-size:12.8px; line-height:1.65; white-space:pre-wrap; margin:10px 0;}
+.promptbox .lab{display:block; font-family:'Manrope'; font-weight:800; color:#9ADCCB; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;}
+.result-tag{display:inline-flex; align-items:center; gap:6px; background:var(--good-soft); color:#1E7A45; font-weight:700; font-size:12.5px; padding:6px 12px; border-radius:999px; margin-top:6px;}
+
+/* MIND MAP (reusable) */
+.mindmap-wrap{position:relative; margin:30px 0 10px;}
+.mindmap-svg{width:100%; height:auto; display:block;}
+.mm-node{cursor:pointer;}
+.mm-node circle{fill:var(--surface); stroke:var(--mm-color,var(--line)); stroke-width:3; transition:.15s;}
+.mm-node:hover circle, .mm-node.active circle{fill:var(--mm-color,var(--accent)); fill-opacity:.14;}
+.mm-node.active circle{stroke-width:4;}
+.mm-node text{font-family:'Manrope'; font-weight:700; fill:var(--ink); font-size:12.5px;}
+.mm-node .mm-icon{font-size:19px;}
+.mm-hub circle{fill:var(--accent); stroke:none;}
+.mm-hub text{fill:#fff; font-family:'Unbounded'; font-size:12px;}
+.mm-line{stroke:var(--line); stroke-width:2.5;}
+
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:8px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-body{color:var(--ink-soft); font-size:14.5px;}
+.rd-body b{color:var(--ink);}
+.rd-example{border-radius:var(--radius-s); padding:12px 15px; font-size:13.6px; background:var(--accent-soft); color:var(--accent-ink); margin-top:12px;}
+
+/* SETTING GENERATOR */
+.generator{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:28px; margin-top:26px; box-shadow:var(--shadow); text-align:center;}
+.gen-btn{background:var(--violet); color:#fff; border:none; padding:15px 32px; border-radius:999px; font-weight:800; font-size:15.5px; cursor:pointer; font-family:'Unbounded'; box-shadow:var(--shadow-pop); transition:.12s;}
+.gen-btn:active{transform:translateY(2px); box-shadow:none;}
+.gen-card{display:none; text-align:left; margin-top:24px; background:var(--violet-soft); border-radius:var(--radius-m); padding:20px 22px; border:1.5px solid rgba(139,92,246,.25);}
+.gen-card.show{display:block;}
+.gen-row{display:flex; gap:12px; margin-bottom:12px; align-items:flex-start;}
+.gen-row .gen-ico{width:34px; height:34px; border-radius:10px; background:var(--violet); color:#fff; display:flex; align-items:center; justify-content:center; flex:none; font-size:16px;}
+.gen-row .gen-text b{display:block; font-size:11.5px; text-transform:uppercase; color:#6B4FC9; letter-spacing:.03em; margin-bottom:2px;}
+.gen-row .gen-text span{font-size:14.5px; font-weight:600; color:var(--ink);}
+.gen-promptbox{background:var(--ink); color:#F3EEFF; border-radius:var(--radius-m); padding:16px 18px; font-family:'JetBrains Mono'; font-size:12.6px; line-height:1.6; margin-top:14px; white-space:pre-wrap;}
+.gen-actions{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; justify-content:center;}
+.gen-actions button{font-family:'Manrope'; font-weight:800; font-size:13px; border-radius:999px; padding:9px 18px; cursor:pointer; border:1.5px solid var(--line); background:var(--surface);}
+.gen-actions .reroll{border-color:var(--violet); color:var(--violet);}
+.gen-actions .copy2{border-color:var(--good); color:#1E7A45;}
+.copy-msg2{font-size:12px; color:var(--good); margin-top:8px; opacity:0; transition:.2s; text-align:center;}
+.copy-msg2.show{opacity:1;}
+
+/* SIMULATOR */
+.simulator{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:26px; box-shadow:var(--shadow); display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+@media(max-width:760px){.simulator{grid-template-columns:1fr;}}
+.sim-controls .ctrl-row{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px dashed var(--line); gap:10px;}
+.sim-controls .ctrl-row:last-child{border-bottom:none;}
+.ctrl-label{font-size:13.5px; font-weight:700;}
+.ctrl-label small{display:block; font-weight:500; color:var(--ink-faint); font-size:11.5px;}
+.switch{position:relative; width:44px; height:25px; flex:none;}
+.switch input{opacity:0; width:0; height:0;}
+.slider-tog{position:absolute; inset:0; background:var(--line); border-radius:999px; cursor:pointer; transition:.2s;}
+.slider-tog::before{content:""; position:absolute; width:19px; height:19px; left:3px; top:3px; background:var(--surface); border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.2);}
+input:checked + .slider-tog{background:var(--accent);}
+input:checked + .slider-tog::before{transform:translateX(19px);}
+.sim-meter-wrap{margin-top:18px;}
+.sim-meter-label{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--ink-faint); margin-bottom:6px;}
+.sim-meter{height:10px; border-radius:999px; background:var(--line); overflow:hidden;}
+.sim-meter-bar{height:100%; width:10%; border-radius:999px; background:linear-gradient(90deg,var(--bad),var(--warn),var(--good)); transition:width .35s;}
+.sim-output{background:var(--bg); border-radius:var(--radius-m); border:1px solid var(--line); padding:16px; font-family:'JetBrains Mono'; font-size:12.6px; line-height:1.65; min-height:220px; color:var(--ink);}
+.sim-output .tag{display:inline-block; background:var(--accent-soft); color:var(--accent-ink); font-family:'Manrope'; font-weight:700; font-size:11px; padding:2px 8px; border-radius:999px; margin-bottom:8px;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--surface);}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good);}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+
+/* QUIZ */
+.quiz-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:28px; margin-top:26px; box-shadow:var(--shadow);}
+.quiz-progress{display:flex; gap:5px; margin-bottom:20px;}
+.quiz-progress span{flex:1; height:5px; border-radius:999px; background:var(--line);}
+.quiz-progress span.done{background:var(--accent);}
+.quiz-q{font-family:'Unbounded'; font-size:16px; margin-bottom:16px; line-height:1.4;}
+.quiz-opts{display:grid; gap:9px;}
+.qz-btn{text-align:left; padding:12px 15px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-size:14px; font-weight:700; color:var(--ink); box-shadow:var(--shadow-pop); transition:.12s;}
+.qz-btn:hover{border-color:var(--accent); transform:translateY(1px); box-shadow:0 3px 0 rgba(20,22,30,.14);}
+.qz-btn.correct{background:var(--good-soft); border-color:var(--good); color:#1E7A45;}
+.qz-btn.wrong{background:var(--bad-soft); border-color:var(--bad); color:#B23A4C;}
+.qz-explain{margin-top:14px; background:var(--accent-soft); color:var(--accent-ink); padding:13px 15px; border-radius:var(--radius-s); font-size:13.6px; display:none;}
+.qz-explain.show{display:block;}
+.qz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+.next-btn{background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; opacity:.4; pointer-events:none; transition:.2s; box-shadow:var(--shadow-pop);}
+.next-btn.ready{opacity:1; pointer-events:all;}
+.quiz-result{text-align:center; padding:20px 0;}
+.quiz-result .score{font-family:'Unbounded'; font-size:50px; color:var(--accent-ink);}
+.restart-btn{margin-top:16px; background:var(--pink); color:#fff; border:none; padding:11px 24px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+
+/* GLOSSARY + CHEAT */
+.gloss-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:22px;}
+.gloss-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:17px 18px; box-shadow:var(--shadow);}
+.gloss-card h4{font-size:14px; font-family:'JetBrains Mono'; color:var(--accent-ink); margin-bottom:6px;}
+.gloss-card p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+.cheat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:20px;}
+.cheat-item{border-radius:var(--radius-m); padding:16px 12px; text-align:center; font-weight:800; font-size:13px; color:#fff; box-shadow:var(--shadow-pop);}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:54ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+
+@media(max-width:640px){
+  .simulator{padding:20px;}
+  .gen-row{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">🎮 Цифрова лабораторія AI</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#teoriya">Теорія</a>
+      <a href="#formula">Формула</a>
+      <a href="#praktyka">Практика</a>
+      <a href="#generator">Генератор сеттингу</a>
+      <a href="#simulyator">Плейтест</a>
+      <a href="#refleksiya">Рефлексія</a>
+      <a href="#quiz">Перевір себе</a>
+      <a href="#dovidnyk">Довідник</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Курс «Цифрова лабораторія AI» · Урок 5</div>
+    <h1>Геймдизайн і тексти: створюємо AI-квест</h1>
+    <p class="lede">Придумай свою гру-пригоду разом зі штучним інтелектом: побудуй дерево рішень, напиши 5 сцен і перевір, чи немає в грі «дірок», — за допомогою промптів.</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">📖</span> Анатомія квесту</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">🧮</span> Формула промпту</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">🛠️</span> 4 кроки створення</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🎲</span> Генератор ідей</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= TEORIYA ================= -->
+<section class="block c-blue" id="teoriya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📖</span><span class="label">ТЕОРІЯ</span></div>
+    <h2>Анатомія інтерактивної історії</h2>
+    <p class="intro"><b>Текстовий квест</b> (Interactive Fiction) — гра, де світ і події описуються словами, а гравець керує сюжетом через вибір дій. Замість графіки тут працює уява, а замість джойстика — логічні рішення.</p>
+
+    <h3 style="margin-top:30px; font-size:18px;">Ментальна карта: з чого складається квест</h3>
+    <p class="intro">Натисни на будь-яку кульку, щоб дізнатися більше про цей елемент гри.</p>
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 520" id="mindmapSvg1">
+        <g id="mmLines1"></g>
+        <g class="mm-node mm-hub" transform="translate(400,260)">
+          <circle r="58"/>
+          <text text-anchor="middle" dy="-4">ТЕКСТОВИЙ</text>
+          <text text-anchor="middle" dy="14">КВЕСТ</text>
+        </g>
+        <g id="mmNodes1"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetail1"></div>
+
+    <h3 style="margin-top:44px; font-size:18px;">Базова структура: «Ромб із двома фіналами»</h3>
+    <p class="intro">Саме за цією схемою на занятті будуємо гру на 5 сцен: 1 старт → 2 розвилки → 1 кульмінація → 2 альтернативні фінали.</p>
+    <div class="flow">
+      <div class="flow-node start">🚪 Сцена 1: Старт / Вибір шляху</div>
+      <div class="flow-arrow"></div>
+      <div class="flow-branch">
+        <div class="flow-leaf neutral">💪 Сцена 2: Шлях сили</div>
+        <div class="flow-leaf neutral">🦊 Сцена 3: Шлях хитрощів</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node">⚡ Сцена 4: Кульмінація / Випробування</div>
+      <div class="flow-arrow"></div>
+      <div class="flow-branch">
+        <div class="flow-leaf good">🏆 Сцена 5A: Перемога</div>
+        <div class="flow-leaf bad">💀 Сцена 5B: Поразка</div>
+      </div>
+    </div>
+    <div class="callout">🧩 Разом — <b>5 обов'язкових вузлів</b>: 1 старт + 2 розвилки + 1 кульмінація + 2 альтернативні фінали. Саме ця кількість сцен — мета заняття.</div>
+  </div>
+</section>
+
+<!-- ================= FORMULA ================= -->
+<section class="block c-purple" id="formula">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧮</span><span class="label">ФОРМУЛА ПРОМПТУ</span></div>
+    <h2>Формула промпт-інжинірингу для сценариста</h2>
+    <p class="intro">Перед практикою запам'ятай формулу надійного промпту — вона працює для будь-якого кроку створення квесту. Натисни на елемент ланцюжка.</p>
+
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 520" id="mindmapSvg2">
+        <g id="mmLines2"></g>
+        <g class="mm-node mm-hub" transform="translate(400,260)">
+          <circle r="58"/>
+          <text text-anchor="middle" dy="-4">НАДІЙНИЙ</text>
+          <text text-anchor="middle" dy="14">ПРОМПТ</text>
+        </g>
+        <g id="mmNodes2"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetail2"></div>
+
+    <div class="callout warn" style="margin-top:30px;">⚠️ <b>Чому це важливо саме для квесту:</b> без обмеження довжини ШІ напише цілу повість замість короткої ігрової сцени. Без формату виводу — заплутає варіанти вибору, і дерево рішень «розсиплеться».</div>
+  </div>
+</section>
+
+<!-- ================= PRAKTYKA ================= -->
+<section class="block c-orange" id="praktyka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🛠️</span><span class="label">ПРАКТИКА</span></div>
+    <h2>Покрокова розробка квесту (55–60 хв)</h2>
+    <p class="intro">Чотири кроки — від ідеї до перевіреної гри. Натисни на крок, щоби розгорнути шаблон промпту та побачити приклад результату.</p>
+    <div class="rule-grid" id="stepsGrid"></div>
+  </div>
+</section>
+
+<!-- ================= GENERATOR ================= -->
+<section class="block c-pink" id="generator">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎲</span><span class="label">НЕМАЄ ІДЕЇ?</span></div>
+    <h2>Генератор сеттингу для гри</h2>
+    <p class="intro">Якщо фантазія мовчить — натисни кнопку, і генератор випадково збере для тебе світ гри, мету та небезпеку, а також одразу готовий промпт для Кроку 1.</p>
+    <div class="generator">
+      <button class="gen-btn" id="genBtn">🎲 Згенерувати сеттинг</button>
+      <div class="gen-card" id="genCard">
+        <div class="gen-row"><div class="gen-ico">🌍</div><div class="gen-text"><b>Сеттинг</b><span id="genSetting"></span></div></div>
+        <div class="gen-row"><div class="gen-ico">🎭</div><div class="gen-text"><b>Головний герой</b><span id="genHero"></span></div></div>
+        <div class="gen-row"><div class="gen-ico">🏆</div><div class="gen-text"><b>Мета (умова перемоги)</b><span id="genGoal"></span></div></div>
+        <div class="gen-row"><div class="gen-ico">☠️</div><div class="gen-text"><b>Небезпека (умова поразки)</b><span id="genDanger"></span></div></div>
+        <div class="gen-promptbox" id="genPrompt"></div>
+        <div class="gen-actions">
+          <button class="reroll" id="genReroll">🔁 Інший варіант</button>
+          <button class="copy2" id="genCopy">📋 Скопіювати промпт</button>
+        </div>
+        <div class="copy-msg2" id="genCopyMsg">Скопійовано! Встав цей текст у ChatGPT.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SIMULATOR ================= -->
+<section class="block c-teal" id="simulyator">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧪</span><span class="label">СИМУЛЯЦІЯ</span></div>
+    <h2>Симулятор якості сцени та AI-плейтесту</h2>
+    <p class="intro">Вмикай і вимикай вимоги з Кроку 3 та дивись, як змінюється (симульований) текст сцени — і чи «пройде» така сцена AI-плейтест.</p>
+    <div class="simulator">
+      <div class="sim-controls">
+        <div class="ctrl-row">
+          <div class="ctrl-label">Атмосферний опис<small>2–4 динамічні речення в теперішньому часі</small></div>
+          <label class="switch"><input type="checkbox" id="s-desc"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Рівно 2 варіанти вибору<small>формат [[Дія -> Сцена X]]</small></div>
+          <label class="switch"><input type="checkbox" id="s-choices"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Обмеження довжини<small>щоб не вийшла ціла повість</small></div>
+          <label class="switch"><input type="checkbox" id="s-limit"><span class="slider-tog"></span></label>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Чіткий фінальний статус<small>для сцен 5A / 5B</small></div>
+          <label class="switch"><input type="checkbox" id="s-final"><span class="slider-tog"></span></label>
+        </div>
+        <div class="sim-meter-wrap">
+          <div class="sim-meter-label"><span>Готовність сцени до гри</span><span id="meterPct">10%</span></div>
+          <div class="sim-meter"><div class="sim-meter-bar" id="meterBar"></div></div>
+        </div>
+      </div>
+      <div><div class="sim-output" id="simOutput"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REFLEKSIYA ================= -->
+<section class="block c-green" id="refleksiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">✅</span><span class="label">РЕФЛЕКСІЯ</span></div>
+    <h2>Чек-лист готовності до Заняття №2</h2>
+    <p class="intro">До кінця заняття у твоєму файлі має бути все це. Познач пункти — прогрес-бар покаже, чи ти готовий(а) до наступного кроку (генерації візуалу).</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBar"></div></div>
+      <div id="clList"></div>
+    </div>
+    <div class="callout pink" style="margin-top:22px;">🎁 <b>Домашній бонус:</b> виділи в тексті маркером 3 ключові візуальні об'єкти (наприклад: «покинутий шаттл», «магічний кристал», «робот-охоронець») — для них на наступному занятті генеруватимемо ілюстрації.</div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="block c-blue" id="quiz">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🏆</span><span class="label">ПЕРЕВІР СЕБЕ</span></div>
+    <h2>Контрольні питання</h2>
+    <p class="intro">Вісім запитань за матеріалом заняття. Обери відповідь — і одразу дізнаєшся, чи правильно.</p>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DOVIDNYK ================= -->
+<section class="block c-yellow" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Довідкові матеріали</h2>
+
+    <h3 style="font-size:18px;">Глосарій</h3>
+    <div class="gloss-grid" id="glossGrid"></div>
+
+    <h3 style="margin-top:36px; font-size:18px;">Шпаргалка: 4 кроки створення квесту</h3>
+    <div class="cheat-grid" id="cheatGrid"></div>
+
+    <h3 style="margin-top:36px; font-size:18px;">Приклад готової сцени</h3>
+    <div class="promptbox" style="margin-top:14px;"><span class="lab">СЦЕНА 1: Рубка управління</span>Аварійні сирени глушать твої думки, а червоне світло вихоплює з темряви розбиту консоль навігатора. Двері до рятувальної капсули заблоковані кодовим замком, а в вентиляційній шахті поруч чути металевий скрегіт.
+
+Вибір:
+[[Зламати термінал замка -> Сцена 2]]
+[[Залізти у вентиляцію -> Сцена 3]]</div>
+  </div>
+</section>
+
+<footer>
+  <p>Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 5 <span class="heart">✨</span><br>Найкращий квест — це той, де навіть ШІ-плейтестер не знайде жодної глухої гілки.</p>
+</footer>
+
+<script>
+/* ---------- NAV ---------- */
+const sections = ["teoriya","formula","praktyka","generator","simulyator","refleksiya","quiz","dovidnyk"].map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- GENERIC MINDMAP BUILDER ---------- */
+function buildMindmap(items, svgId, linesId, nodesId, detailId){
+  const mmLines = document.getElementById(linesId);
+  const mmNodes = document.getElementById(nodesId);
+  const cx=400, cy=260, R=200;
+  const n = items.length;
+  items.forEach((r,i)=>{
+    const angle = (-90 + i*(360/n)) * Math.PI/180;
+    const x = cx + R*Math.cos(angle), y = cy + R*Math.sin(angle);
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",cx); line.setAttribute("y1",cy); line.setAttribute("x2",x); line.setAttribute("y2",y);
+    line.setAttribute("class","mm-line"); mmLines.appendChild(line);
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","mm-node"); g.setAttribute("transform",`translate(${x},${y})`); g.dataset.idx=i;
+    g.style.setProperty("--mm-color", rainbow[i%rainbow.length]);
+    const shortTitle = r.title.length>15? r.title.slice(0,14)+"…": r.title;
+    g.innerHTML = `<circle r="46"/><text class="mm-icon" text-anchor="middle" dy="-14">${r.icon}</text><text text-anchor="middle" dy="10">${shortTitle}</text>`;
+    g.addEventListener("click", ()=>selectMindNode(items, i, nodesId, detailId));
+    mmNodes.appendChild(g);
+  });
+}
+function selectMindNode(items, i, nodesId, detailId){
+  document.querySelectorAll(`#${nodesId} .mm-node`).forEach(n=>n.classList.remove("active"));
+  const g = document.querySelector(`#${nodesId} [data-idx="${i}"]`); if(g) g.classList.add("active");
+  const r = items[i];
+  const rd = document.getElementById(detailId);
+  rd.style.setProperty("--rd-color", rainbow[i%rainbow.length]);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${r.icon}</div><div class="rd-title">${r.title}</div></div>
+    <div class="rd-body">${r.body}</div>
+    ${r.example? `<div class="rd-example">💡 ${r.example}</div>` : ""}
+  `;
+  rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+/* Mindmap 1: Анатомія квесту */
+const anatomyItems = [
+  {icon:"🖼️", title:"Сцена (вузол)", body:"Окрема ситуація, кімната чи момент часу. У ній обов'язково є <b>художній опис</b> (що гравець бачить і чує), <b>виклик</b> (що загрожує) і <b>точки вибору</b> (варіанти дій).", example:"«Ти заходиш у темну кімнату. На столі лежить дивний ключ...»"},
+  {icon:"🌳", title:"Дерево рішень", body:"Структура, за якої рішення гравця ведуть різними гілками. <b>Лінійна історія:</b> А → Б → В. <b>Розгалужена історія:</b> з точки А можна піти в Б або В, і кожна гілка має свої наслідки."},
+  {icon:"🏆", title:"Перемога (Win)", body:"Гравець досягає мети: знайшов вихід, розгадав таємницю, врятував станцію. Завжди визначай умову перемоги ще на етапі ідеї (Крок 1)."},
+  {icon:"💀", title:"Поразка (Game Over)", body:"Помилка гравця завершує гру: пастка спрацювала, закінчився кисень, час вийшов. Поразка — не покарання, а чесний наслідок вибору."},
+  {icon:"🌫️", title:"Відкритий фінал", body:"Нестандартне завершення з натяком на продовження — ні перемога, ні поразка. Гарний прийом для квесту з продовженням на наступному занятті."},
+];
+buildMindmap(anatomyItems, "mindmapSvg1","mmLines1","mmNodes1","ruleDetail1");
+selectMindNode(anatomyItems, 0, "mmNodes1","ruleDetail1");
+
+/* Mindmap 2: Формула промпту */
+const formulaItems = [
+  {icon:"🎭", title:"Роль", body:"Хто саме відповідає: «Дій як креативний геймдизайнер» або «Ти — провідний автор квестів». Роль задає глибину й стиль відповіді.", example:"«Ти — сценарист інтерактивних ігор.»"},
+  {icon:"🌍", title:"Контекст / Сеттинг", body:"Світ гри: де відбувається дія і яка в ньому атмосфера. Без контексту ШІ обере випадковий, часто нецікавий сеттинг.", example:"«підводна біолабораторія, покинутий космічний корабель, школа магії 2099 року»"},
+  {icon:"📋", title:"Завдання", body:"Що конкретно має зробити ШІ: запропонувати ідеї, побудувати схему, написати текст сцен чи протестувати гру.", example:"«Створи схему сюжету на 5 сцен для гри.»"},
+  {icon:"📏", title:"Обмеження", body:"Межі результату: скільки слів, скільки речень, скільки варіантів вибору. Без обмежень ШІ напише цілу повість замість короткої сцени.", example:"«Опис — строго 2–4 речення. Рівно 2 варіанти вибору.»"},
+  {icon:"🗂️", title:"Формат виводу", body:"Як має виглядати відповідь: нумерований список, подвійні дужки [[Дія -> Сцена X]], короткі тези. Формат «програмує» структуру результату.", example:"«[[Зламати термінал замка -> Сцена 2]]»"},
+];
+buildMindmap(formulaItems, "mindmapSvg2","mmLines2","mmNodes2","ruleDetail2");
+selectMindNode(formulaItems, 0, "mmNodes2","ruleDetail2");
+
+/* ---------- PRACTICAL STEPS ACCORDION ---------- */
+const steps = [
+  {icon:"💡", time:"10 хв", title:"Крок 1. Генерація концепту та сеттингу",
+   goal:"Учні обирають тему або просять ШІ запропонувати 3 незвичні ідеї.",
+   prompt:`Дій як креативний геймдизайнер. Запропонуй 3 оригінальні концепції для короткого текстового квесту.
+Сеттинги на вибір: підводна біолабораторія, покинутий космічний корабель, школа магії 2099 року, детективне агентство котів.
+Для кожного варіанту вкажи:
+— Назву гри
+— Головну мету гравця (умова перемоги)
+— Головну небезпеку (умова поразки)
+Відповідь оформи короткими тезами до 50 слів на кожен концепт.`,
+   result:"Учень обирає один сеттинг і фіксує головну мету гри."},
+  {icon:"🗺️", time:"15 хв", title:"Крок 2. Побудова карти 5 сцен",
+   goal:"Формування логічного кістяка гри без детального тексту, щоб гілки не заплуталися.",
+   prompt:`Ти — сценарист інтерактивних ігор. Створи схему сюжету на 5 сцен для гри: [Вставити назву та мету з Кроку 1].
+Схема має відповідати структурі:
+Сцена 1: Старт (дає вибір між Дією А та Дією Б)
+Сцена 2: Наслідок вибору А
+Сцена 3: Наслідок вибору Б
+Сцена 4: Фінальне випробування (куди сходяться обидва шляхи)
+Сцена 5A: Перемога
+Сцена 5B: Поразка
+Виведи результат строго у вигляді нумерованого списку. Для кожної сцени напиши лише 1 речення опису та варіанти переходів.`,
+   result:"Перевірена логічна схема, де зрозуміло, яка дія куди веде."},
+  {icon:"✍️", time:"20 хв", title:"Крок 3. Генерація детального тексту сцен",
+   goal:"Наповнення кожної сцени атмосферним описом та чіткими кнопками вибору за розміткою [[Текст вибору -> Номер сцени]].",
+   prompt:`Ти — провідний автор квестів. Напиши детальний текст для кожної з 5 сцен нашої гри за затвердженою схемою: [Вставити схему з Кроку 2].
+Вимоги до кожної сцени:
+— Опис ситуації: строго від 2 до 4 динамічних речень у теперішньому часі ("Ти заходиш...", "Перед тобою...").
+— Атмосфера: напружена, таємнича.
+— Кнопки дій: рівно 2 варіанти у форматі: [[Дія -> Сцена X]].
+— Для сцен 5A та 5B виборів немає, тільки фінальний статус: [[ГРУ ЗАВЕРШЕНО: ПЕРЕМОГА]] або [[ГРУ ЗАВЕРШЕНО: ПОРАЗКА]].
+Згенеруй усі 5 сцен за цим зразком.`,
+   result:"Повний текст гри, збережений у документі (Google Docs / Блокнот)."},
+  {icon:"🕵️", time:"10–15 хв", title:"Крок 4. AI-плейтест (перевірка на баги)",
+   goal:"Учні змушують ШІ зіграти у власну гру, щоб знайти сюжетні дірки або нестиковки.",
+   prompt:`Забудь попередні ролі. Тепер ти — прискіпливий гравець-тестувальник.
+Я надсилаю тобі текст моєї гри з 5 сцен: [Вставити створені сцени].
+Твоє завдання:
+— Пройти гру шляхом 1: Сцена 1 -> 2 -> 4 -> 5A.
+— Пройти гру шляхом 2: Сцена 1 -> 3 -> 4 -> 5B.
+— Дати висновок: чи логічні переходи? Чи немає глухих кутів? Чи відповідає кінцівка діям гравця?`,
+   result:"Виправлення неточностей, фінальна версія тексту."},
+];
+const stepsGrid = document.getElementById("stepsGrid");
+steps.forEach((s,i)=>{
+  const card = document.createElement("div"); card.className="rule-card wide";
+  card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+  card.innerHTML = `<button class="rc-head"><span class="rc-num">${s.icon}</span><span class="rc-title">${s.title}</span><span class="rc-time">${s.time}</span><span class="rc-arrow">▾</span></button>
+  <div class="rc-body"><div class="rc-body-in">
+    <div class="rc-goal">🎯 ${s.goal}</div>
+    <div class="promptbox"><span class="lab">Шаблон промпту</span>${s.prompt}</div>
+    <div class="result-tag">✅ Результат кроку: ${s.result}</div>
+  </div></div>`;
+  card.querySelector(".rc-head").addEventListener("click", ()=>card.classList.toggle("open"));
+  stepsGrid.appendChild(card);
+});
+
+/* ---------- SETTING GENERATOR ---------- */
+const genSettings = [
+  "підводна біолабораторія на дні океану","покинутий космічний корабель на орбіті Сатурна","школа магії 2099 року",
+  "детективне агентство котів у нічному місті","плавуче місто над хмарами","підземне метро-місто гномів",
+  "цирк привидів, що з'являється раз на сто років","затонулий піратський корабель-призрак","секретна лабораторія роботів на Марсі",
+  "бібліотека, де оживають книжки після заходу сонця"
+];
+const genHeroes = [
+  "відважний(а) інженер-рятівник(ниця)","юний(а) детектив","учень(иця)-чарівник(иня)-початківець(ниця)",
+  "кіт-слідчий у плащі","пілот(ка)-новачок(ка)","мандрівник(ця) між світами","юний(а) винахідник(иця)"
+];
+const genGoals = [
+  "знайти вихід раніше, ніж закінчиться кисень","розгадати таємницю зниклого капітана","врятувати станцію від самознищення",
+  "знайти викрадений магічний кристал","викрити шпигуна серед команди","повернути додому загублений артефакт",
+  "розбудити заклятий механізм, що захищає місто"
+];
+const genDangers = [
+  "вентиляційна система видає дедалі більше газу","невідома істота блукає коридорами","час до фіналу невпинно тече",
+  "охоронна система вважає тебе ворогом","магія виходить з-під контролю","союзники можуть виявитися зрадниками",
+  "будівля повільно занурюється під воду"
+];
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function renderGenerator(){
+  const setting = pick(genSettings), hero = pick(genHeroes), goal = pick(genGoals), danger = pick(genDangers);
+  document.getElementById("genSetting").textContent = setting;
+  document.getElementById("genHero").textContent = hero;
+  document.getElementById("genGoal").textContent = goal;
+  document.getElementById("genDanger").textContent = danger;
+  const promptText = `Ти — сценарист інтерактивних ігор. Створи схему сюжету на 5 сцен для текстового квесту.
+Сеттинг: ${setting}.
+Головний герой: ${hero}.
+Мета гравця (умова перемоги): ${goal}.
+Головна небезпека (умова поразки): ${danger}.
+Схема має відповідати структурі: Сцена 1 (старт, вибір між Дією А і Дією Б) → Сцена 2 (наслідок А) / Сцена 3 (наслідок Б) → Сцена 4 (фінальне випробування) → Сцена 5A (перемога) / Сцена 5B (поразка).
+Виведи результат строго у вигляді нумерованого списку, для кожної сцени — лише 1 речення опису та варіанти переходів.`;
+  document.getElementById("genPrompt").textContent = promptText;
+  document.getElementById("genCard").classList.add("show");
+}
+document.getElementById("genBtn").addEventListener("click", renderGenerator);
+document.getElementById("genReroll").addEventListener("click", renderGenerator);
+document.getElementById("genCopy").addEventListener("click", async ()=>{
+  const txt = document.getElementById("genPrompt").textContent;
+  const msg = document.getElementById("genCopyMsg");
+  try{ await navigator.clipboard.writeText(txt); }catch(e){}
+  msg.classList.add("show"); setTimeout(()=>msg.classList.remove("show"), 2000);
+});
+
+/* ---------- SIMULATOR ---------- */
+const simEls = { desc: document.getElementById("s-desc"), choices: document.getElementById("s-choices"), limit: document.getElementById("s-limit"), final: document.getElementById("s-final") };
+function renderSim(){
+  const v = { desc: simEls.desc.checked, choices: simEls.choices.checked, limit: simEls.limit.checked, final: simEls.final.checked };
+  let score = 10;
+  if(v.desc) score += 25; if(v.choices) score += 28; if(v.limit) score += 20; if(v.final) score += 17;
+  score = Math.min(score,100);
+  document.getElementById("meterBar").style.width = score+"%";
+  document.getElementById("meterPct").textContent = score+"%";
+
+  let out = "СЦЕНА 2: Шлях сили\n";
+  if(v.desc){
+    out += (v.limit
+      ? "Ти з силою вдаряєш по заклинченому люку. Металева обшивка скрипить і піддається на кілька сантиметрів."
+      : "Ти підходиш до люка і думаєш довго про те, що варто було б зробити, і про те, як дивно влаштований цей корабель, і про своє дитинство, і...");
+  } else {
+    out += "Двері. Ти йдеш далі.";
+  }
+  out += "\n\nВибір:\n";
+  if(v.choices){
+    out += "[[Налягти ще раз -> Сцена 4]]\n[[Пошукати інший шлях -> Сцена 3]]";
+  } else {
+    out += "Можеш зробити щось, якщо хочеш.";
+  }
+  if(v.final){
+    out += "\n\n📌 Для сцен 5A/5B: [[ГРУ ЗАВЕРШЕНО: ПЕРЕМОГА]] / [[ГРУ ЗАВЕРШЕНО: ПОРАЗКА]]";
+  }
+
+  let verdict;
+  if(score < 40) verdict = "AI-ПЛЕЙТЕСТ: ПРОВАЛЕНО ❌";
+  else if(score < 75) verdict = "AI-ПЛЕЙТЕСТ: Є ЗАУВАЖЕННЯ ⚠️";
+  else verdict = "AI-ПЛЕЙТЕСТ: ПРОЙДЕНО ✅";
+  document.getElementById("simOutput").innerHTML = `<span class="tag">${verdict}</span>\n${out.replace(/\n/g,"<br>")}`;
+}
+Object.values(simEls).forEach(el=>el.addEventListener("input", renderSim));
+renderSim();
+
+/* ---------- CHECKLIST ---------- */
+const clItems = [
+  "Назва гри та жанр/стиль визначені",
+  "5 пронумерованих сцен із текстом 2–4 речення кожна",
+  "Прописані варіанти вибору з мітками [[ -> ]]",
+  "Мінімум 2 різні кінцівки (перемога / поразка)",
+  "Гра пройдена AI-плейтестом хоча б одним шляхом",
+  "Виділено маркером 3 ключові візуальні об'єкти (домашній бонус)",
+];
+const clList = document.getElementById("clList");
+clItems.forEach((t,i)=>{
+  const row = document.createElement("div"); row.className="cl-item"; row.dataset.i=i;
+  row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${t}</span>`;
+  row.addEventListener("click", ()=>{ row.classList.toggle("checked"); updateClBar(); });
+  clList.appendChild(row);
+});
+function updateClBar(){
+  const total = clItems.length;
+  const done = document.querySelectorAll(".cl-item.checked").length;
+  document.getElementById("clBar").style.width = (done/total*100)+"%";
+}
+
+/* ---------- QUIZ ---------- */
+const quizData = [
+  {q:"Що таке текстовий квест (Interactive Fiction)?", opts:["Гра тільки з графікою, без тексту","Гра, де світ і сюжет описуються словами, а гравець обирає дії","Фільм про роботів","Текстовий редактор для школи"], correct:1, explain:"Текстовий квест — формат гри, де замість графіки працює уява гравця, а замість джойстика — вибір дій."},
+  {q:"З чого обов'язково складається кожна сцена квесту?", opts:["Тільки з картинки","З художнього опису, виклику і точок вибору","З музики та відео","Тільки з назви"], correct:1, explain:"Сцена містить художній опис, виклик/проблему і точки вибору — варіанти дій гравця."},
+  {q:"Що таке «розгалужена історія» (branching narrative)?", opts:["Коли сюжет завжди йде по одній лінії А→Б→В","Коли з однієї точки можна піти різними шляхами з різними наслідками","Коли гра не має сюжету взагалі","Коли гравець не може нічого обрати"], correct:1, explain:"У розгалуженій історії з точки А можна піти в Б або В, і кожна гілка веде до своїх наслідків."},
+  {q:"Скільки обов'язкових вузлів-сцен у моделі «Ромб із двома фіналами»?", opts:["3","4","5","7"], correct:2, explain:"1 старт + 2 розвилки + 1 кульмінація + 2 альтернативні фінали = 5 сцен."},
+  {q:"З яких елементів складається формула надійного промпту?", opts:["Тільки Завдання","Роль + Контекст/Сеттинг + Завдання + Обмеження + Формат виводу","Тільки Сеттинг + Формат","Назва гри + Автор"], correct:1, explain:"Усі п'ять елементів формули потрібні, щоб отримати саме те, що задумав сценарист."},
+  {q:"Що станеться, якщо не задати обмеження довжини в промпті?", opts:["ШІ напише надто коротку відповідь","ШІ напише цілу повість замість короткої сцени","Нічого не змінюється","ШІ відмовиться відповідати"], correct:1, explain:"Без обмежень ШІ може розгорнути сцену в довгий текст, що ламає ритм гри."},
+  {q:"Яка розмітка використовується для варіантів вибору у сцені?", opts:["{{Дія: Сцена X}}","<Дія => Сцена X>","[[Дія -> Сцена X]]","(Дія / Сцена X)"], correct:2, explain:"Подвійні квадратні дужки [[Дія -> Сцена X]] готують текст до перенесення у Twine чи Inklewriter."},
+  {q:"У чому мета AI-плейтесту (Кроку 4)?", opts:["Намалювати ілюстрації до гри","Знайти сюжетні дірки та нестиковки, пройшовши гру різними шляхами","Скоротити кількість сцен","Придумати нову назву гри"], correct:1, explain:"На цьому кроці ШІ грає роль тестувальника, проходить різні шляхи й перевіряє логіку переходів і фіналів."},
+];
+let qi=0, score=0;
+const quizBody = document.getElementById("quizBody");
+const quizProgress = document.getElementById("quizProgress");
+quizData.forEach(()=>{ const s=document.createElement("span"); quizProgress.appendChild(s); });
+function renderQuiz(){
+  [...quizProgress.children].forEach((s,i)=>s.classList.toggle("done", i<qi));
+  if(qi>=quizData.length){
+    quizBody.innerHTML = `<div class="quiz-result"><div class="score">${score}/${quizData.length}</div><p style="color:var(--ink-soft);">${score===quizData.length? "Відмінно! Ти готовий(а) створювати власні AI-квести.": "Непогано! Можеш переглянути теорію ще раз і спробувати знову."}</p><button class="restart-btn" id="restartBtn">Пройти ще раз</button></div>`;
+    document.getElementById("restartBtn").addEventListener("click", ()=>{ qi=0; score=0; renderQuiz(); });
+    return;
+  }
+  const item = quizData[qi];
+  quizBody.innerHTML = `<div class="quiz-q">${qi+1}. ${item.q}</div><div class="quiz-opts" id="quizOpts"></div><div class="qz-explain" id="qzExplain">${item.explain}</div><div class="qz-nav"><button class="next-btn" id="nextBtn">Далі →</button></div>`;
+  const opts = document.getElementById("quizOpts");
+  item.opts.forEach((o,i)=>{
+    const b = document.createElement("button"); b.className="qz-btn"; b.textContent=o;
+    b.addEventListener("click", ()=>{
+      [...opts.children].forEach(c=>c.style.pointerEvents="none");
+      if(i===item.correct){ b.classList.add("correct"); score++; }
+      else{ b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+      document.getElementById("qzExplain").classList.add("show");
+      document.getElementById("nextBtn").classList.add("ready");
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById("nextBtn").addEventListener("click", ()=>{ qi++; renderQuiz(); });
+}
+renderQuiz();
+
+/* ---------- GLOSSARY ---------- */
+const glossTerms = [
+  ["📖","текстовий квест","Гра, де світ, події та наслідки описуються словами, а гравець керує сюжетом через вибір дій."],
+  ["🖼️","сцена (вузол)","Окрема ситуація чи момент гри з описом, викликом і точками вибору."],
+  ["🌳","дерево рішень","Структура, за якої рішення гравця ведуть різними гілками сюжету з різними наслідками."],
+  ["🏆","умова перемоги","Мета, яку має досягти гравець, щоб завершити гру успішно."],
+  ["💀","умова поразки","Помилка чи подія, яка завершує гру невдачею для гравця."],
+  ["🧮","формула промпту","Роль + Контекст/Сеттинг + Завдання + Обмеження + Формат виводу."],
+  ["🎯","few-shot prompting","Прийом, коли в промпт додають готовий приклад формату, щоб ШІ точно повторив структуру."],
+  ["🕵️","AI-плейтест","Перевірка гри самим ШІ в ролі тестувальника — пошук логічних дірок і нестиковок."],
+];
+const glossGrid = document.getElementById("glossGrid");
+glossTerms.forEach((t,i)=>{
+  const c = document.createElement("div"); c.className="gloss-card";
+  c.innerHTML = `<div class="whale-ico" style="background:${rainbow[i%rainbow.length]};margin-bottom:10px;">${t[0]}</div><h4>${t[1]}</h4><p>${t[2]}</p>`;
+  glossGrid.appendChild(c);
+});
+
+/* ---------- CHEAT SHEET ---------- */
+const cheatGrid = document.getElementById("cheatGrid");
+steps.forEach((s,i)=>{
+  const d = document.createElement("div"); d.className="cheat-item";
+  d.style.background = rainbow[i%rainbow.length];
+  d.innerHTML = `<div style="font-size:22px;margin-bottom:4px;">${s.icon}</div>Крок ${i+1}<br><span style="font-size:11px;font-weight:600;">${s.time}</span>`;
+  cheatGrid.appendChild(d);
+});
+
+updateClBar();
+</script>
+</body>
+</html>
