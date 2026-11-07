@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 9. Професійні інструменти</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7; --bg-hero:#FFF6E4; --surface:#FFFFFF;
+  --ink:#20222E; --ink-soft:#555A6E; --ink-faint:#8D91A6; --line:#ECE6D6;
+  --accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;
+  --violet:#8B5CF6; --violet-soft:#F1EAFE;
+  --warn:#FFB020; --warn-soft:#FFF1D2;
+  --bad:#F2495C; --bad-soft:#FDE3E7;
+  --good:#22B573; --good-soft:#DDF7EC;
+  --teal:#12B3A0; --teal-soft:#DBF7F2;
+  --pink:#EC4899; --pink-soft:#FCE1EF;
+  --orange:#FF7A2F; --orange-soft:#FFE7D4;
+  --radius-s:12px; --radius-m:18px; --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+.block.c-red{--accent:#F2495C; --accent-ink:#B23A4C; --accent-soft:#FDE3E7;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+}
+:root[data-theme="dark"] .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:12.5px; padding:8px 11px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(24px,4vw,38px); max-width:19ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:62ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:300px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:12.5px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+section.block{padding:52px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(21px,2.8vw,28px); max-width:26ch;}
+.block > .wrap > p.intro, .block p.intro{color:var(--ink-soft); max-width:64ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+.callout.pink{background:var(--pink-soft); color:#9A2A66; border-color:rgba(236,72,153,.25);}
+.callout.good{background:var(--good-soft); color:#1E7A45; border-color:rgba(47,158,91,.25);}
+.callout.bad{background:var(--bad-soft); color:#B23A4C; border-color:rgba(242,73,92,.25);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .callout.violet{color:#CFC4FF;}
+  :root:not([data-theme="light"]) .callout.warn{color:#FFD98A;}
+  :root:not([data-theme="light"]) .callout.pink{color:#FFB6DA;}
+  :root:not([data-theme="light"]) .callout.good{color:#8CE6BC;}
+  :root:not([data-theme="light"]) .callout.bad{color:#FFA3AE;}
+}
+:root[data-theme="dark"] .callout.violet{color:#CFC4FF;}
+:root[data-theme="dark"] .callout.warn{color:#FFD98A;}
+:root[data-theme="dark"] .callout.pink{color:#FFB6DA;}
+:root[data-theme="dark"] .callout.good{color:#8CE6BC;}
+:root[data-theme="dark"] .callout.bad{color:#FFA3AE;}
+
+/* MINDMAP */
+.mindmap-wrap{position:relative; margin:30px 0 10px;}
+.mindmap-svg{width:100%; height:auto; display:block;}
+.mm-node{cursor:pointer;}
+.mm-node circle{fill:var(--surface); stroke:var(--mm-color,var(--line)); stroke-width:3; transition:.15s;}
+.mm-node:hover circle, .mm-node.active circle{fill:var(--mm-color,var(--accent)); fill-opacity:.14;}
+.mm-node.active circle{stroke-width:4;}
+.mm-node text{font-family:'Manrope'; font-weight:700; fill:var(--ink); font-size:12.5px;}
+.mm-node .mm-icon{font-size:19px;}
+.mm-hub circle{fill:var(--accent); stroke:none;}
+.mm-hub text{fill:#fff; font-family:'Unbounded'; font-size:11.5px;}
+.mm-line{stroke:var(--line); stroke-width:2.5;}
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:8px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-body{color:var(--ink-soft); font-size:14.5px;}
+.rd-body b{color:var(--ink);}
+.rd-example{border-radius:var(--radius-s); padding:12px 15px; font-size:13.4px; background:var(--accent-soft); color:var(--accent-ink); margin-top:12px; font-family:'JetBrains Mono';}
+
+/* ACCORDION */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card.wide{grid-column:1/-1;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none; padding-top:6px;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+.rc-body-in{padding:0 18px 20px 18px; font-size:14px; color:var(--ink-soft);}
+.rule-card.open .rc-body{max-height:800px;}
+
+/* WHALE CARDS */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* CHECKER */
+.checker{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:24px; box-shadow:var(--shadow);}
+.checker-grid{display:grid; grid-template-columns:1.2fr 1fr; gap:24px;}
+@media(max-width:780px){.checker-grid{grid-template-columns:1fr;}}
+.checker textarea{width:100%; min-height:170px; border-radius:var(--radius-m); border:1.5px solid var(--line); background:var(--bg); padding:16px; font-family:'Manrope'; font-size:14.5px; color:var(--ink); resize:vertical; line-height:1.6;}
+.checker textarea:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.checker label.fl{display:block; font-size:11.5px; font-weight:800; color:var(--ink-faint); text-transform:uppercase; margin:12px 0 6px;}
+.score-ring-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.score-ring{position:relative; width:150px; height:150px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring .ring-bg{fill:none; stroke:var(--line); stroke-width:12;}
+.score-ring .ring-fg{fill:none; stroke:var(--accent); stroke-width:12; stroke-linecap:round; transition:stroke-dasharray .4s ease, stroke .4s ease;}
+.score-ring .ring-num{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;}
+.score-ring .ring-num b{font-family:'Unbounded'; font-size:30px; line-height:1;}
+.score-ring .ring-num span{font-size:11px; color:var(--ink-faint); font-weight:700; text-transform:uppercase;}
+.rank-badge{margin-top:8px; font-family:'Unbounded'; font-size:13px; padding:7px 16px; border-radius:999px; color:#fff; background:var(--accent);}
+.cat-list{margin-top:18px; display:flex; flex-direction:column; gap:10px;}
+.cat-item{font-size:12.8px;}
+.cat-item .cat-top{display:flex; justify-content:space-between; margin-bottom:4px; font-weight:700;}
+.cat-bar-bg{height:7px; border-radius:999px; background:var(--line); overflow:hidden;}
+.cat-bar-fg{height:100%; border-radius:999px; transition:width .35s ease;}
+.tips-box{margin-top:16px; background:var(--warn-soft); color:#8A5F0F; border-radius:var(--radius-s); padding:13px 15px; font-size:13px; display:none;}
+.tips-box.show{display:block;}
+.tips-box ul{margin:6px 0 0; padding-left:18px;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tips-box{color:#FFD98A;} }
+:root[data-theme="dark"] .tips-box{color:#FFD98A;}
+
+/* PROMPT BOX / BUILDER */
+.promptbox{background:var(--ink); color:#EAF7F4; border-radius:var(--radius-m); padding:16px 18px; font-family:'JetBrains Mono'; font-size:12.8px; line-height:1.65; white-space:pre-wrap; margin:14px 0;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .promptbox{background:#0B0C12; border:1px solid var(--line);} }
+:root[data-theme="dark"] .promptbox{background:#0B0C12; border:1px solid var(--line);}
+.promptbox .lab{display:block; font-family:'Manrope'; font-weight:800; color:#9ADCCB; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;}
+.copy-btn{margin-top:4px; background:var(--accent); color:#fff; border:none; padding:10px 20px; border-radius:999px; font-weight:800; font-size:13px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+.copy-msg{font-size:12px; color:var(--good); margin-left:10px; opacity:0; transition:.2s;}
+.copy-msg.show{opacity:1;}
+.builder{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:16px; box-shadow:var(--shadow);}
+.builder-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px;}
+.builder-field label{display:block; font-size:11.5px; font-weight:800; color:var(--ink-faint); text-transform:uppercase; margin-bottom:6px;}
+.builder-field select{width:100%; padding:10px 11px; border-radius:9px; border:1.5px solid var(--line); background:var(--bg); font-family:'Manrope'; font-weight:600; font-size:13px; color:var(--ink);}
+
+/* PLATFORM HEAD */
+.platform-head{display:flex; align-items:center; gap:16px; margin:6px 0 14px; flex-wrap:wrap;}
+.platform-logo{width:54px; height:54px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; box-shadow:var(--shadow-pop); flex:none; background:var(--accent);}
+.platform-link{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); padding:5px 12px; border-radius:999px; text-decoration:none;}
+
+/* SIMULATOR */
+.simulator{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:26px; box-shadow:var(--shadow); display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+@media(max-width:760px){.simulator{grid-template-columns:1fr;}}
+.sim-controls .ctrl-row{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px dashed var(--line); gap:10px;}
+.sim-controls .ctrl-row:last-child{border-bottom:none;}
+.ctrl-label{font-size:13.5px; font-weight:700;}
+.ctrl-label small{display:block; font-weight:500; color:var(--ink-faint); font-size:11.5px;}
+.switch{position:relative; width:44px; height:25px; flex:none;}
+.switch input{opacity:0; width:0; height:0;}
+.slider-tog{position:absolute; inset:0; background:var(--line); border-radius:999px; cursor:pointer; transition:.2s;}
+.slider-tog::before{content:""; position:absolute; width:19px; height:19px; left:3px; top:3px; background:var(--surface); border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.2);}
+input:checked + .slider-tog{background:var(--accent);}
+input:checked + .slider-tog::before{transform:translateX(19px);}
+.switch input:focus-visible + .slider-tog{outline:2px solid var(--accent); outline-offset:2px;}
+.sim-meter-wrap{margin-top:18px;}
+.sim-meter-label{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--ink-faint); margin-bottom:6px;}
+.sim-meter{height:10px; border-radius:999px; background:var(--line); overflow:hidden;}
+.sim-meter-bar{height:100%; width:10%; border-radius:999px; background:linear-gradient(90deg,var(--bad),var(--warn),var(--good)); transition:width .35s;}
+.preview-box{border-radius:var(--radius-m); min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-size:14px; color:#fff; font-weight:700; transition:background .4s ease; position:relative; overflow:hidden;}
+.preview-box .preview-emoji{font-size:40px; display:block; margin-bottom:10px;}
+.preview-box .preview-text{font-family:'Manrope'; font-weight:600; font-size:13px; max-width:30ch;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent;}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good); color:#fff;}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+.cl-status{margin-top:14px; font-family:'Unbounded'; font-size:13px; color:var(--accent-ink);}
+
+/* QUIZ */
+.quiz-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:28px; margin-top:26px; box-shadow:var(--shadow);}
+.quiz-progress{display:flex; gap:5px; margin-bottom:20px;}
+.quiz-progress span{flex:1; height:5px; border-radius:999px; background:var(--line);}
+.quiz-progress span.done{background:var(--accent);}
+.quiz-q{font-family:'Unbounded'; font-size:16px; margin-bottom:16px; line-height:1.4;}
+.quiz-opts{display:grid; gap:9px;}
+.qz-btn{text-align:left; padding:12px 15px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-size:14px; font-weight:700; color:var(--ink); box-shadow:var(--shadow-pop); transition:.12s; font-family:'Manrope';}
+.qz-btn:hover{border-color:var(--accent); transform:translateY(1px); box-shadow:0 3px 0 rgba(20,22,30,.14);}
+.qz-btn.correct{background:var(--good-soft); border-color:var(--good); color:#1E7A45;}
+.qz-btn.wrong{background:var(--bad-soft); border-color:var(--bad); color:#B23A4C;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .qz-btn.correct{color:#8CE6BC;} :root:not([data-theme="light"]) .qz-btn.wrong{color:#FFA3AE;} }
+:root[data-theme="dark"] .qz-btn.correct{color:#8CE6BC;}
+:root[data-theme="dark"] .qz-btn.wrong{color:#FFA3AE;}
+.qz-explain{margin-top:14px; background:var(--accent-soft); color:var(--accent-ink); padding:13px 15px; border-radius:var(--radius-s); font-size:13.6px; display:none;}
+.qz-explain.show{display:block;}
+.qz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+.next-btn{background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; opacity:.4; pointer-events:none; transition:.2s; box-shadow:var(--shadow-pop);}
+.next-btn.ready{opacity:1; pointer-events:all;}
+.quiz-result{text-align:center; padding:20px 0;}
+.quiz-result .score{font-family:'Unbounded'; font-size:50px; color:var(--accent-ink);}
+.restart-btn{margin-top:16px; background:var(--pink); color:#fff; border:none; padding:11px 24px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+
+/* THINK */
+.think-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:26px;}
+.think-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--tc-color,var(--accent)); border-radius:var(--radius-m); padding:18px 20px; box-shadow:var(--shadow); font-size:14.5px; color:var(--ink);}
+.think-card .think-num{font-family:'Unbounded'; font-size:13px; color:var(--tc-color,var(--accent)); margin-bottom:6px; display:block;}
+
+/* GLOSSARY + CHEAT + TABLE */
+.gloss-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-top:22px;}
+.gloss-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:17px 18px; box-shadow:var(--shadow);}
+.gloss-card h4{font-size:14px; font-family:'JetBrains Mono'; color:var(--accent-ink); margin-bottom:6px;}
+.gloss-card p{font-size:13.3px; color:var(--ink-soft); margin:0;}
+.cheat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:20px;}
+.cheat-item{border-radius:var(--radius-m); padding:16px 10px; text-align:center; font-weight:800; font-size:12.5px; color:#fff; box-shadow:var(--shadow-pop);}
+.table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:13.6px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:11px 14px; font-family:'Unbounded'; font-size:12px; font-weight:600;}
+table.crit td{padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top;}
+table.crit tr:last-child td{border-bottom:none;}
+
+/* SCENE (ObjectRemover) */
+.scene-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:26px; box-shadow:var(--shadow);}
+.scene-svg{width:100%; height:auto; display:block; border-radius:var(--radius-m); background:#CFE8FF;}
+.obj{cursor:pointer; transition:opacity .6s ease, transform .6s ease;}
+.obj .mask{fill:#F2495C; opacity:0; transition:opacity .2s;}
+.obj path.mask{fill:none;}
+.obj.sel .mask{opacity:.55;}
+.obj:hover .mask{opacity:.28;}
+.obj.sel:hover .mask{opacity:.55;}
+.obj.gone{opacity:0; pointer-events:none;}
+.obj text{font-size:46px; text-anchor:middle; dominant-baseline:central;}
+.scene-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:16px;}
+.btn{border:none; cursor:pointer; padding:11px 20px; border-radius:999px; font-weight:800; font-size:13.4px; font-family:'Manrope'; color:#fff; background:var(--accent); box-shadow:var(--shadow-pop);}
+.btn.alt{background:var(--ink-faint);}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+.scene-status{font-size:13.6px; color:var(--ink-soft); font-weight:700; flex:1; min-width:200px;}
+
+/* CHOOSER */
+.chooser{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:26px;}
+@media(max-width:760px){.chooser{grid-template-columns:1fr;}}
+.choose-list{display:grid; gap:9px;}
+.choose-btn{text-align:left; padding:12px 15px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-size:14px; font-weight:700; color:var(--ink); font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+.choose-btn.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink);}
+.choose-out{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; box-shadow:var(--shadow); min-height:200px;}
+.choose-out h4{font-size:16px;}
+.tool-tag{display:inline-block; font-family:'JetBrains Mono'; font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; color:#fff; margin:0 6px 6px 0;}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:54ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+@media(max-width:640px){
+  .simulator{padding:20px;}
+  table.crit td, table.crit th{padding:9px 10px; font-size:12.5px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">🦸 Цифрова лабораторія AI</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#bezpeka">Безпека</a>
+      <a href="#kling">Kling AI</a>
+      <a href="#kling-os">Особливості Kling</a>
+      <a href="#kling-pp">Плюси й мінуси Kling</a>
+      <a href="#kling-prompt">Промпт для Kling</a>
+      <a href="#leo">Leonardo AI</a>
+      <a href="#leo-os">Особливості Leonardo</a>
+      <a href="#leo-pp">Плюси й мінуси Leonardo</a>
+      <a href="#leo-prompt">Промпт для Leonardo</a>
+      <a href="#remover">ObjectRemover</a>
+      <a href="#choose">Що обрати?</a>
+      <a href="#zavdannya">Завдання</a>
+      <a href="#simulyator">Симулятор</a>
+      <a href="#quiz">Перевір себе</a>
+      <a href="#vdoma">Подумати вдома</a>
+      <a href="#hero">Супергерой</a>
+      <a href="#dovidnyk">Довідник</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none" aria-hidden="true">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Курс «Цифрова лабораторія AI» · Урок 9</div>
+    <h1>Генерація зображень: професійні інструменти</h1>
+    <p class="lede">Сьогодні ти познайомишся з двома потужними ШІ-майстернями — Kling AI та Leonardo AI, навчишся складати промпти для кожної, а ще дізнаєшся, як «стерти» зайве з фото за допомогою ObjectRemover. Удома створиш власного супергероя!</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">🎞️</span> Kling AI</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">🎨</span> Leonardo AI</div>
+      <div class="chip" style="--chip-color:#12B3A0;"><span class="chip-ico">🧽</span> ObjectRemover</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🦸</span> Супергерой вдома</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= BEZPEKA ================= -->
+<section class="block c-red" id="bezpeka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🛡️</span><span class="label">СПОЧАТКУ БЕЗПЕКА</span></div>
+    <h2>Правила безпеки для роботи з ШІ-сервісами</h2>
+    <p class="intro">Kling AI та Leonardo AI — професійні сервіси для дорослих творців. Щоб працювати з ними безпечно, запам'ятай шість правил. Клікай на кожне, коли прочитаєш і зрозумієш.</p>
+
+    <div class="callout bad">👨‍👩‍👧 <b>Важливо:</b> акаунти в таких сервісах створює <b>дорослий</b> — вчитель або хтось із батьків. За умовами Kling AI мінімальний вік користувача — 13 років, а підлітки реєструються через батьків чи опікунів. Для Leonardo AI вікові правила теж потрібно дивитися в офіційних умовах користування. Тому на уроці ми працюємо <b>разом із дорослим</b>.</div>
+
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="safeBar"></div></div>
+      <div id="safeList"></div>
+      <div class="cl-status" id="safeStatus">Прочитай усі правила — і отримаєш значок «Безпечний творець» 🏅</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= KLING ================= -->
+<section class="block c-blue" id="kling">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎞️</span><span class="label">ЗНАЙОМСТВО · KLING AI</span></div>
+    <h2>Що таке Kling AI і які інструменти в ньому є</h2>
+    <div class="platform-head">
+      <div class="platform-logo">🎞️</div>
+      <div><b>Kling AI</b> — ШІ-платформа для створення зображень і відео. Найбільше вона відома своїми відеомоделями, але вміє й генерувати та редагувати картинки.<br><a class="platform-link" href="https://kling.ai" target="_blank" rel="noopener">kling.ai</a></div>
+    </div>
+    <p class="intro">Натисни на кульку ментальної карти, щоб дізнатися про кожен інструмент.</p>
+
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 560" aria-label="Ментальна карта інструментів Kling AI">
+        <g id="mmLinesK"></g>
+        <g class="mm-node mm-hub" transform="translate(400,280)">
+          <circle r="58"/>
+          <text text-anchor="middle" dy="-4">ІНСТРУМЕНТИ</text>
+          <text text-anchor="middle" dy="14">KLING AI</text>
+        </g>
+        <g id="mmNodesK"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetailK"></div>
+
+    <div class="callout" style="margin-top:30px;">🆓 <b>Безкоштовний план Kling:</b> за даними оглядів, щодня нараховується близько <b>66 кредитів</b> (вони не накопичуються — наступного дня «згорають»). Усі безкоштовні результати мають <b>водяний знак</b> і підходять лише для особистого використання. Умови сервісів змінюються — актуальну інформацію перевіряй на сайті разом із дорослим.</div>
+  </div>
+</section>
+
+<section class="block c-orange" id="kling-os">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚙️</span><span class="label">ОСОБЛИВОСТІ · KLING AI</span></div>
+    <h2>Чим генерація зображень у Kling особлива</h2>
+    <p class="intro">Розгорни кожну картку, щоб дізнатися більше.</p>
+    <div class="rule-grid" id="klingOs"></div>
+  </div>
+</section>
+
+<section class="block c-purple" id="kling-pp">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚖️</span><span class="label">ПЛЮСИ Й МІНУСИ · KLING AI</span></div>
+    <h2>Переваги та недоліки Kling AI</h2>
+    <h3 style="margin-top:10px; font-size:17px;">✅ Переваги</h3>
+    <div class="whale-grid" id="klingPros"></div>
+    <h3 style="margin-top:30px; font-size:17px;">⚠️ Недоліки</h3>
+    <div class="whale-grid" id="klingCons"></div>
+  </div>
+</section>
+
+<section class="block c-teal" id="kling-prompt">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎯</span><span class="label">ІДЕАЛЬНИЙ ПРОМПТ · KLING AI</span></div>
+    <h2>Як скласти ідеальний промпт для Kling</h2>
+    <p class="intro">Kling добре розуміє прості, чіткі речення. Описуй <b>одну головну ідею</b> та додавай деталі за формулою з восьми складових. Англомовні промпти зазвичай дають передбачуваніший результат.</p>
+
+    <div class="table-scroll"><table class="crit">
+      <tr><th>№</th><th>Складова</th><th>Приклад</th></tr>
+      <tr><td>1</td><td>Суб'єкт</td><td>a young girl astronaut</td></tr>
+      <tr><td>2</td><td>Дія / поза</td><td>waving from a rover</td></tr>
+      <tr><td>3</td><td>Місце / фон</td><td>red dusty hills on Mars</td></tr>
+      <tr><td>4</td><td>Стиль</td><td>cinematic photo, 3D animation style</td></tr>
+      <tr><td>5</td><td>Світло</td><td>warm sunset light</td></tr>
+      <tr><td>6</td><td>Камера / кадр</td><td>wide shot, close-up</td></tr>
+      <tr><td>7</td><td>Якість</td><td>highly detailed, sharp focus</td></tr>
+      <tr><td>8</td><td>Формат</td><td>aspect ratio 16:9</td></tr>
+    </table></div>
+
+    <div class="callout" style="margin-top:22px;">💡 <b>Приклад готового промпту:</b> <span class="mono">«A young girl astronaut waving from a rover, red dusty hills on Mars in the background, cinematic photo, warm sunset light, wide shot, highly detailed, aspect ratio 16:9»</span></div>
+    <div class="callout violet">🧩 <b>Секрет Kling:</b> якщо хочеш, щоб персонаж виглядав однаково на різних картинках — додай <b>референс-зображення</b> (власне фото-приклад) замість того, щоб щоразу довго описувати героя словами.</div>
+
+    <h3 style="margin-top:34px; font-size:18px;">🧪 Зібери свій промпт для Kling</h3>
+    <div class="builder" id="builderKling"></div>
+
+    <h3 style="margin-top:34px; font-size:18px;">✍️ Перевір свій промпт для Kling</h3>
+    <p class="intro">Впиши промпт у поле — оцінка оновлюється одразу, поки ти пишеш.</p>
+    <div id="checkerKling"></div>
+  </div>
+</section>
+
+<!-- ================= LEONARDO ================= -->
+<section class="block c-purple" id="leo">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎨</span><span class="label">ЗНАЙОМСТВО · LEONARDO AI</span></div>
+    <h2>Що таке Leonardo AI і які інструменти в ньому є</h2>
+    <div class="platform-head">
+      <div class="platform-logo">🎨</div>
+      <div><b>Leonardo AI</b> — ШІ-студія для створення зображень: від концепт-арту й персонажів до ігрових текстур. Є панель налаштувань, редактор Canvas, генерація відео та галерея спільноти.<br><a class="platform-link" href="https://leonardo.ai" target="_blank" rel="noopener">leonardo.ai</a></div>
+    </div>
+    <p class="intro">Натисни на кульку ментальної карти, щоб дізнатися про кожен інструмент.</p>
+
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 560" aria-label="Ментальна карта інструментів Leonardo AI">
+        <g id="mmLinesL"></g>
+        <g class="mm-node mm-hub" transform="translate(400,280)">
+          <circle r="58"/>
+          <text text-anchor="middle" dy="-4">ІНСТРУМЕНТИ</text>
+          <text text-anchor="middle" dy="14">LEONARDO</text>
+        </g>
+        <g id="mmNodesL"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetailL"></div>
+
+    <div class="callout violet" style="margin-top:30px;">🆓 <b>Безкоштовний план Leonardo:</b> за даними оглядів, щодня нараховується близько <b>150 токенів</b>. Важчі завдання коштують більше токенів. На безкоштовному тарифі твої роботи є <b>публічними</b> — їх можуть бачити інші. Актуальні умови перевіряй на сайті.</div>
+  </div>
+</section>
+
+<section class="block c-pink" id="leo-os">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚙️</span><span class="label">ОСОБЛИВОСТІ · LEONARDO AI</span></div>
+    <h2>Чим генерація зображень у Leonardo особлива</h2>
+    <p class="intro">Розгорни кожну картку, щоб дізнатися більше.</p>
+    <div class="rule-grid" id="leoOs"></div>
+  </div>
+</section>
+
+<section class="block c-green" id="leo-pp">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚖️</span><span class="label">ПЛЮСИ Й МІНУСИ · LEONARDO AI</span></div>
+    <h2>Переваги та недоліки Leonardo AI</h2>
+    <h3 style="margin-top:10px; font-size:17px;">✅ Переваги</h3>
+    <div class="whale-grid" id="leoPros"></div>
+    <h3 style="margin-top:30px; font-size:17px;">⚠️ Недоліки</h3>
+    <div class="whale-grid" id="leoCons"></div>
+  </div>
+</section>
+
+<section class="block c-yellow" id="leo-prompt">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎯</span><span class="label">ІДЕАЛЬНИЙ ПРОМПТ · LEONARDO AI</span></div>
+    <h2>Як скласти ідеальний промпт для Leonardo</h2>
+    <p class="intro">У Leonardo є окреме поле <b>негативного промпту</b> — там пишемо, чого на картинці <b>не повинно бути</b>. Це головна відмінність від Kling. Починай з короткого промпту, а деталі додавай поступово.</p>
+
+    <div class="table-scroll"><table class="crit">
+      <tr><th>№</th><th>Складова</th><th>Приклад</th></tr>
+      <tr><td>1</td><td>Суб'єкт</td><td>a friendly robot librarian</td></tr>
+      <tr><td>2</td><td>Дія / деталі</td><td>holding a glowing book</td></tr>
+      <tr><td>3</td><td>Стиль</td><td>digital illustration, 35mm film photography</td></tr>
+      <tr><td>4</td><td>Світло</td><td>soft warm light</td></tr>
+      <tr><td>5</td><td>Камера / кадр</td><td>medium shot</td></tr>
+      <tr><td>6</td><td>Якість</td><td>highly detailed</td></tr>
+      <tr><td>7</td><td>Негативний промпт</td><td>blurry, extra fingers, distorted face, watermark</td></tr>
+      <tr><td>8</td><td>Текст у лапках (за потреби)</td><td>a sign that says &quot;OPEN&quot;</td></tr>
+    </table></div>
+
+    <div class="callout" style="margin-top:22px;">💡 <b>Приклад:</b> <span class="mono">«A friendly robot librarian holding a glowing book, cozy library, digital illustration, soft warm light, medium shot, highly detailed»</span><br><b>Негативний промпт:</b> <span class="mono">«blurry, extra fingers, distorted face, watermark»</span></div>
+    <div class="callout warn">🔤 <b>Текст на картинці:</b> якщо потрібен напис, візьми його в подвійні лапки й зроби коротким (1–3 слова) — так він частіше виходить без помилок.</div>
+
+    <h3 style="margin-top:34px; font-size:18px;">🧪 Зібери свій промпт для Leonardo</h3>
+    <div class="builder" id="builderLeo"></div>
+
+    <h3 style="margin-top:34px; font-size:18px;">✍️ Перевір свій промпт для Leonardo</h3>
+    <p class="intro">Впиши основний промпт і (за бажанням) негативний — отримаєш бали за кожну складову.</p>
+    <div id="checkerLeo"></div>
+  </div>
+</section>
+
+<!-- ================= OBJECT REMOVER ================= -->
+<section class="block c-teal" id="remover">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧽</span><span class="label">ІНСТРУМЕНТ · OBJECTREMOVER</span></div>
+    <h2>ObjectRemover: як «стерти» зайве з фото</h2>
+    <div class="platform-head">
+      <div class="platform-logo">🧽</div>
+      <div><b>ObjectRemover</b> — безкоштовний онлайн-інструмент, який прибирає з фото небажані речі (людей, написи, дроти, сміття) і домальовує фон так, щоб було природно.<br><a class="platform-link" href="https://objectremover.com/" target="_blank" rel="noopener">objectremover.com</a></div>
+    </div>
+
+    <h3 style="font-size:17px; margin-top:20px;">🎮 Спробуй сам: прибери зайве з парку</h3>
+    <p class="intro">Клікни на зайві предмети — вони підсвітяться червоним, як «маска» у ObjectRemover. Потім натисни «Стерти» і подивись, як ШІ «дозаповнить» фон.</p>
+
+    <div class="scene-card">
+      <svg class="scene-svg" viewBox="0 0 600 340" id="sceneSvg" role="img" aria-label="Парк із лавкою, деревом і кількома зайвими предметами">
+        <defs>
+          <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8EC9FF"/><stop offset="1" stop-color="#DDF0FF"/></linearGradient>
+        </defs>
+        <rect width="600" height="340" fill="url(#skyG)"/>
+        <circle cx="520" cy="60" r="34" fill="#FFD84D"/>
+        <ellipse cx="150" cy="70" rx="48" ry="16" fill="#fff" opacity=".9"/><ellipse cx="185" cy="58" rx="36" ry="14" fill="#fff" opacity=".9"/>
+        <path d="M0 215 Q150 150 300 205 T600 190 V340 H0Z" fill="#7BCB6B"/>
+        <path d="M0 255 Q300 215 600 262 V340 H0Z" fill="#5DB65A"/>
+        <path d="M250 340 Q290 270 330 250 L360 250 Q330 280 330 340Z" fill="#E9D6A5"/>
+        <rect x="396" y="150" width="22" height="90" fill="#8A5A33"/>
+        <circle cx="407" cy="130" r="58" fill="#3E9E4B"/><circle cx="370" cy="150" r="36" fill="#47AE55"/><circle cx="445" cy="152" r="34" fill="#47AE55"/>
+        <g>
+          <rect x="70" y="245" width="130" height="14" rx="4" fill="#B97A45"/>
+          <rect x="70" y="222" width="130" height="14" rx="4" fill="#B97A45"/>
+          <rect x="80" y="259" width="10" height="32" fill="#6C4627"/><rect x="180" y="259" width="10" height="32" fill="#6C4627"/>
+        </g>
+        <g class="obj" data-id="cable" tabindex="0" role="button" aria-label="Електричний дріт">
+          <path class="mask" d="M0 40 Q300 90 600 36" stroke="#F2495C" stroke-width="26" fill="none" stroke-linecap="round"/>
+          <path d="M0 40 Q300 90 600 36" stroke="#2B2D3A" stroke-width="4" fill="none"/>
+        </g>
+        <g class="obj" data-id="bin" tabindex="0" role="button" aria-label="Смітник" transform="translate(255,250)">
+          <circle class="mask" r="40"/><text>🗑️</text>
+        </g>
+        <g class="obj" data-id="cone" tabindex="0" role="button" aria-label="Дорожній конус" transform="translate(510,285)">
+          <circle class="mask" r="38"/><text>🚧</text>
+        </g>
+        <g class="obj" data-id="bird" tabindex="0" role="button" aria-label="Птах" transform="translate(135,195)">
+          <circle class="mask" r="34"/><text>🐦</text>
+        </g>
+      </svg>
+      <div class="scene-bar">
+        <button class="btn" id="eraseBtn" disabled>🧽 Стерти виділене</button>
+        <button class="btn alt" id="resetBtn">↺ Почати знову</button>
+        <div class="scene-status" id="sceneStatus">Виділено: 0 · Стерто: 0 із 4</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:36px; font-size:17px;">📋 Як працювати з ObjectRemover (3 кроки)</h3>
+    <div class="rule-grid" id="removerSteps"></div>
+
+    <div class="callout good" style="margin-top:26px;">✅ <b>Що відомо про інструмент:</b> він безкоштовний, працює в браузері без реєстрації, приймає файли JPG, PNG та WebP, а завантажені зображення автоматично видаляються приблизно за 2 години. Найкраще працює на простих фонах — стіна, небо, трава, тканина.</div>
+    <div class="callout bad">🚫 <b>Етика й безпека:</b> завантажуй лише <b>власні</b> чи згенеровані безпечні зображення — не фото інших людей без їхнього дозволу. Прибирати зайве з фото можна, щоб зробити кадр охайнішим, але <b>не можна</b> змінювати фото так, щоб когось обманути. Якщо картинку суттєво змінив ШІ — чесно напиши про це.</div>
+  </div>
+</section>
+
+<!-- ================= CHOOSE ================= -->
+<section class="block c-blue" id="choose">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧭</span><span class="label">ЩО ОБРАТИ?</span></div>
+    <h2>Який інструмент підходить для твого завдання</h2>
+    <p class="intro">Обери завдання зліва — і дізнаєшся, який інструмент (або кілька) допоможе найкраще.</p>
+    <div class="chooser">
+      <div class="choose-list" id="chooseList"></div>
+      <div class="choose-out" id="chooseOut"><p style="color:var(--ink-faint);">👈 Обери завдання зі списку</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZAVDANNYA ================= -->
+<section class="block c-yellow" id="zavdannya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎨</span><span class="label">ПРАКТИКА</span></div>
+    <h2>Три творчі завдання (безкоштовні версії)</h2>
+    <p class="intro">Виконуй разом із дорослим, який увійшов в акаунт. Завдання поєднуються в ланцюжок: Kling → Leonardo → ObjectRemover. Не забувай про ліміти: токенів і кредитів на день небагато, тож продумуй промпт, перш ніж натискати «Generate».</p>
+    <div class="rule-grid" id="taskSteps"></div>
+    <div class="callout warn">📌 Збережи всі три результати разом зі своїми промптами — на наступному уроці порівняємо, що вийшло в різних інструментах.</div>
+  </div>
+</section>
+
+<!-- ================= SIMULATOR ================= -->
+<section class="block c-blue" id="simulyator">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧪</span><span class="label">СИМУЛЯЦІЯ</span></div>
+    <h2>Симулятор: як елементи промпту впливають на результат</h2>
+    <p class="intro">Вмикай і вимикай елементи й дивись, як (симульовано) змінюється якість майбутнього зображення. Це навчальна модель, а не справжня генерація.</p>
+    <div class="simulator">
+      <div class="sim-controls">
+        <div class="ctrl-row"><div class="ctrl-label">Суб'єкт і дія<small>хто/що і що робить</small></div><label class="switch"><input type="checkbox" id="s-subject"><span class="slider-tog"></span></label></div>
+        <div class="ctrl-row"><div class="ctrl-label">Стиль<small>комікс, фото, 3D...</small></div><label class="switch"><input type="checkbox" id="s-style"><span class="slider-tog"></span></label></div>
+        <div class="ctrl-row"><div class="ctrl-label">Світло<small>захід сонця, неон...</small></div><label class="switch"><input type="checkbox" id="s-light"><span class="slider-tog"></span></label></div>
+        <div class="ctrl-row"><div class="ctrl-label">Камера / кадр<small>wide shot, close-up...</small></div><label class="switch"><input type="checkbox" id="s-camera"><span class="slider-tog"></span></label></div>
+        <div class="ctrl-row"><div class="ctrl-label">Негативний промпт<small>Leonardo: чого не має бути</small></div><label class="switch"><input type="checkbox" id="s-neg"><span class="slider-tog"></span></label></div>
+        <div class="ctrl-row"><div class="ctrl-label">Референс-зображення<small>Kling: приклад персонажа</small></div><label class="switch"><input type="checkbox" id="s-ref"><span class="slider-tog"></span></label></div>
+        <div class="sim-meter-wrap">
+          <div class="sim-meter-label"><span>Якість результату</span><span id="meterPct">5%</span></div>
+          <div class="sim-meter"><div class="sim-meter-bar" id="meterBar"></div></div>
+        </div>
+      </div>
+      <div class="preview-box" id="previewBox">
+        <div><span class="preview-emoji">🌫️</span><span class="preview-text">Порожній промпт — ШІ вигадує все сам</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="block c-purple" id="quiz">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🏆</span><span class="label">ПЕРЕВІР СЕБЕ</span></div>
+    <h2>Контрольні питання</h2>
+    <p class="intro">Вісім запитань за матеріалом уроку. Обери відповідь — і одразу дізнаєшся, чи правильно.</p>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VDOMA ================= -->
+<section class="block c-teal" id="vdoma">
+  <div class="wrap">
+    <div class="kicker"><span class="num">💭</span><span class="label">ПОДУМАТИ ВДОМА</span></div>
+    <h2>Творчі питання для роздумів</h2>
+    <p class="intro">Ці питання не мають єдиної правильної відповіді. Подумай над ними сам(а) або обговори з родиною — а на наступному уроці поділишся думками.</p>
+    <div class="think-grid" id="thinkGrid"></div>
+  </div>
+</section>
+
+<!-- ================= HERO HOMEWORK ================= -->
+<section class="block c-orange" id="hero">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🦸</span><span class="label">ДОМАШНЄ ЗАВДАННЯ</span></div>
+    <h2>Створи власного супергероя в стилі коміксів</h2>
+    <p class="intro">Вигадай <b>свого</b> супергероя або супергероїню та згенеруй його в стилі американських коміксів — яскраві кольори, виразні контури, динамічна поза. Користуйся Kling AI або Leonardo AI разом із дорослим.</p>
+
+    <div class="callout pink">⚠️ <b>Золоте правило:</b> персонажі Marvel і DC належать їхнім творцям. Тому в промптах <b>не пиши імена існуючих героїв</b> — вигадай <b>власного</b> героя з унікальним костюмом, силою та історією. Стиль коміксів — це лише манера малювання, і ним можна користуватись.</div>
+
+    <h3 style="margin-top:30px; font-size:18px;">🧪 Конструктор супергероя</h3>
+    <div class="builder" id="builderHero"></div>
+
+    <h3 style="margin-top:34px; font-size:18px;">✅ Чек-лист виконання</h3>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="heroBar"></div></div>
+      <div id="heroList"></div>
+      <div class="cl-status" id="heroStatus">Рівень героя: Новачок 🌱</div>
+    </div>
+
+    <div class="callout warn" style="margin-top:22px;">📌 Збережи зображення та свій промпт і принеси на наступний урок — влаштуємо галерею супергероїв класу! Кожен герой має мати ім'я та історію походження суперсили.</div>
+  </div>
+</section>
+
+<!-- ================= DOVIDNYK ================= -->
+<section class="block c-pink" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Довідкові матеріали</h2>
+
+    <h3 style="font-size:18px;">Глосарій</h3>
+    <div class="gloss-grid" id="glossGrid"></div>
+
+    <h3 style="margin-top:36px; font-size:18px;">Шпаргалка: складові промпту</h3>
+    <div class="cheat-grid" id="cheatGrid"></div>
+
+    <h3 style="margin-top:36px; font-size:18px;">Kling AI, Leonardo AI, ObjectRemover — коротко</h3>
+    <div class="table-scroll"><table class="crit">
+      <tr><th>Інструмент</th><th>Головна особливість</th><th>Безкоштовно (за даними оглядів)</th></tr>
+      <tr><td>Kling AI</td><td>Референси, редагування словами, оживлення картинок у відео</td><td>Щоденні кредити (близько 66), водяний знак, лише особисте використання, черга</td></tr>
+      <tr><td>Leonardo AI</td><td>Негативний промпт, Canvas, галерея промптів спільноти</td><td>Щоденні токени (близько 150), роботи публічні</td></tr>
+      <tr><td>ObjectRemover</td><td>Прибирає зайві об'єкти з фото</td><td>Безкоштовно, без реєстрації, файли JPG/PNG/WebP, зображення видаляються приблизно за 2 години</td></tr>
+    </table></div>
+    <p style="font-size:12.5px; color:var(--ink-faint); margin-top:12px;">Ліміти й умови змінюються. Орієнтовні цифри взято з оглядів станом на 2026 рік — актуальні дані дивись на офіційних сайтах kling.ai, leonardo.ai та objectremover.com.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 9 <span class="heart">🦸</span><br>Найкращий промпт — той, у якому ти точно знаєш, що хочеш побачити, ще до того, як натиснеш «Generate».</p>
+</footer>
+
+<script>
+/* ---------- NAV ---------- */
+const sectionIds = ["bezpeka","kling","kling-os","kling-pp","kling-prompt","leo","leo-os","leo-pp","leo-prompt","remover","choose","zavdannya","simulyator","quiz","vdoma","hero","dovidnyk"];
+const sections = sectionIds.map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>{
+    const on = a.getAttribute("href")==="#"+cur;
+    a.classList.toggle("active", on);
+    if(on){ const box=a.parentElement.parentElement; const r=a.getBoundingClientRect(), b=box.getBoundingClientRect(); if(r.left<b.left||r.right>b.right){ box.scrollTo({left: box.scrollLeft + (r.left-b.left) - 20, behavior:"smooth"}); } }
+  });
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- MINDMAP ---------- */
+function buildMindmap(items, linesId, nodesId, detailId){
+  const mmLines = document.getElementById(linesId);
+  const mmNodes = document.getElementById(nodesId);
+  const cx=400, cy=280, R=210, n = items.length;
+  items.forEach((r,i)=>{
+    const angle = (-90 + i*(360/n)) * Math.PI/180;
+    const x = cx + R*Math.cos(angle), y = cy + R*Math.sin(angle);
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",cx); line.setAttribute("y1",cy); line.setAttribute("x2",x); line.setAttribute("y2",y);
+    line.setAttribute("class","mm-line"); mmLines.appendChild(line);
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","mm-node"); g.setAttribute("transform",`translate(${x},${y})`); g.dataset.idx=i;
+    g.setAttribute("tabindex","0"); g.setAttribute("role","button"); g.setAttribute("aria-label", r.title);
+    g.style.setProperty("--mm-color", rainbow[i%rainbow.length]);
+    const shortTitle = r.title.length>14? r.title.slice(0,13)+"…": r.title;
+    g.innerHTML = `<circle r="46"/><text class="mm-icon" text-anchor="middle" dy="-14">${r.icon}</text><text text-anchor="middle" dy="10">${shortTitle}</text>`;
+    const pick = ()=>selectMindNode(items, i, nodesId, detailId, true);
+    g.addEventListener("click", pick);
+    g.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); }});
+    mmNodes.appendChild(g);
+  });
+}
+function selectMindNode(items, i, nodesId, detailId, scroll){
+  document.querySelectorAll(`#${nodesId} .mm-node`).forEach(n=>n.classList.remove("active"));
+  const g = document.querySelector(`#${nodesId} [data-idx="${i}"]`); if(g) g.classList.add("active");
+  const r = items[i];
+  const rd = document.getElementById(detailId);
+  rd.style.setProperty("--rd-color", rainbow[i%rainbow.length]);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${r.icon}</div><div class="rd-title">${r.title}</div></div>
+    <div class="rd-body">${r.body}</div>
+    ${r.example? `<div class="rd-example">💡 ${r.example}</div>` : ""}`;
+  if(scroll) rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+const klingTools = [
+  {icon:"🖼️", title:"Image", body:"Генерація зображень за <b>текстовим описом</b>. Ти пишеш промпт — Kling створює картинку. Це основа для супергероя та інших завдань уроку.", example:"«Введи промпт за формулою з 8 складових і обери формат кадру.»"},
+  {icon:"🧩", title:"Референси", body:"Режим <b>image-to-image</b>: ти додаєш власне зображення як приклад, а Kling створює нове на його основі. За описом моделі Kling O1 Image, вона може враховувати до <b>10 референсів</b> одночасно.", example:"«Завантаж малюнок свого героя — отримай його в новій сцені.»"},
+  {icon:"✏️", title:"Редагування", body:"Зміна готового зображення <b>простими словами</b>: змінити фон, додати чи прибрати предмет, змінити одяг або вираз обличчя.", example:"«Заміни денне небо на нічне з зірками.»"},
+  {icon:"🎬", title:"Оживлення", body:"Перетворення нерухомої картинки на <b>коротке відео</b> (приблизно 5 секунд). Саме відеомоделями Kling найбільш відомий.", example:"«Оживи свого супергероя: плащ ніби розвівається вітром.»"},
+  {icon:"📝", title:"Text→Video", body:"Створення короткого відео <b>одразу з тексту</b>, без готової картинки. Відео коштує більше кредитів, ніж зображення.", example:"«Спочатку відточи картинку, а вже потім оживляй — так економиш кредити.»"},
+  {icon:"💳", title:"Кредити", body:"Усе у Kling «коштує» кредитів. На безкоштовному плані їх нараховується близько <b>66 на добу</b>, але вони не накопичуються. Безкоштовні результати мають водяний знак.", example:"«Не витрачай кредити на невдалі промпти — спершу перевір їх тут, у посібнику!»"},
+];
+buildMindmap(klingTools, "mmLinesK","mmNodesK","ruleDetailK");
+selectMindNode(klingTools, 0, "mmNodesK","ruleDetailK", false);
+
+const leoTools = [
+  {icon:"🖼️", title:"Image", body:"Головна сторінка генерації: поле промпту, <b>вибір моделі</b> (наприклад, Lucid Origin чи Phoenix), розмір кадру та кількість зображень.", example:"«Введи промпт, обери модель і натисни Generate.»"},
+  {icon:"🖌️", title:"Canvas", body:"Редактор для доопрацювання: <b>inpainting</b> (перемалювати виділену частину), <b>outpainting</b> (дорисувати краї) і перетворення начерку на картинку.", example:"«Виділи маску на обличчі героя й попроси змінити вираз.»"},
+  {icon:"🧩", title:"Референс", body:"<b>Image-to-image</b>: завантажене зображення стає прикладом. Повзунок «strength» керує тим, наскільки сильно результат повторює референс.", example:"«Малюнок олівцем + промпт = детальна ілюстрація.»"},
+  {icon:"⚡", title:"Realtime", body:"Режим, у якому картинка змінюється <b>одразу</b>, поки ти редагуєш опис. На безкоштовному плані доступний у обмеженому вигляді.", example:"«Дописуй слова — і дивись, як змінюється кадр.»"},
+  {icon:"🎬", title:"Motion", body:"Оживлення зображень і створення коротких відео за допомогою моделей Motion.", example:"«Обирай відео лише коли картинка тобі вже подобається.»"},
+  {icon:"🌍", title:"Спільнота", body:"<b>Галерея</b>, де видно роботи інших разом із їхніми промптами, та моделі, створені користувачами. Чудовий спосіб вчитися на прикладах!", example:"«Знайди картинку, що подобається, і придивись, з яких слів складено її промпт.»"},
+];
+buildMindmap(leoTools, "mmLinesL","mmNodesL","ruleDetailL");
+selectMindNode(leoTools, 0, "mmNodesL","ruleDetailL", false);
+
+/* ---------- ACCORDION ---------- */
+function buildStepAccordion(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((s,i)=>{
+    const card = document.createElement("div"); card.className="rule-card wide";
+    card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+    card.innerHTML = `<button class="rc-head" aria-expanded="false"><span class="rc-num">${s.icon}</span><span class="rc-title">${s.title}</span><span class="rc-arrow">▾</span></button>
+    <div class="rc-body"><div class="rc-body-in">${s.body}</div></div>`;
+    const btn = card.querySelector(".rc-head");
+    btn.addEventListener("click", ()=>{ const o = card.classList.toggle("open"); btn.setAttribute("aria-expanded", o); });
+    grid.appendChild(card);
+  });
+}
+function buildWhaleGrid(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((it,i)=>{
+    const c = document.createElement("div"); c.className="whale";
+    c.innerHTML = `<div class="whale-ico" style="background:${rainbow[i%rainbow.length]};">${it.icon}</div><h4>${it.title}</h4><p>${it.body}</p>`;
+    grid.appendChild(c);
+  });
+}
+
+/* ---------- KLING: features / pros / cons ---------- */
+buildStepAccordion([
+  {icon:"🎞️", title:"Сильна сторона — рух і відео", body:"Kling найбільше відомий відеомоделями. Тому гарна стратегія така: спершу створи й відточи нерухоме зображення, а потім «оживи» його на кілька секунд."},
+  {icon:"🧩", title:"Багато референсів для стабільного героя", body:"Модель Kling O1 Image, за описами, вміє враховувати до 10 зображень-прикладів і зберігати риси персонажа. Це корисно, коли потрібен той самий герой у різних сценах."},
+  {icon:"✏️", title:"Редагування звичайними словами", body:"Замість складного редактора достатньо описати зміну: «заміни фон», «додай дощ», «зміни колір плаща». Kling перемальовує лише потрібне."},
+  {icon:"💳", title:"Щоденні кредити, що не накопичуються", body:"На безкоштовному плані кредити нараховуються щодня (близько 66 на добу), але невикористані «згорають». Відео коштує значно більше кредитів, ніж зображення."},
+  {icon:"⏳", title:"Черга для безкоштовних користувачів", body:"Безкоштовні завдання мають нижчий пріоритет, а в години пік може з'явитися повідомлення, що черга зайнята. У такому разі потрібно трохи зачекати або спробувати пізніше."},
+  {icon:"🏷️", title:"Водяний знак і особисте використання", body:"Безкоштовні результати мають водяний знак і можуть використовуватися лише для особистих, навчальних цілей — не для заробітку."},
+], "klingOs");
+
+buildWhaleGrid([
+  {icon:"🆓", title:"Постійний безкоштовний план", body:"Щоденні кредити дозволяють вчитися без оплати, а не лише протягом пробного періоду."},
+  {icon:"🧩", title:"Сильні референси", body:"Можна показати ШІ приклад героя або стилю — персонаж виходить схожим у різних кадрах."},
+  {icon:"✏️", title:"Редагування словами", body:"Зміни у зображенні описуються простими реченнями."},
+  {icon:"🎬", title:"Картинка перетворюється на відео", body:"Один сервіс і для зображень, і для коротких відеороликів."},
+  {icon:"⚡", title:"Швидке редагування", body:"За описом моделі, редагування й генерація відбуваються майже в реальному часі."},
+], "klingPros");
+buildWhaleGrid([
+  {icon:"⏳", title:"Черги на безкоштовному плані", body:"У години пік доводиться чекати, навіть якщо кредити ще є."},
+  {icon:"🏷️", title:"Водяний знак", body:"Безкоштовні експорти мають мітку сервісу; без неї потрібен платний план."},
+  {icon:"🚫", title:"Лише особисте використання", body:"Безкоштовні результати не можна застосовувати комерційно."},
+  {icon:"🔒", title:"Не все доступно безкоштовно", body:"Доступність деяких моделей залежить від тарифу й може змінюватися."},
+  {icon:"🔞", title:"Вікові обмеження", body:"Мінімальний вік — 13 років, а неповнолітні реєструються через батьків. Тому працюємо з дорослим."},
+], "klingCons");
+
+/* ---------- LEONARDO: features / pros / cons ---------- */
+buildStepAccordion([
+  {icon:"🎛️", title:"Панель налаштувань і вибір моделі", body:"Ліворуч від поля промпту — налаштування: модель (наприклад, Lucid Origin чи Phoenix), розмір кадру, кількість зображень. Різні моделі дають різний «характер» картинки."},
+  {icon:"🚫", title:"Негативний промпт", body:"Окреме поле для слів, яких не має бути на картинці: <span class='mono'>blurry, extra fingers, watermark</span>. Це допомагає прибирати типові помилки ШІ."},
+  {icon:"🔤", title:"Текст у лапках", body:"Якщо на зображенні потрібен напис, візьми його в подвійні лапки й зроби коротким. Так сучасні моделі (Phoenix, Lucid Origin) частіше пишуть слова без помилок."},
+  {icon:"🖌️", title:"Canvas: перемалюй і дорисуй", body:"У Canvas можна виділити частину зображення та перегенерувати її (inpainting) або продовжити картинку за межі кадру (outpainting)."},
+  {icon:"🪙", title:"Токени", body:"Кожна генерація «коштує» токенів. За оглядами, безкоштовний план дає близько 150 токенів на день. Важчі завдання витрачають більше."},
+  {icon:"🌍", title:"Публічні роботи й галерея з промптами", body:"На безкоштовному плані твої створені зображення є публічними. Зате в галереї ти бачиш чужі роботи разом із промптами — це чудовий підручник. Тільки не публікуй особистого!"},
+], "leoOs");
+
+buildWhaleGrid([
+  {icon:"🆓", title:"Безкоштовний план без обмеження в часі", body:"Щоденні токени дозволяють регулярно практикуватись."},
+  {icon:"🚫", title:"Негативний промпт", body:"Точніше керування: можна прямо заборонити небажані елементи."},
+  {icon:"🖌️", title:"Canvas для редагування", body:"Перемальовування частин і розширення кадру без іншої програми."},
+  {icon:"🌍", title:"Галерея з промптами", body:"Можна вчитись на прикладах інших творців."},
+  {icon:"🧠", title:"Кілька сучасних моделей", body:"Обирай модель під стиль: фото, ілюстрація, концепт-арт."},
+], "leoPros");
+buildWhaleGrid([
+  {icon:"👀", title:"Безкоштовні роботи публічні", body:"Приватні творіння доступні лише на платних планах."},
+  {icon:"🪙", title:"Токени швидко закінчуються", body:"Складні й великі завдання витрачають їх швидше."},
+  {icon:"💎", title:"Частина функцій платна", body:"Наприклад, власні моделі та покращена якість доступні не безкоштовно."},
+  {icon:"🏷️", title:"Можливі обмеження експорту", body:"Безкоштовний план може мати брендинг чи обмеження — перевіряй умови."},
+  {icon:"🔞", title:"Вікові правила", body:"Реєструється дорослий; вікові вимоги дивись в офіційних умовах сервісу."},
+], "leoCons");
+
+/* ---------- PROMPT BUILDER (generic) ---------- */
+function buildPromptBuilder(containerId, platformName, fields, makeOutputs){
+  const c = document.getElementById(containerId);
+  c.innerHTML = `<div class="builder-grid">${fields.map(f=>`<div class="builder-field"><label>${f.label}</label><select data-k="${f.k}">${f.opts.map(o=>`<option>${o}</option>`).join("")}</select></div>`).join("")}</div>
+  <div class="b-outs"></div>
+  <button class="copy-btn b-copy">📋 Скопіювати промпт</button><span class="copy-msg b-msg">Скопійовано!</span>`;
+  const outsEl = c.querySelector(".b-outs");
+  let current = [];
+  function render(){
+    const v = {}; c.querySelectorAll("select").forEach(s=>v[s.dataset.k]=s.value);
+    current = makeOutputs(v);
+    outsEl.innerHTML = current.map(o=>`<div class="promptbox"><span class="lab">${o.label}</span>${o.text.replace(/</g,"&lt;")}</div>`).join("");
+  }
+  c.querySelectorAll("select").forEach(s=>s.addEventListener("input", render));
+  render();
+  c.querySelector(".b-copy").addEventListener("click", async ()=>{
+    try{ await navigator.clipboard.writeText(current.map(o=>o.copy||o.text).join("\n")); }catch(e){}
+    const msg = c.querySelector(".b-msg");
+    msg.classList.add("show"); setTimeout(()=>msg.classList.remove("show"), 2000);
+  });
+}
+buildPromptBuilder("builderKling","Kling AI",[
+  {k:"subject",label:"Суб'єкт",opts:["a young girl astronaut","a curious red fox","a steampunk robot explorer"]},
+  {k:"action",label:"Дія / поза",opts:["waving from a rover","jumping over a river","reading a glowing map"]},
+  {k:"setting",label:"Місце / фон",opts:["red dusty hills on Mars","a misty pine forest","a neon-lit city street"]},
+  {k:"style",label:"Стиль",opts:["cinematic photo","3D animation style","watercolor illustration"]},
+  {k:"light",label:"Світло",opts:["warm sunset light","soft morning light","moody blue twilight"]},
+  {k:"shot",label:"Камера / кадр",opts:["wide shot","close-up","low-angle shot"]},
+  {k:"aspect",label:"Формат",opts:["aspect ratio 16:9","aspect ratio 1:1","aspect ratio 9:16"]},
+], v=>[{label:"Промпт для Kling AI", text:`${v.subject} ${v.action}, ${v.setting} in the background, ${v.style}, ${v.light}, ${v.shot}, highly detailed, ${v.aspect}.`}]);
+
+buildPromptBuilder("builderLeo","Leonardo AI",[
+  {k:"subject",label:"Суб'єкт",opts:["a friendly robot librarian","a tiny dragon baker","an old wizard gardener"]},
+  {k:"detail",label:"Дія / деталі",opts:["holding a glowing book","surrounded by floating lanterns","wearing a patched velvet coat"]},
+  {k:"style",label:"Стиль",opts:["digital illustration","35mm film photography","storybook watercolor"]},
+  {k:"light",label:"Світло",opts:["soft warm light","golden hour lighting","soft studio lighting"]},
+  {k:"camera",label:"Камера / кадр",opts:["medium shot","wide shot","close-up portrait"]},
+  {k:"neg",label:"Негативний промпт",opts:["blurry, extra fingers, distorted face, watermark","low quality, deformed hands, cropped","text errors, duplicate objects, noise"]},
+], v=>[
+  {label:"Основний промпт (Prompt)", text:`${v.subject} ${v.detail}, ${v.style}, ${v.light}, ${v.camera}, highly detailed.`},
+  {label:"Негативний промпт (Negative prompt)", text:v.neg}
+].map(o=>({...o, copy: o.label.startsWith("Нег") ? "Negative prompt: "+o.text : o.text})));
+
+/* ---------- CHECKER (generic) ---------- */
+function buildChecker(rootId, cfg){
+  const root = document.getElementById(rootId), p = rootId;
+  root.innerHTML = `<div class="checker"><div class="checker-grid"><div>
+    <textarea id="${p}In" placeholder="${cfg.placeholder}"></textarea>
+    ${cfg.neg? `<label class="fl" for="${p}Neg">Негативний промпт (за бажанням)</label><textarea id="${p}Neg" style="min-height:80px;" placeholder="Наприклад: blurry, extra fingers, watermark"></textarea>` : ""}
+    <div class="tips-box" id="${p}Tips"></div></div>
+    <div><div class="score-ring-wrap"><div class="score-ring"><svg viewBox="0 0 120 120" width="150" height="150"><circle class="ring-bg" cx="60" cy="60" r="52"></circle><circle class="ring-fg" id="${p}Ring" cx="60" cy="60" r="52" stroke-dasharray="0 327"></circle></svg>
+    <div class="ring-num"><b id="${p}Num">0</b><span>балів зі 100</span></div></div><div class="rank-badge" id="${p}Rank">Новачок</div></div>
+    <div class="cat-list" id="${p}Cats"></div></div></div></div>`;
+  const cats = document.getElementById(p+"Cats");
+  const all = [{key:"subject",label:"Суб'єкт і деталі",max:cfg.subjectMax,color:"#1E88E5"}, ...cfg.categories];
+  if(cfg.neg) all.push({key:"neg",label:"Негативний промпт",max:cfg.negMax,color:"#F2495C"});
+  all.forEach(c=>{
+    const row = document.createElement("div"); row.className="cat-item";
+    row.innerHTML = `<div class="cat-top"><span>${c.label}</span><span id="${p}-${c.key}-v">0/${c.max}</span></div><div class="cat-bar-bg"><div class="cat-bar-fg" id="${p}-${c.key}-b" style="width:0%; background:${c.color};"></div></div>`;
+    cats.appendChild(row);
+  });
+  const CIRC = 2*Math.PI*52;
+  const inp = document.getElementById(p+"In"), negEl = cfg.neg? document.getElementById(p+"Neg"):null;
+  const ring=document.getElementById(p+"Ring"), num=document.getElementById(p+"Num"), rank=document.getElementById(p+"Rank"), tips=document.getElementById(p+"Tips");
+  function set(key, pts, max){ document.getElementById(`${p}-${key}-v`).textContent = `${pts}/${max}`; document.getElementById(`${p}-${key}-b`).style.width = (pts/max*100)+"%"; }
+  function evaluate(){
+    const text = inp.value.toLowerCase();
+    let total = 0; const missing = [];
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    const sp = Math.min(cfg.subjectMax, Math.round((words/cfg.subjectWords)*cfg.subjectMax));
+    set("subject", sp, cfg.subjectMax); total += sp;
+    if(text.trim() && sp < cfg.subjectMax*0.5) missing.push("Суб'єкт і деталі (опиши докладніше)");
+    cfg.categories.forEach(c=>{
+      const matched = c.words.filter(w=>text.includes(w));
+      const pts = Math.min(c.max, Math.round((matched.length/2)*c.max));
+      set(c.key, pts, c.max); total += pts;
+      if(pts < c.max*0.5) missing.push(c.label);
+    });
+    if(cfg.neg){
+      const items = negEl.value.split(/[,;\n]/).map(s=>s.trim()).filter(Boolean).length;
+      const pts = Math.min(cfg.negMax, Math.round((items/3)*cfg.negMax));
+      set("neg", pts, cfg.negMax); total += pts;
+      if(pts < cfg.negMax*0.5) missing.push("Негативний промпт (напиши 2–3 слова через кому)");
+    }
+    total = Math.max(0, Math.min(100, total));
+    num.textContent = total;
+    ring.setAttribute("stroke-dasharray", `${(total/100*CIRC).toFixed(1)} ${CIRC}`);
+    let r, col;
+    if(total < 35){ r="Новачок"; col="#8D91A6"; }
+    else if(total < 60){ r="Молодший промпт-інженер"; col="#1E88E5"; }
+    else if(total < 85){ r="Досвідчений(а) промпт-майстер"; col="#22B573"; }
+    else { r="Майстер генерації 🏆"; col="#EC4899"; }
+    rank.textContent = r; rank.style.background = col;
+    ring.style.stroke = total<35? "#F2495C" : total<60? "#FFB020" : total<85? "#1E88E5" : "#22B573";
+    if(text.trim()){
+      tips.classList.add("show");
+      tips.innerHTML = missing.length? `💡 <b>Додай у промпт:</b><ul>${missing.map(m=>`<li>${m}</li>`).join("")}</ul>` : "🎉 Чудово! Твій промпт охоплює всі головні складові.";
+    } else tips.classList.remove("show");
+  }
+  inp.addEventListener("input", evaluate); if(negEl) negEl.addEventListener("input", evaluate);
+  evaluate();
+}
+const W_STYLE=["стил","style","фотореаліст","акварел","watercolor","3d","render","рендер","аніме","anime","cinematic","photo","фото","ілюстрац","illustration","комікс","comic","digital art","малюн"];
+const W_LIGHT=["світл","light","золот","golden","неон","neon","сутінк","twilight","sunset","sunrise","захід","схід","moonlight","місяц","вечір","ранк","morning"];
+const W_CAMERA=["ракурс","camera","кадр","shot","план","зверху","top-down","знизу","35mm","portrait","landscape","крупн","wide","close-up","low-angle","angle"];
+const W_QUALITY=["detail","детал","якіст","4k","8k","hd","sharp","high resolution","чіткіст","quality"];
+buildChecker("checkerKling",{
+  placeholder:"Наприклад: «A young girl astronaut waving from a rover, red dusty hills on Mars in the background, cinematic photo, warm sunset light, wide shot, highly detailed, aspect ratio 16:9»",
+  subjectMax:20, subjectWords:14,
+  categories:[
+    {key:"action",label:"Дія / поза",max:10,color:"#FF7A2F",words:["waving","running","flying","jumping","holding","reading","standing","sitting","walking","dancing","стоїть","біжить","летить","стрибає","тримає","махає","сидить","іде","pose","поза","дія"]},
+    {key:"setting",label:"Місце / фон",max:10,color:"#8B5CF6",words:["background","forest","city","street","room","space","mars","castle","park","mountain","sea","ліс","місто","вулиц","кімнат","космос","замок","фон","гор","море","парк"]},
+    {key:"style",label:"Стиль",max:15,color:"#EC4899",words:W_STYLE},
+    {key:"light",label:"Світло",max:10,color:"#FFB020",words:W_LIGHT},
+    {key:"camera",label:"Камера / кадр",max:10,color:"#12B3A0",words:W_CAMERA},
+    {key:"quality",label:"Якість",max:10,color:"#22B573",words:W_QUALITY},
+    {key:"aspect",label:"Формат (aspect ratio)",max:15,color:"#1E88E5",words:["формат","aspect","9:16","16:9","1:1","4:5","square","квадрат","портрет","альбом"]},
+  ]
+});
+buildChecker("checkerLeo",{
+  placeholder:"Наприклад: «A friendly robot librarian holding a glowing book, cozy library, digital illustration, soft warm light, medium shot, highly detailed»",
+  subjectMax:20, subjectWords:12, neg:true, negMax:15,
+  categories:[
+    {key:"style",label:"Стиль",max:20,color:"#EC4899",words:W_STYLE},
+    {key:"light",label:"Світло",max:15,color:"#FFB020",words:W_LIGHT},
+    {key:"camera",label:"Камера / кадр",max:15,color:"#12B3A0",words:W_CAMERA},
+    {key:"quality",label:"Якість",max:15,color:"#22B573",words:W_QUALITY},
+  ]
+});
+
+/* ---------- SAFETY CHECKLIST ---------- */
+function buildChecklist(items, listId, barId, statusId, statusFn){
+  const list = document.getElementById(listId), bar = document.getElementById(barId), status = document.getElementById(statusId);
+  function upd(){
+    const total = list.children.length, n = list.querySelectorAll(".cl-item.checked").length;
+    bar.style.width = (n/total*100)+"%";
+    status.textContent = statusFn(n, total);
+  }
+  items.forEach(label=>{
+    const row = document.createElement("div"); row.className="cl-item"; row.tabIndex=0; row.setAttribute("role","checkbox"); row.setAttribute("aria-checked","false");
+    row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${label}</span>`;
+    const t = ()=>{ const on = row.classList.toggle("checked"); row.setAttribute("aria-checked", on); upd(); };
+    row.addEventListener("click", t);
+    row.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); t(); }});
+    list.appendChild(row);
+  });
+  upd();
+}
+buildChecklist([
+  "Акаунт у сервісі створює й тримає відкритим <b>дорослий</b> (вчитель або батьки).",
+  "Я не пишу в промптах <b>справжніх імен, адрес, назви школи</b> чи телефонів.",
+  "Я не завантажую <b>фото людей без їхньої згоди</b> — особливо облич.",
+  "Я пам'ятаю: у безкоштовному Leonardo мої роботи <b>публічні</b>, тому не публікую особистого.",
+  "Якщо ШІ показав щось дивне чи лякаюче — <b>одразу кажу дорослому</b>.",
+  "Я поважаю чужі права: <b>не копіюю</b> існуючих героїв і чесно пишу, що зображення створив ШІ.",
+], "safeList","safeBar","safeStatus", (n,t)=> n===t? "🏅 Значок «Безпечний творець» отримано! Можна починати." : `Прочитано правил: ${n} з ${t}`);
+
+/* ---------- OBJECT REMOVER SCENE ---------- */
+const sceneObjs = [...document.querySelectorAll("#sceneSvg .obj")];
+const eraseBtn = document.getElementById("eraseBtn"), resetBtn = document.getElementById("resetBtn"), sceneStatus = document.getElementById("sceneStatus");
+function sceneUpdate(){
+  const sel = sceneObjs.filter(o=>o.classList.contains("sel") && !o.classList.contains("gone")).length;
+  const gone = sceneObjs.filter(o=>o.classList.contains("gone")).length;
+  eraseBtn.disabled = sel===0;
+  sceneStatus.textContent = gone===sceneObjs.length
+    ? "🎉 Парк чистий! Але пам'ятай: стирай зайве, щоб кадр був охайним, а не щоб когось обманути."
+    : `Виділено: ${sel} · Стерто: ${gone} із ${sceneObjs.length}`;
+}
+sceneObjs.forEach(o=>{
+  const t = ()=>{ if(o.classList.contains("gone")) return; o.classList.toggle("sel"); sceneUpdate(); };
+  o.addEventListener("click", t);
+  o.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); t(); }});
+});
+eraseBtn.addEventListener("click", ()=>{
+  sceneObjs.forEach(o=>{ if(o.classList.contains("sel")){ o.classList.add("gone"); } });
+  sceneUpdate();
+});
+resetBtn.addEventListener("click", ()=>{ sceneObjs.forEach(o=>o.classList.remove("sel","gone")); sceneUpdate(); });
+sceneUpdate();
+
+buildStepAccordion([
+  {icon:"1️⃣", title:"Завантаж фото", body:"Відкрий objectremover.com і завантаж зображення у форматі JPG, PNG або WebP. Для навчання бери <b>власне чи згенероване</b> зображення, де немає чужих облич."},
+  {icon:"2️⃣", title:"Виділи зайве пензликом або опиши словами", body:"Зафарбуй пензликом об'єкт, який потрібно прибрати (це і є «маска»), або коротко опиши його текстом. Чим <b>точніше</b> виділення, тим кращий результат."},
+  {icon:"3️⃣", title:"Дай ШІ відновити фон і збережи", body:"ШІ домалює місце, де був предмет. Якщо залишились сліди — виділи їх ще раз і повтори. Коли результат влаштовує, завантаж готову картинку. Найкраще вдається на простих фонах: стіна, небо, трава."},
+], "removerSteps");
+
+/* ---------- CHOOSER ---------- */
+const chooseData = [
+  {q:"Хочу картинку з нуля за описом", tools:[["Kling AI","#1E88E5"],["Leonardo AI","#8B5CF6"]], why:"Обидва сервіси генерують зображення з тексту. Спробуй один і той самий промпт у кожному та порівняй результати."},
+  {q:"Хочу, щоб мій герой виглядав однаково на різних картинках", tools:[["Kling AI","#1E88E5"]], why:"У Kling є режим референсів (image-to-image): завантаж приклад героя — і нова сцена збереже його риси. Референси є й у Leonardo, але Kling особливо відомий узгодженістю персонажа."},
+  {q:"Хочу прибрати з фото зайву річ", tools:[["ObjectRemover","#12B3A0"]], why:"ObjectRemover створений саме для цього: виділяєш предмет пензликом — ШІ добудовує фон. Редагувати частини зображення можна й у Leonardo Canvas чи Kling, але ObjectRemover найпростіший."},
+  {q:"Хочу заборонити в картинці розмиття та зайві пальці", tools:[["Leonardo AI","#8B5CF6"]], why:"У Leonardo є окреме поле негативного промпту: пишеш, чого не повинно бути, — наприклад, blurry, extra fingers."},
+  {q:"Хочу оживити малюнок у коротке відео", tools:[["Kling AI","#1E88E5"],["Leonardo AI","#8B5CF6"]], why:"Kling відомий відеомоделями, а в Leonardo є модулі Motion. Спершу доведи картинку до ідеалу — відео витрачає більше кредитів."},
+  {q:"Хочу побачити вдалі промпти інших творців", tools:[["Leonardo AI","#8B5CF6"]], why:"У галереї спільноти Leonardo видно роботи разом із промптами. Дивись, які слова вони використали — і навчайся. Лише пам'ятай про правила безпеки."},
+];
+const chooseList = document.getElementById("chooseList"), chooseOut = document.getElementById("chooseOut");
+chooseData.forEach((d,i)=>{
+  const b = document.createElement("button"); b.className="choose-btn"; b.textContent = d.q;
+  b.addEventListener("click", ()=>{
+    [...chooseList.children].forEach(c=>c.classList.remove("on")); b.classList.add("on");
+    chooseOut.innerHTML = `<h4>Рекомендація</h4><div>${d.tools.map(t=>`<span class="tool-tag" style="background:${t[1]};">${t[0]}</span>`).join("")}</div><p style="color:var(--ink-soft); font-size:14.5px;">${d.why}</p>`;
+  });
+  chooseList.appendChild(b);
+});
+
+/* ---------- TASKS ---------- */
+buildStepAccordion([
+  {icon:"🚀", title:"Завдання 1 · Kling AI. Місто майбутнього", body:"<b>Мета:</b> створити зображення й побачити силу однієї зміни.<br>1) Склади промпт за формулою з 8 складових, наприклад: <span class='mono'>a flying train above a green city of the future, cinematic photo, warm sunset light, wide shot, highly detailed, aspect ratio 16:9</span>.<br>2) Згенеруй картинку.<br>3) Змін лише <b>світло</b> (наприклад, на нічне неонове) і згенеруй знову. Порівняй обидва результати: що змінилося найбільше?"},
+  {icon:"🤖", title:"Завдання 2 · Leonardo AI. Талісман для шкільного клубу", body:"<b>Мета:</b> навчитись користуватись негативним промптом.<br>1) Вигадай дружнього талісмана (робота, дракончика, лисеня) і склади основний промпт.<br>2) Спершу згенеруй <b>без</b> негативного промпту.<br>3) Додай у поле Negative prompt: <span class='mono'>blurry, extra fingers, distorted face, watermark</span> і згенеруй знову.<br>4) Поміркуй: чи покращилась картинка? Які помилки зникли?"},
+  {icon:"🧽", title:"Завдання 3 · ObjectRemover. Чисте фото", body:"<b>Мета:</b> поєднати інструменти в ланцюжок.<br>1) У Kling або Leonardo згенеруй сцену із зайвою річчю, наприклад: <span class='mono'>a quiet park bench with a trash can next to it, soft morning light, wide shot</span>.<br>2) Завантаж результат в ObjectRemover, виділи смітник пензликом і дай ШІ прибрати його.<br>3) Порівняй «до» і «після». Вдалося дозаповнити фон природно? Що можна було б зробити краще, виділивши предмет ще точніше?"},
+], "taskSteps");
+
+/* ---------- SIMULATOR ---------- */
+const sim = {};
+["subject","style","light","camera","neg","ref"].forEach(k=>sim[k]=document.getElementById("s-"+k));
+const previewBox = document.getElementById("previewBox");
+function renderSim(){
+  const v = {}; for(const k in sim) v[k]=sim[k].checked;
+  let score = 5;
+  if(v.subject) score+=20; if(v.style) score+=20; if(v.light) score+=15; if(v.camera) score+=15; if(v.neg) score+=13; if(v.ref) score+=12;
+  score = Math.min(100, score);
+  document.getElementById("meterBar").style.width = score+"%";
+  document.getElementById("meterPct").textContent = score+"%";
+  const count = ["subject","style","light","camera"].filter(k=>v[k]).length;
+  let emoji="🌫️", text="Порожній промпт — ШІ вигадує все сам", bg="linear-gradient(135deg,#8D91A6,#555A6E)";
+  if(v.subject && count===1){ emoji="❓"; text="Є суб'єкт, але стиль, світло й кадр випадкові — результат непередбачуваний"; bg="linear-gradient(135deg,#FFB020,#FF7A2F)"; }
+  else if(count===1 && !v.subject){ emoji="🤔"; text="Є окремі побажання, але незрозуміло, що саме малювати"; bg="linear-gradient(135deg,#FFB020,#F2495C)"; }
+  else if(count===2){ emoji="🖼️"; text="Вже щось цікаве, але частину деталей ШІ все одно обирає сам"; bg="linear-gradient(135deg,#1E88E5,#8B5CF6)"; }
+  else if(count===3){ emoji="🎨"; text="Гарний, зрозумілий опис — лишилось уточнити останню деталь"; bg="linear-gradient(135deg,#12B3A0,#1E88E5)"; }
+  else if(count===4 && !v.neg && !v.ref){ emoji="✨"; text="Чіткий детальний промпт! Негативний промпт чи референс зроблять його ще точнішим"; bg="linear-gradient(135deg,#22B573,#12B3A0)"; }
+  else if(count===4 && (v.neg||v.ref) && !(v.neg&&v.ref)){ emoji="🌟"; text= v.neg? "Негативний промпт відсікає типові помилки: розмиття, зайві пальці" : "Референс допомагає зберегти вигляд героя"; bg="linear-gradient(135deg,#22B573,#1E88E5)"; }
+  else if(count===4 && v.neg && v.ref){ emoji="🏆"; text="Максимальна якість: усі елементи промпту, негативний промпт і референс"; bg="linear-gradient(135deg,#EC4899,#8B5CF6)"; }
+  else if(count===0 && (v.neg||v.ref)){ emoji="🌫️"; text="Додатки без основного опису мало допоможуть — спершу опиши, що малювати"; bg="linear-gradient(135deg,#8D91A6,#555A6E)"; }
+  previewBox.style.background = bg;
+  previewBox.innerHTML = `<div><span class="preview-emoji">${emoji}</span><span class="preview-text">${text}</span></div>`;
+}
+Object.values(sim).forEach(el=>el.addEventListener("input", renderSim));
+renderSim();
+
+/* ---------- QUIZ ---------- */
+const quizData = [
+  {q:"Що відомо про безкоштовний план Kling AI?", opts:["Результати без водяного знака й для комерційного використання","Щоденні кредити, водяний знак на результатах і використання лише для особистих цілей","Необмежена кількість відео без черги","Доступний лише дорослим у платній версії"], correct:1, explain:"Безкоштовний план Kling дає щоденні кредити, але результати мають водяний знак і призначені для особистого використання."},
+  {q:"Що таке негативний промпт у Leonardo AI?", opts:["Промпт, що пишеться українською","Поле, де вказують, чого на зображенні НЕ повинно бути","Промпт для відео","Пароль для входу"], correct:1, explain:"У негативному промпті перелічують небажані елементи: blurry, extra fingers, watermark та інші."},
+  {q:"Для чого потрібні референс-зображення в Kling?", opts:["Щоб збільшити кількість кредитів","Щоб ШІ врахував приклад персонажа чи стилю й зберіг схожість","Щоб прибрати водяний знак","Щоб видалити акаунт"], correct:1, explain:"Референс — це зображення-приклад, за яким ШІ створює нову картинку, зберігаючи риси героя чи стиль."},
+  {q:"Що важливо знати про безкоштовні роботи в Leonardo AI?", opts:["Вони завжди приватні","Вони публічні — їх можуть бачити інші","Вони автоматично друкуються","Вони не зберігаються"], correct:1, explain:"На безкоштовному тарифі створені зображення є публічними, тож не варто публікувати особисте."},
+  {q:"Що вміє робити ObjectRemover?", opts:["Створювати відео з тексту","Прибирати з фото небажані об'єкти й домальовувати фон","Навчати власні ШІ-моделі","Перекладати тексти"], correct:1, explain:"ObjectRemover стирає виділені предмети й заповнює місце, де вони були, природним фоном."},
+  {q:"Яке фото НЕ варто завантажувати в онлайн-сервіси?", opts:["Власний малюнок","Згенеровану ШІ картинку","Фото однокласника без його дозволу","Фото пейзажу, зроблене тобою"], correct:2, explain:"Фото інших людей, особливо облич, не можна завантажувати без їхньої згоди."},
+  {q:"Як правильно створити свого супергероя в стилі коміксів?", opts:["Написати в промпті ім'я відомого героя Marvel чи DC","Вигадати власного героя й описати його костюм, силу та стиль малюнка","Скопіювати чужу картинку","Не писати нічого"], correct:1, explain:"Стиль коміксів можна використовувати, але герой має бути власним — персонажі Marvel і DC захищені авторським правом."},
+  {q:"Який порядок економить кредити, якщо хочеш оживити картинку у відео?", opts:["Одразу генерувати відео з будь-яким промптом","Спершу відточити нерухоме зображення, а потім оживляти його","Генерувати лише відео без картинок","Видалити акаунт і створити новий"], correct:1, explain:"Відео коштує більше кредитів, ніж зображення, тому спершу варто довести статичну картинку до ідеалу."},
+];
+let qi=0, qScore=0;
+const quizBody = document.getElementById("quizBody"), quizProgress = document.getElementById("quizProgress");
+quizData.forEach(()=>quizProgress.appendChild(document.createElement("span")));
+function renderQuiz(){
+  [...quizProgress.children].forEach((s,i)=>s.classList.toggle("done", i<qi));
+  if(qi>=quizData.length){
+    quizBody.innerHTML = `<div class="quiz-result"><div class="score">${qScore}/${quizData.length}</div><p style="color:var(--ink-soft);">${qScore===quizData.length? "Відмінно! Ти справжній(я) майстер(иня) ШІ-інструментів.": qScore>=6? "Дуже добре! Ще трохи — і буде ідеально.": "Непогано! Перечитай теорію й спробуй ще раз."}</p><button class="restart-btn" id="restartBtn">Пройти ще раз</button></div>`;
+    document.getElementById("restartBtn").addEventListener("click", ()=>{ qi=0; qScore=0; renderQuiz(); });
+    return;
+  }
+  const item = quizData[qi];
+  quizBody.innerHTML = `<div class="quiz-q">${qi+1}. ${item.q}</div><div class="quiz-opts" id="quizOpts"></div><div class="qz-explain" id="qzExplain">${item.explain}</div><div class="qz-nav"><button class="next-btn" id="nextBtn">${qi===quizData.length-1? "Результат →":"Далі →"}</button></div>`;
+  const opts = document.getElementById("quizOpts");
+  item.opts.forEach((o,i)=>{
+    const b = document.createElement("button"); b.className="qz-btn"; b.textContent=o;
+    b.addEventListener("click", ()=>{
+      [...opts.children].forEach(c=>c.style.pointerEvents="none");
+      if(i===item.correct){ b.classList.add("correct"); qScore++; }
+      else{ b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+      document.getElementById("qzExplain").classList.add("show");
+      document.getElementById("nextBtn").classList.add("ready");
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById("nextBtn").addEventListener("click", ()=>{ qi++; renderQuiz(); });
+}
+renderQuiz();
+
+/* ---------- THINK AT HOME ---------- */
+const thinkQuestions = [
+  "Як би виглядав твій супергерой, якби його суперсила була не бойовою, а доброю — наприклад, «вміє розуміти тварин»? Який би він мав костюм?",
+  "Чому, на твою думку, не можна просто написати в промпті ім'я відомого супергероя? Як би ти почувався(лась), якби хтось скопіював твого героя?",
+  "Чи чесно прибирати з фото людей чи предмети, а потім видавати його за «справжнє»? Коли така правка нормальна, а коли — обман?",
+  "Яку одну річ ти б «стер» із реального світу за допомогою ObjectRemover, якби це було можливо? Чи не зламало б це щось інше?",
+  "Чому в Leonardo безкоштовні роботи публічні? Що б ти ніколи не став(ла) туди завантажувати?",
+  "Який інструмент із трьох (Kling, Leonardo, ObjectRemover) тобі сподобався найбільше і чому? Для якого власного проєкту ти б його використав(ла)?",
+];
+const thinkGrid = document.getElementById("thinkGrid");
+thinkQuestions.forEach((q,i)=>{
+  const c = document.createElement("div"); c.className="think-card";
+  c.style.setProperty("--tc-color", rainbow[i%rainbow.length]);
+  c.innerHTML = `<span class="think-num">Питання ${i+1}</span>${q}`;
+  thinkGrid.appendChild(c);
+});
+
+/* ---------- HERO BUILDER + CHECKLIST ---------- */
+buildPromptBuilder("builderHero","Супергерой",[
+  {k:"who",label:"Герой(їня)",opts:["a teenage girl hero with wind powers","a young boy hero with a glowing magnetic gauntlet","a masked guardian with wings made of light"]},
+  {k:"suit",label:"Костюм",opts:["bold red and gold suit with a flowing cape","sleek midnight-blue armor with silver lines","green and white suit with a lightning emblem"]},
+  {k:"power",label:"Суперсила (ефект)",opts:["swirling wind streams around her hands","crackling energy sparks","glowing light trails"]},
+  {k:"city",label:"Місто / сцена",opts:["on a rooftop of a futuristic city at night","above a stormy harbor city","in front of a sunny city skyline"]},
+  {k:"style",label:"Стиль",opts:["comic book cover style, bold ink outlines, halftone dots, vibrant colors","dynamic comic book illustration, thick black outlines, saturated colors","retro comic panel style, halftone shading, bold colors"]},
+  {k:"shot",label:"Кадр",opts:["dynamic low-angle shot, heroic pose","full-body shot, flying pose","close-up portrait, confident look"]},
+  {k:"aspect",label:"Формат",opts:["aspect ratio 2:3","aspect ratio 1:1","aspect ratio 16:9"]},
+], v=>[{label:"Промпт для твого оригінального героя", text:`${v.who}, ${v.suit}, ${v.power}, ${v.city}, ${v.style}, ${v.shot}, highly detailed, ${v.aspect}.`},
+       {label:"Негативний промпт (для Leonardo)", text:"blurry, extra fingers, distorted face, watermark, text errors", copy:"Negative prompt: blurry, extra fingers, distorted face, watermark, text errors"}]);
+
+buildChecklist([
+  "Вигадав(ла) <b>власного</b> героя: ім'я та історію суперсили",
+  "Описав(ла) костюм і суперсилу (візуальний ефект)",
+  "Додав(ла) місце дії та освітлення",
+  "Обрав(ла) стиль коміксів і формат зображення",
+  "Не використав(ла) імен існуючих героїв Marvel чи DC",
+  "Згенерував(ла) зображення в Kling або Leonardo разом із дорослим",
+  "Зберіг(ла) картинку, свій промпт і (за бажанням) негативний промпт",
+], "heroList","heroBar","heroStatus", (n,t)=>{
+  const lv = n===0? "Новачок 🌱" : n<3? "Початківець 🔰" : n<5? "Герой-стажист ⚡" : n<t? "Майже супергерой 🦸" : "Легенда міста 🏆";
+  return `Рівень героя: ${lv} (${n} з ${t})`;
+});
+
+/* ---------- CHEAT + GLOSSARY ---------- */
+const cheat = [["🧒","Суб'єкт"],["🏃","Дія / поза"],["🏙️","Місце / фон"],["🎭","Стиль"],["💡","Світло"],["📷","Камера"],["✨","Якість"],["📐","Формат"],["🚫","Негативний промпт"]];
+const cheatGrid = document.getElementById("cheatGrid");
+cheat.forEach((r,i)=>{
+  const d = document.createElement("div"); d.className="cheat-item"; d.style.background = rainbow[i%rainbow.length];
+  d.innerHTML = `<div style="font-size:20px;margin-bottom:4px;">${r[0]}</div>${r[1]}`;
+  cheatGrid.appendChild(d);
+});
+const glossTerms = [
+  ["🎞️","Kling AI","ШІ-платформа для створення зображень і коротких відео; має референси, редагування й оживлення картинок."],
+  ["🎨","Leonardo AI","ШІ-студія для зображень із негативним промптом, редактором Canvas та галереєю спільноти."],
+  ["🧽","ObjectRemover","безкоштовний онлайн-інструмент, що прибирає з фото небажані об'єкти й домальовує фон."],
+  ["🪙","Токени / кредити","умовна «валюта» сервісу: кожна генерація витрачає певну кількість."],
+  ["🚫","Negative prompt","негативний промпт: перелік того, чого на зображенні не має бути."],
+  ["🧩","Референс","зображення-приклад, за яким ШІ створює нову картинку (image-to-image)."],
+  ["🖌️","Inpainting","перемальовування виділеної частини зображення (маски)."],
+  ["🏷️","Водяний знак","напис чи логотип сервісу на безкоштовних результатах."],
+  ["🎭","Маска","виділена пензликом ділянка зображення, з якою працює ШІ."],
+  ["📐","Aspect ratio","співвідношення сторін зображення, наприклад 16:9 чи 1:1."],
+  ["👀","Публічна галерея","місце, де інші користувачі бачать твої роботи й промпти."],
+  ["📝","Промпт","текстовий опис, який ти даєш ШІ для створення зображення."],
+];
+const glossGrid = document.getElementById("glossGrid");
+glossTerms.forEach((t,i)=>{
+  const c = document.createElement("div"); c.className="gloss-card";
+  c.innerHTML = `<div class="whale-ico" style="background:${rainbow[i%rainbow.length]};margin-bottom:10px;">${t[0]}</div><h4>${t[1]}</h4><p>${t[2]}</p>`;
+  glossGrid.appendChild(c);
+});
+</script>
+</body>
+</html>
