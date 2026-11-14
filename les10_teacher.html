@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Методичні рекомендації. Урок 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7; --bg-hero:#FFF6E4; --surface:#FFFFFF;
+  --ink:#20222E; --ink-soft:#555A6E; --ink-faint:#8D91A6; --line:#ECE6D6;
+  --accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;
+  --violet:#8B5CF6; --violet-soft:#F1EAFE;
+  --warn:#FFB020; --warn-soft:#FFF1D2;
+  --bad:#F2495C; --bad-soft:#FDE3E7;
+  --good:#22B573; --good-soft:#DDF7EC;
+  --teal:#12B3A0; --teal-soft:#DBF7F2;
+  --pink:#EC4899; --pink-soft:#FCE1EF;
+  --orange:#FF7A2F; --orange-soft:#FFE7D4;
+  --radius-s:12px; --radius-m:18px; --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+.block.c-red{--accent:#F2495C; --accent-ink:#B23A4C; --accent-soft:#FDE3E7;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+}
+:root[data-theme="dark"] .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:13px; padding:8px 12px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(26px,4vw,40px); max-width:18ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:62ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:320px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+section.block{padding:56px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(21px,2.8vw,28px); max-width:26ch;}
+.block p.intro{color:var(--ink-soft); max-width:64ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+.callout.pink{background:var(--pink-soft); color:#9A2A66; border-color:rgba(236,72,153,.25);}
+.callout.bad{background:var(--bad-soft); color:#B23A4C; border-color:rgba(242,73,92,.25);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .callout.violet{color:#CFC4FF;}
+  :root:not([data-theme="light"]) .callout.warn{color:#FFD98A;}
+  :root:not([data-theme="light"]) .callout.pink{color:#FFB6DA;}
+  :root:not([data-theme="light"]) .callout.bad{color:#FFA3AE;}
+  :root:not([data-theme="light"]) .rd-example.good .lab{color:#8CE6BC;}
+  :root:not([data-theme="light"]) .rd-example.bad .lab{color:#FFA3AE;}
+}
+:root[data-theme="dark"] .callout.violet{color:#CFC4FF;}
+:root[data-theme="dark"] .callout.warn{color:#FFD98A;}
+:root[data-theme="dark"] .callout.pink{color:#FFB6DA;}
+:root[data-theme="dark"] .callout.bad{color:#FFA3AE;}
+:root[data-theme="dark"] .rd-example.good .lab{color:#8CE6BC;}
+:root[data-theme="dark"] .rd-example.bad .lab{color:#FFA3AE;}
+
+/* WHALE */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* ACCORDION */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none; padding-top:6px;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.rc-body-in{padding:0 18px 18px 67px; font-size:14px; color:var(--ink-soft);}
+.rc-body-in ul{margin:0; padding-left:18px;}
+.rc-body-in li{margin-bottom:5px;}
+.rule-card.open .rc-body{max-height:640px;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent;}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good); color:#fff;}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+.cl-status{margin-top:14px; font-family:'Unbounded'; font-size:13px; color:var(--accent-ink);}
+
+/* FLOW */
+.flow{display:flex; flex-direction:column; align-items:stretch; gap:0; margin:30px 0;}
+.flow-node{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:15px 20px; font-weight:700; font-size:14.5px; box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center; gap:14px; transition:.15s;}
+.flow-node:hover{border-color:var(--fn-color,var(--accent));}
+.flow-node.active{border-color:var(--fn-color,var(--accent)); background:var(--accent-soft);}
+.flow-node .fn-ico{width:40px; height:40px; border-radius:50%; background:var(--fn-color,var(--accent)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex:none; box-shadow:var(--shadow-pop);}
+.flow-node .fn-title{flex:1;}
+.flow-node .fn-time{font-family:'JetBrains Mono'; font-weight:700; font-size:12.5px; color:var(--ink-faint); background:var(--bg); padding:4px 10px; border-radius:999px; flex:none;}
+.flow-arrow{width:2px; height:20px; background:var(--line); margin-left:39px; position:relative;}
+.flow-arrow::after{content:"";position:absolute; bottom:-1px; left:-3px; border:4px solid transparent; border-top-color:var(--line);}
+
+/* STAGE DETAIL */
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:18px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-essence{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px;}
+.rd-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:640px){.rd-cols{grid-template-columns:1fr;}}
+.rd-example{border-radius:var(--radius-s); padding:14px 16px; font-size:14px;}
+.rd-example.good{background:var(--good-soft); border:1px solid rgba(47,158,91,.25);}
+.rd-example.bad{background:var(--bad-soft); border:1px solid rgba(224,87,106,.25);}
+.rd-example .lab{font-weight:800; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; display:block;}
+.rd-example.good .lab{color:#1E7A45;} .rd-example.bad .lab{color:#B23A4C;}
+.rd-analysis{margin-top:14px; font-size:13.8px; color:var(--accent-ink); background:var(--accent-soft); border-radius:var(--radius-s); padding:12px 14px; font-style:italic;}
+.rd-proscons{display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;}
+.rd-proscons div{flex:1; min-width:200px; font-size:13.3px;}
+.rd-proscons .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; margin-bottom:4px; display:block; color:var(--ink-faint);}
+.rd-tasks{margin-top:16px; border-top:1px dashed var(--line); padding-top:14px; font-size:13.6px; color:var(--ink-soft);}
+.rd-tasks .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; display:block;}
+
+/* TIME BUDGET */
+.timebar{display:flex; height:34px; border-radius:999px; overflow:hidden; margin:24px 0 6px; box-shadow:var(--shadow);}
+.timebar span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; font-family:'JetBrains Mono';}
+.timebar-legend{display:flex; flex-wrap:wrap; gap:10px 16px; font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;}
+.timebar-legend span{display:flex; align-items:center; gap:6px;}
+.timebar-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+/* TABLE */
+.table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:14px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:12px 16px; font-family:'Unbounded'; font-size:12.5px; font-weight:600;}
+table.crit td{padding:12px 16px; border-bottom:1px solid var(--line); vertical-align:top;}
+table.crit tr:last-child td{border-bottom:none; font-weight:800;}
+table.crit td:last-child, table.crit th:last-child{text-align:right; white-space:nowrap;}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:56ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+
+@media(max-width:640px){
+  .rd-cols{grid-template-columns:1fr;}
+  table.crit td, table.crit th{padding:10px 12px; font-size:13px;}
+  .flow-node{flex-wrap:wrap;}
+  .rc-body-in{padding-left:18px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">📷 Методичні рекомендації</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#meta">Мета уроку</a>
+      <a href="#pidhotovka">Підготовка</a>
+      <a href="#hid-uroku">Хід уроку</a>
+      <a href="#trudnoshi">Труднощі</a>
+      <a href="#dyferentsiatsiya">Диференціація</a>
+      <a href="#otsinyuvannya">Оцінювання</a>
+      <a href="#dovidnyk">Довідник</a>
+      <a href="#refleksiya">Рефлексія</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none" aria-hidden="true">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Для вчителя · Курс «Цифрова лабораторія AI» · Урок 10</div>
+    <h1>Методичні рекомендації до уроку</h1>
+    <p class="lede">Покроковий сценарій, хронометраж, орієнтовні репліки, типові труднощі й поради для проведення уроку «Інструменти обробки зображення» (AiEase, insMind, ImageColorizer, Clipdrop; 90 хв, учні 8–12 років).</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">🎯</span> Мета і завдання</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">⏱️</span> Хронометраж 90 хв</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">🗺️</span> Хід уроку крок за кроком</div>
+      <div class="chip" style="--chip-color:#F2495C;"><span class="chip-ico">🛡️</span> Безпека й згода на фото</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🖼️</span> Домашнє: родинна фотографія</div>
+    </div>
+  </div>
+</header>
+
+<section class="block c-blue" id="meta">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎯</span><span class="label">МЕТА УРОКУ</span></div>
+    <h2>Навчальна, розвивальна й виховна мета</h2>
+    <p class="intro">Фінальний результат заняття: учні знають, які операції з фото вміє виконувати ШІ, розрізняють чотири сервіси, обирають інструмент під завдання, дотримуються правильного порядку обробки й усвідомлюють, що результат ШІ — це здогад, який треба порівняти з оригіналом.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">📘</div><h4>Навчальна</h4><p>Ознайомити учнів із середовищем та інструментами AiEase, insMind, ImageColorizer і Clipdrop; показати 8 типових операцій (колоризація, відновлення, чіткість, збільшення, видалення фону й об'єктів, розширення кадру, новий фон і світло).</p></div>
+      <div class="whale"><div class="whale-ico">🧩</div><h4>Розвивальна</h4><p>Розвивати вміння планувати послідовність обробки («Лікар фотографій»), порівнювати результати різних сервісів і вибирати інструмент під конкретну проблему фото.</p></div>
+      <div class="whale"><div class="whale-ico">🛡️</div><h4>Виховна</h4><p>Формувати повагу до приватності й згоди на використання фото, звичку працювати з копією оригіналу, чесно позначати «оброблено ШІ» і дбайливе ставлення до родинної пам'яті.</p></div>
+    </div>
+    <div class="callout">📌 <b>Тип уроку:</b> комбінований (демонстрація + практика). <b>Вік учнів:</b> 8–12 років. <b>Тривалість:</b> 90 хв. <b>Формат:</b> фронтальна робота з інтерактивним посібником, практика в парах на акаунті дорослого, безкоштовні версії сервісів.</div>
+    <div class="callout bad">👨‍👩‍👧 <b>Вікові та приватні обмеження — ключове організаційне питання.</b> Умови insMind вимагають, щоб користувач був дорослим. Для AiEase, ImageColorizer і Clipdrop вікових вимог на перевірених сторінках не знайдено, але це не означає, що їх немає: прочитайте умови користування до уроку. Тому акаунти створює й тримає <b>дорослий</b>, а діти працюють у парах за його акаунтом. Завантажувати можна лише власні, навчальні чи родинні фото, на які є дозвіл.</div>
+  </div>
+</section>
+
+<section class="block c-orange" id="pidhotovka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧰</span><span class="label">ПІДГОТОВКА</span></div>
+    <h2>Що підготувати заздалегідь</h2>
+    <p class="intro">Позначте пункти в міру готовності — прогрес-бар покаже, наскільки урок готовий до старту.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarPrep"></div></div>
+      <div id="clListPrep"></div>
+    </div>
+    <div class="callout warn">📊 <b>Про цифри лімітів.</b> Орієнтовні дані (близько 20 обробок на добу у Clipdrop, збільшення ×2 в Upscaler, водяний знак на деяких функціях) узято з оглядів сторонніх сайтів. Для інших сервісів чисел немає. Умови змінюються, тому в день уроку перевірте їх на офіційних сторінках і за потреби поправте усну розповідь.</div>
+    <div class="callout pink">🖼️ <b>Навчальні фото — найважливіше в підготовці.</b> Приготуйте 2–3 безпечні зображення: чорно-біле з подряпинами (власне або з відкритого джерела), маленьке розмите, і з небажаним предметом у кадрі (наприклад, смітник біля лавки). Облич сторонніх людей на них бути не повинно.</div>
+  </div>
+</section>
+
+<section class="block c-purple" id="hid-uroku">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🗺️</span><span class="label">ХІД УРОКУ</span></div>
+    <h2>Алгоритм уроку та хронометраж (90 хв)</h2>
+    <p class="intro">Натисни на будь-який етап, щоб розгорнути методичні поради: що робити, які репліки використати та на що звернути увагу.</p>
+    <div class="timebar-legend" id="timebarLegend"></div>
+    <div class="timebar" id="timebar"></div>
+    <div class="flow" id="stageFlow"></div>
+    <div class="rule-detail" id="stageDetail"></div>
+  </div>
+</section>
+
+<section class="block c-teal" id="trudnoshi">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚡</span><span class="label">ТИПОВІ ТРУДНОЩІ</span></div>
+    <h2>З чим найчастіше стикаються вчителі на цьому уроці</h2>
+    <p class="intro">Клацни на картку, щоб побачити пораду щодо подолання труднощі.</p>
+    <div class="rule-grid" id="difficultyGrid"></div>
+  </div>
+</section>
+
+<section class="block c-pink" id="dyferentsiatsiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🌈</span><span class="label">ДИФЕРЕНЦІАЦІЯ</span></div>
+    <h2>Як адаптувати завдання під різний рівень і вік класу</h2>
+    <p class="intro">Вік 8–12 років — помітна різниця в упевненості й швидкості роботи. Диференціюйте кількість операцій і самостійність, а не складність самих інструментів.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">🌱</div><h4>Молодшим учням і тим, хто працює повільно</h4><p>Достатньо виконати 2 із 3 практичних завдань і застосувати 1–2 операції на фото. Користуйтеся «Лікарем фотографій» з посібника: він сам показує порядок і потрібний інструмент.</p></div>
+      <div class="whale"><div class="whale-ico">🚀</div><h4>Старшим і впевненим учням</h4><p>Запропонуйте обробити одне фото у двох різних сервісах і порівняти, пояснити, де ШІ «вгадав» зайве, та оформити «Паспорт фото» з описом усіх кроків.</p></div>
+      <div class="whale"><div class="whale-ico">🤝</div><h4>Для роботи на одному акаунті</h4><p>Поділіть клас на пари з ролями: «оператор» (працює в сервісі), «експерт-порівнювач» (дивиться на оригінал і результат), «хранитель правил». Ролі змінюються після кожного завдання.</p></div>
+    </div>
+    <div class="callout violet">💡 Фотолабораторія-симулятор у посібнику сама диференціює: одні учні просто вмикають операції, інші шукають правильний порядок і пояснюють, чому він такий.</div>
+  </div>
+</section>
+
+<section class="block c-green" id="otsinyuvannya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📊</span><span class="label">ОЦІНЮВАННЯ</span></div>
+    <h2>Формативне оцінювання під час уроку та критерії результату</h2>
+    <p class="intro">Основне оцінювання вбудоване в посібник: чек-лист безпеки, симулятор, вибір інструмента, квіз і чек-лист домашнього завдання. Таблицю нижче можна використати для підсумкової оцінки роботи учня (чи пари) за урок.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">👀</div><h4>Спостереження</h4><p>Чи учень працює з копією? Чи порівнює результат з оригіналом? Чи дотримується правил безпеки й згоди на фото?</p></div>
+      <div class="whale"><div class="whale-ico">🎯</div><h4>«Який інструмент обрати?»</h4><p>Вибір сервісу для 8 типових завдань показує, чи розрізняє учень можливості чотирьох інструментів.</p></div>
+      <div class="whale"><div class="whale-ico">🏆</div><h4>Квіз наприкінці</h4><p>8 контрольних запитань — швидкий підсумковий зріз розуміння теми, включно з безпекою й чесністю.</p></div>
+    </div>
+    <div class="table-scroll"><table class="crit">
+      <tr><th>Критерій (робота за урок)</th><th>Бал</th></tr>
+      <tr><td>Прочитано правила безпеки й отримано значок «Хранитель фото»</td><td>0–2</td></tr>
+      <tr><td>У фотолабораторії обрано правильний порядок обробки й пояснено, чому</td><td>0–2</td></tr>
+      <tr><td>Виконано щонайменше два з трьох практичних завдань, збережено оригінал і результат</td><td>0–2</td></tr>
+      <tr><td>Пройдено квіз (не менш як 6/8 правильних)</td><td>0–2</td></tr>
+      <tr><td>Результат підписано «оброблено ШІ» і порівняно з оригіналом (що ШІ «вгадав»?)</td><td>0–2</td></tr>
+      <tr><td>Разом</td><td>10</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="block c-yellow" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Банк додаткових запитань для обговорення</h2>
+    <p class="intro">Використовуйте, якщо в класі виникла пауза, сервіс тимчасово недоступний або лишився час до кінця уроку.</p>
+    <div class="rule-grid" id="questionBankGrid"></div>
+  </div>
+</section>
+
+<section class="block c-blue" id="refleksiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🪞</span><span class="label">РЕФЛЕКСІЯ ВЧИТЕЛЯ</span></div>
+    <h2>Самоперевірка після уроку</h2>
+    <p class="intro">Пройдіться чек-листом одразу після уроку, поки враження свіжі — це допоможе підготуватися до наступного заняття.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarReflect"></div></div>
+      <div id="clListReflect"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Методичні рекомендації · Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 10 <span class="heart">📷</span><br>Старе фото — це чиясь пам'ять. Обробляй її обережно: спершу копія, потім чарівство.</p>
+</footer>
+
+<script>
+/* ---------- NAV ---------- */
+const sections = ["meta","pidhotovka","hid-uroku","trudnoshi","dyferentsiatsiya","otsinyuvannya","dovidnyk","refleksiya"].map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- CHECKLIST ---------- */
+function buildChecklist(items, listElId, barElId){
+  const listEl = document.getElementById(listElId);
+  const barEl = document.getElementById(barElId);
+  items.forEach(t=>{
+    const row = document.createElement("div"); row.className="cl-item"; row.tabIndex=0; row.setAttribute("role","checkbox"); row.setAttribute("aria-checked","false");
+    row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${t}</span>`;
+    const toggle = ()=>{
+      const on = row.classList.toggle("checked"); row.setAttribute("aria-checked", on);
+      const done = listEl.querySelectorAll(".cl-item.checked").length;
+      barEl.style.width = (done/items.length*100)+"%";
+    };
+    row.addEventListener("click", toggle);
+    row.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); }});
+    listEl.appendChild(row);
+  });
+}
+const stages = [
+  {ico:"🔔", time:"8 хв", title:"Оргмомент і правила безпеки фото",
+   essence:"Налаштувати клас на тему «ШІ-фотолабораторія» і до будь-якої практики пройти шість правил безпеки з посібника.",
+   good:"Почніть із запитання: «У кого вдома є старе фото бабусі чи дідуся? Яким воно було б, якби його можна було оживити?». Потім поясніть, що сьогодні ми працюємо з чужими й родинними зображеннями, а отже діємо за правилами: акаунт тримає дорослий, фото — лише дозволені, завжди працюємо з копією.",
+   bad:"Пропустити блок безпеки «заради часу» або подати його як формальність. Особливо небезпечно дозволити «просто спробувати» на фото друзів чи однокласників.",
+   quote:"«Сьогодні ми — реставратори. Лікар не починає операцію без дозволу й стерильних рук, а реставратор — без копії оригіналу. Прочитайте шість правил і поставте галочки — отримаєте значок „Хранитель фото“.»",
+   expect:"Діти охоче ставлять галочки, але просять «обробити фото класу». Відповідь: тільки з дозволу всіх, хто на фото, і лише навчальні чи власні зображення.",
+   watch:"Окремо наголосіть на правилах про копію оригіналу та підпис «оброблено ШІ». Це стане основою домашнього завдання.",
+   materials:"Розділ «Безпека» посібника (чек-лист із 6 правил і значок «Хранитель фото»)."},
+  {ico:"🔬", time:"12 хв", title:"Огляд операцій і Фотолабораторія: порядок обробки",
+   essence:"Розібрати 8 операцій обробки фото та п'ять універсальних кроків, а потім у симуляторі «Фотолабораторія» з'ясувати, чому порядок має значення.",
+   good:"Дайте класу самим увімкнути перемикачі в симуляторі (колоризація, чіткість, подряпини, зайві об'єкти, фон). Потім натисніть «Запустити конвеєр» і разом поясніть порядок: спершу прибрати подряпини, потім підвищити чіткість, далі колоризувати, і лише наприкінці прибирати зайве.",
+   bad:"Одразу диктувати правильний порядок. Хай діти спершу самі спробують колоризувати розмите фото й побачать, що результат гірший.",
+   quote:"«Уявіть, що ви прибираєте в кімнаті: спершу сміття, потім миємо підлогу. Так і фото: спершу виправляємо дефекти, потім додаємо красу.»",
+   expect:"Діти хочуть одразу вмикати найефектніше — колоризацію. Це гарна нагода показати, що ШІ «підфарбовує» і подряпини, якщо їх не прибрати.",
+   watch:"Підкресліть, що колоризація, відновлення й розширення кадру — це здогади ШІ, а не правда про минуле. Тому результат завжди порівнюємо з оригіналом.",
+   materials:"Розділи «Огляд операцій» (whale-сітка та 5 кроків) і «Фотолабораторія» (симулятор) посібника."},
+  {ico:"✨", time:"10 хв", title:"AiEase: знайомство із середовищем та інструментами",
+   essence:"Розібрати ментальну карту інструментів AiEase і зрозуміти, для яких завдань сервіс підходить (відновлення, чіткість, збільшення, видалення зайвого).",
+   good:"Покажіть головну сторінку на проєкторі й пройдіться ментальною картою посібника. Зупиніться на тому, які інструменти ми використовуємо, а які — ні.",
+   bad:"Показувати й пропонувати інструменти для змін облич та зачісок. Вони не потрібні для теми уроку і ведуть до розмов про чужі обличчя.",
+   quote:"«У AiEase багато кнопок, але ми беремо лише ті, що лікують фото: чіткість, збільшення, видалення зайвого. Усе, що змінює людські обличчя, залишаємо осторонь.»",
+   expect:"Діти запитують про «весело змінити обличчя». Поясніть, що працювати з обличчями людей без їхньої згоди не можна.",
+   watch:"Безкоштовні ліміти AiEase на сторінках не вказані, тож не називайте цифр — скажіть «обмеження є, перевіримо на практиці». Умови користування прочитайте самі.",
+   materials:"Розділ «AiEase» посібника: ментальна карта з 7 інструментами та блоки про безкоштовний план, вхід, вік і приватність."},
+  {ico:"🎭", time:"10 хв", title:"insMind: знайомство із середовищем та інструментами",
+   essence:"Розібрати ментальну карту інструментів insMind: видалення фону, новий фон, редагування й оформлення зображень.",
+   good:"Підкресліть головне організаційне правило: за умовами insMind користувач має бути дорослим. Отже, оператором за комп'ютером є вчитель чи батьки. Діти пропонують, що саме робити.",
+   bad:"Дозволити учням входити у свої акаунти чи реєструватися «з телефона батьків» без відома дорослого.",
+   quote:"«insMind — як студія оформлення. У неї вхід дорослим, тому я буду вашими руками, а ви — режисерами: кажете, що прибрати і який фон поставити.»",
+   expect:"Діти захоплюються заміною фону й швидко пропонують фантазійні варіанти. Спрямуйте це на домашнє завдання.",
+   watch:"Деякі функції (за відгуками) можуть мати водяний знак на безкоштовному плані — це перевіряємо на практиці й про це згадуємо.",
+   materials:"Розділ «insMind» посібника: ментальна карта з 7 інструментами."},
+  {ico:"🎨", time:"8 хв", title:"ImageColorizer: знайомство та колоризація",
+   essence:"Показати спеціалізований сервіс для колоризації чорно-білих фото й пояснити, що ШІ вгадує кольори.",
+   good:"Колоризуйте заздалегідь підготовлене чорно-біле фото. Дайте дітям висловити припущення про колір одягу, а потім порівняйте з тим, що вгадав ШІ.",
+   bad:"Стверджувати, що ШІ «повертає справжні кольори». Він лише вгадує, і в родинному фото колір сорочки може бути зовсім іншим.",
+   quote:"«ШІ не бачив бабусину сукню. Він вгадує колір за схожими фото. Тому, коли можна, питаємо в родини, якою вона була насправді.»",
+   expect:"Діти захоплені ефектом «ожило»; старші помічають неточності кольору шкіри й неба.",
+   watch:"У AiEase колоризація не підтверджена, тому для неї ми використовуємо ImageColorizer. Не плутайте з функцією перефарбування (AI Recolor) — вона інша.",
+   materials:"Розділ «ImageColorizer» посібника: ментальна карта з 6 пунктів."},
+  {ico:"🧰", time:"10 хв", title:"Clipdrop: застосування інструментів",
+   essence:"Розібрати набір інструментів Clipdrop (збільшення, видалення фону й об'єктів, новий фон і світло, розширення кадру) і п'ять «рецептів» застосування.",
+   good:"Покажіть 1–2 «рецепти» наживо на навчальному фото, решту розгляньте в посібнику. Обговоріть обмеження безкоштовного плану.",
+   bad:"Обіцяти необмежену кількість обробок. За даними сторонніх оглядів безкоштовний план має ліміт приблизно 20 обробок на добу, а деякі функції лишають водяний знак.",
+   quote:"«Clipdrop — наче швейцарський ніж для фото. Але ніж треба знати: що для чого, і в якому порядку відкривати лезо.»",
+   expect:"Діти захоплюються функцією розширення кадру; запитують, чи «правдивий» новий фон. Нагадайте: це вигадка ШІ.",
+   watch:"Поясніть, що розширення кадру — це домальовування ШІ, а не справжня частина сцени. Така робота потребує підпису «оброблено ШІ».",
+   materials:"Розділ «Clipdrop» посібника: ментальна карта з 8 інструментів і акордеон «5 рецептів»; розділ «Який інструмент обрати?»."},
+  {ico:"🛠️", time:"22 хв", title:"Практика: три завдання у вільних версіях",
+   essence:"Пари виконують три завдання: «Друга молодість» (ImageColorizer + AiEase), «Ідеальне вирізання» (Clipdrop + insMind), «Збільшуй, чисть і розширюй» (Clipdrop + AiEase).",
+   good:"Кожна пара працює на акаунті дорослого за ролями. Перед кожним завданням збережіть копію оригіналу. Після — порівняйте «до / після» й запишіть, що ШІ вгадав або змінив.",
+   bad:"Вмикати всі функції одразу. Тоді діти не бачать, що саме покращило фото, і втрачають можливість сформулювати висновок.",
+   quote:"«Один крок — одна зміна. Зробили крок — подивилися, що змінилося. Не сподобалось — повертаємось до копії.»",
+   expect:"Найбільше емоцій — «Друга молодість» та вирізання. Діти самі помічають недоліки: залишки об'єкта, дивні краї.",
+   watch:"Якщо ліміт сервісу вичерпано, переходьте до іншого завдання або використайте заздалегідь оброблений приклад. Усі результати зберігайте поруч з оригіналами.",
+   materials:"Розділ «Три завдання» посібника і тренувальні фото вчителя."},
+  {ico:"🏆", time:"7 хв", title:"Квіз і підсумкова рефлексія",
+   essence:"Закріпити матеріал через 8 контрольних питань і швидке підсумкове обговорення.",
+   good:"Пройдіть квіз фронтально й швидко: кожне запитання обговорюйте 20–30 секунд після відповіді. Особливо зупиніться на питаннях про копію оригіналу й підпис «оброблено ШІ».",
+   bad:"Залишити квіз повністю на самостійне проходження без обговорення відповідей про безпеку й чесність.",
+   quote:"«Закінчіть речення: „Сьогодні я зрозумів(ла), що перед обробкою фото обов'язково треба...“»",
+   expect:"Найчастіша помилка — вважати, що ШІ «повертає» справжні кольори. Це гарна нагода повторити правило перевірки порівнянням.",
+   watch:"Якщо часу мало — оберіть 4–5 найважливіших питань із квізу.",
+   materials:"Розділ «Перевір себе» посібника."},
+  {ico:"🏠", time:"3 хв", title:"Домашнє завдання та питання для роздумів",
+   essence:"Пояснити домашнє творче завдання «Оживи старовинну родинну фотографію» і запросити переглянути питання «Подумати вдома».",
+   good:"Покажіть «Лікаря фотографій» і «Паспорт фото»: учень вказує проблеми, отримує порядок обробки й готує підпис. Нагадайте: фото родинне, значить обов'язкова згода дорослого, копія оригіналу й підпис «оброблено ШІ».",
+   bad:"Дозволити ділитися родинним фото в чатах чи публікувати без дозволу тих, хто на ньому зображений.",
+   quote:"«Ваше фото — частина історії родини. Розкажіть її: хто на фото, коли воно зроблене, що ви виправили, а що вгадав ШІ.»",
+   expect:"Діти розпитуватимуть бабусь і дідусів — це чудовий міжпоколінний ефект, який варто підтримати.",
+   watch:"Якщо вдома немає старого фото або акаунта дорослого, нехай діти заповнять «Лікаря фотографій» та «Паспорт фото» на навчальному зображенні.",
+   materials:"Розділи «Подумати вдома» та «Домашнє завдання» посібника: «Лікар фотографій», «Паспорт фото», чек-лист і довідник."},
+];
+const totalMinutes = stages.reduce((s,x)=>s+parseInt(x.time),0);
+const flowEl = document.getElementById("stageFlow");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  if(i>0){ const ar=document.createElement("div"); ar.className="flow-arrow"; flowEl.appendChild(ar); }
+  const node = document.createElement("div"); node.className="flow-node"; node.dataset.idx=i;
+  node.tabIndex=0; node.setAttribute("role","button");
+  node.style.setProperty("--fn-color", color);
+  node.innerHTML = `<div class="fn-ico">${s.ico}</div><div class="fn-title">${s.title}</div><div class="fn-time">${s.time}</div>`;
+  node.addEventListener("click", ()=>selectStage(i, true));
+  node.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectStage(i, true); }});
+  flowEl.appendChild(node);
+});
+function selectStage(i, scroll){
+  document.querySelectorAll(".flow-node").forEach(n=>n.classList.remove("active"));
+  flowEl.querySelector(`[data-idx="${i}"]`).classList.add("active");
+  const s = stages[i]; const color = rainbow[i%rainbow.length];
+  const rd = document.getElementById("stageDetail");
+  rd.style.setProperty("--rd-color", color);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${s.ico}</div><div class="rd-title">${s.title} <span style="color:var(--ink-faint); font-family:'JetBrains Mono'; font-size:13px;">· ${s.time}</span></div></div>
+    <div class="rd-essence">${s.essence}</div>
+    <div class="rd-cols">
+      <div class="rd-example good"><span class="lab">✅ Що варто робити</span>${s.good}</div>
+      <div class="rd-example bad"><span class="lab">❌ Чого уникати</span>${s.bad}</div>
+    </div>
+    <div class="rd-analysis">💬 ${s.quote}</div>
+    <div class="rd-proscons">
+      <div><span class="lab2">Очікувані реакції учнів</span>${s.expect}</div>
+      <div><span class="lab2">На що звернути увагу</span>${s.watch}</div>
+    </div>
+    <div class="rd-tasks"><span class="lab2">Матеріали до етапу</span>${s.materials}</div>`;
+  if(scroll) rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+selectStage(0, false);
+
+const timebar = document.getElementById("timebar"), legend = document.getElementById("timebarLegend");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  const pct = (parseInt(s.time)/totalMinutes*100);
+  const seg = document.createElement("span"); seg.style.width=pct+"%"; seg.style.background=color;
+  seg.textContent = pct>6? s.time : "";
+  timebar.appendChild(seg);
+  const leg = document.createElement("span"); leg.innerHTML = `<i style="background:${color}"></i>${s.title} (${s.time})`;
+  legend.appendChild(leg);
+});
+
+/* ---------- ACCORDION ---------- */
+function buildAccordion(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((e,i)=>{
+    const card = document.createElement("div"); card.className="rule-card";
+    card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+    card.innerHTML = `<button class="rc-head" aria-expanded="false"><span class="rc-num">${e.ico}</span><span class="rc-title">${e.title}</span><span class="rc-arrow">▾</span></button>
+    <div class="rc-body"><div class="rc-body-in">${e.body}</div></div>`;
+    const btn = card.querySelector(".rc-head");
+    btn.addEventListener("click", ()=>{ const o = card.classList.toggle("open"); btn.setAttribute("aria-expanded", o); });
+    grid.appendChild(card);
+  });
+}
+buildChecklist([
+  "Прочитано умови користування AiEase, insMind, ImageColorizer і Clipdrop; відомо, що insMind вимагає дорослого, а вікові правила інших сервісів до уроку уточнено",
+  "Акаунти створено <b>дорослими</b> (вчитель/батьки); дитячих персональних даних у профілях немає",
+  "Узгоджено з керівництвом закладу чи батьками використання зовнішніх ШІ-сервісів на уроці",
+  "Перевірено, що aiease.ai, insmind.com, imagecolorizer.com і clipdrop.co відкриваються в мережі закладу",
+  "Перевірено актуальні безкоштовні ліміти й наявність водяного знака в кожному сервісі",
+  "Підготовлено 2–3 безпечні навчальні фото: чорно-біле з подряпинами, маленьке розмите, із зайвим предметом",
+  "Для кожного навчального фото збережено копію оригіналу та заздалегідь оброблений запасний результат",
+  "Проєктор або великий екран для показу інтерактивного посібника Уроку 10; учні мають доступ до нього на своїх пристроях",
+  "На дошці чи слайді — коротка пам'ятка з 6 правилами безпеки з посібника",
+  "Таймер на видноті — практика з трьох завдань легко «розтягується»",
+], "clListPrep", "clBarPrep");
+
+buildChecklist([
+  "Чи всі учні прочитали правила безпеки й розуміли, чому акаунт створює дорослий?",
+  "Чи більшість учнів зберегли копію оригіналу перед обробкою?",
+  "Чи зрозуміли учні, чому порядок обробки має значення (подряпини → чіткість → колір → зайве)?",
+  "Чи порівнювали учні результат з оригіналом і називали, що саме «вгадав» ШІ?",
+  "Чи вдалося виконати практику в межах лімітів, чи знадобились запасні результати?",
+  "Чи підписали учні результати «оброблено ШІ»?",
+  "Які питання «подумати вдома» викликали найбільший інтерес — чи варто розвинути їх на наступному уроці?",
+], "clListReflect", "clBarReflect");
+
+buildAccordion([
+  {ico:"🔞", title:"Вікові вимоги сервісів і акаунти дітей", body:"<b>Порада:</b> insMind вимагає, щоб користувач був дорослим; для інших сервісів вікові правила на перевірених сторінках не знайдено, але це не гарантія. Не створюйте дітям акаунтів. Працюйте на акаунті дорослого: діти — «режисери», дорослий — оператор."},
+  {ico:"⏳", title:"Ліміт безкоштовного плану вичерпано або сервіс повільний", body:"<b>Порада:</b> за оглядами сторонніх сайтів Clipdrop обмежує безкоштовні обробки приблизно 20 на добу. Тримайте запасні результати, виконуйте завдання в іншому порядку й об'єднуйте дітей у пари на один акаунт."},
+  {ico:"📸", title:"Діти хочуть завантажити фото друзів чи однокласників", body:"<b>Порада:</b> не дозволяйте. Фото людей можна обробляти лише за згодою всіх, хто на ньому зображений. На уроці використовуйте власні, навчальні чи родинні фото з дозволом. Скористайтеся моментом для розмови про цифровий слід."},
+  {ico:"🎨", title:"Колір після колоризації «неправильний»", body:"<b>Порада:</b> це нормально — ШІ вгадує. Попросіть дітей порівняти з тим, що знають про епоху чи родину, і сформулювати: «ШІ вгадав..., а я не впевнений(а) у...». Це корисна навичка критичного мислення."},
+  {ico:"🧽", title:"Після видалення об'єкта лишилися сліди чи «розмиття»", body:"<b>Порада:</b> виділяйте об'єкт точніше, з невеликим запасом, і повторіть прохід. Результат кращий на простих фонах. Складну ділянку обробляйте частинами."},
+  {ico:"💾", title:"Діти втратили оригінал або зберегли лише оброблене", body:"<b>Порада:</b> нагадайте першочергове правило: спершу копія. Найпростіше — давати файлам імена «оригінал» і «ШІ-версія». Якщо оригінал втрачено, продовжуйте з навчального фото, а в домашньому завданні попросіть дорослого зробити копію."},
+  {ico:"⚠️", title:"Результат вийшов дивним, лякаючим чи недоречним", body:"<b>Порада:</b> негайно припиніть, закрийте результат і не показуйте його класу. Заспокойте дітей: це помилка ШІ, а не їхня вина. За потреби повідомте адміністрацію сервісу. Це ще одна причина, чому поруч має бути дорослий."},
+], "difficultyGrid");
+
+buildAccordion([
+  {ico:"🔬", title:"Додаткові запитання: порядок обробки", body:"<ul><li>Чому колоризувати фото з подряпинами — погана ідея?</li><li>Що станеться, якщо збільшити розмите фото до того, як підвищити чіткість?</li><li>Який крок ви виконали б останнім і чому?</li></ul>"},
+  {ico:"🎨", title:"Додаткові запитання: ШІ вгадує", body:"<ul><li>Чому колір сукні на колоризованому фото може бути неправильним?</li><li>Як перевірити, чи ШІ не вигадав зайвого при розширенні кадру?</li><li>Чим «відновлення» відрізняється від «вигадування»?</li></ul>"},
+  {ico:"🛡️", title:"Додаткові запитання: етика й приватність", body:"<ul><li>У яких випадках можна обробляти фото іншої людини?</li><li>Чому слід підписувати «оброблено ШІ»?</li><li>Чому оригінал треба зберегти завжди?</li></ul>"},
+  {ico:"🏠", title:"Додаткові запитання: родинна фотографія", body:"<ul><li>Що ви хотіли б дізнатися про людей на старому фото?</li><li>Кого з рідних можна розпитати про те, що на ньому?</li><li>Як би ви розповіли історію цього фото в одному реченні?</li></ul>"},
+], "questionBankGrid");
+</script>
+</body>
+</html>
