@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Методичні рекомендації. Урок 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7; --bg-hero:#FFF6E4; --surface:#FFFFFF;
+  --ink:#20222E; --ink-soft:#555A6E; --ink-faint:#8D91A6; --line:#ECE6D6;
+  --accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;
+  --violet:#8B5CF6; --violet-soft:#F1EAFE;
+  --warn:#FFB020; --warn-soft:#FFF1D2;
+  --bad:#F2495C; --bad-soft:#FDE3E7;
+  --good:#22B573; --good-soft:#DDF7EC;
+  --teal:#12B3A0; --teal-soft:#DBF7F2;
+  --pink:#EC4899; --pink-soft:#FCE1EF;
+  --orange:#FF7A2F; --orange-soft:#FFE7D4;
+  --radius-s:12px; --radius-m:18px; --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+.block.c-red{--accent:#F2495C; --accent-ink:#B23A4C; --accent-soft:#FDE3E7;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+}
+:root[data-theme="dark"] .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:13px; padding:8px 12px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(26px,4vw,40px); max-width:18ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:62ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:320px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+section.block{padding:56px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(21px,2.8vw,28px); max-width:26ch;}
+.block p.intro{color:var(--ink-soft); max-width:64ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+.callout.pink{background:var(--pink-soft); color:#9A2A66; border-color:rgba(236,72,153,.25);}
+.callout.bad{background:var(--bad-soft); color:#B23A4C; border-color:rgba(242,73,92,.25);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .callout.violet{color:#CFC4FF;}
+  :root:not([data-theme="light"]) .callout.warn{color:#FFD98A;}
+  :root:not([data-theme="light"]) .callout.pink{color:#FFB6DA;}
+  :root:not([data-theme="light"]) .callout.bad{color:#FFA3AE;}
+  :root:not([data-theme="light"]) .rd-example.good .lab{color:#8CE6BC;}
+  :root:not([data-theme="light"]) .rd-example.bad .lab{color:#FFA3AE;}
+}
+:root[data-theme="dark"] .callout.violet{color:#CFC4FF;}
+:root[data-theme="dark"] .callout.warn{color:#FFD98A;}
+:root[data-theme="dark"] .callout.pink{color:#FFB6DA;}
+:root[data-theme="dark"] .callout.bad{color:#FFA3AE;}
+:root[data-theme="dark"] .rd-example.good .lab{color:#8CE6BC;}
+:root[data-theme="dark"] .rd-example.bad .lab{color:#FFA3AE;}
+
+/* WHALE */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* ACCORDION */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none; padding-top:6px;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.rc-body-in{padding:0 18px 18px 67px; font-size:14px; color:var(--ink-soft);}
+.rc-body-in ul{margin:0; padding-left:18px;}
+.rc-body-in li{margin-bottom:5px;}
+.rule-card.open .rc-body{max-height:640px;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent;}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good); color:#fff;}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+.cl-status{margin-top:14px; font-family:'Unbounded'; font-size:13px; color:var(--accent-ink);}
+
+/* FLOW */
+.flow{display:flex; flex-direction:column; align-items:stretch; gap:0; margin:30px 0;}
+.flow-node{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:15px 20px; font-weight:700; font-size:14.5px; box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center; gap:14px; transition:.15s;}
+.flow-node:hover{border-color:var(--fn-color,var(--accent));}
+.flow-node.active{border-color:var(--fn-color,var(--accent)); background:var(--accent-soft);}
+.flow-node .fn-ico{width:40px; height:40px; border-radius:50%; background:var(--fn-color,var(--accent)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex:none; box-shadow:var(--shadow-pop);}
+.flow-node .fn-title{flex:1;}
+.flow-node .fn-time{font-family:'JetBrains Mono'; font-weight:700; font-size:12.5px; color:var(--ink-faint); background:var(--bg); padding:4px 10px; border-radius:999px; flex:none;}
+.flow-arrow{width:2px; height:20px; background:var(--line); margin-left:39px; position:relative;}
+.flow-arrow::after{content:"";position:absolute; bottom:-1px; left:-3px; border:4px solid transparent; border-top-color:var(--line);}
+
+/* STAGE DETAIL */
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:18px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-essence{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px;}
+.rd-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:640px){.rd-cols{grid-template-columns:1fr;}}
+.rd-example{border-radius:var(--radius-s); padding:14px 16px; font-size:14px;}
+.rd-example.good{background:var(--good-soft); border:1px solid rgba(47,158,91,.25);}
+.rd-example.bad{background:var(--bad-soft); border:1px solid rgba(224,87,106,.25);}
+.rd-example .lab{font-weight:800; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; display:block;}
+.rd-example.good .lab{color:#1E7A45;} .rd-example.bad .lab{color:#B23A4C;}
+.rd-analysis{margin-top:14px; font-size:13.8px; color:var(--accent-ink); background:var(--accent-soft); border-radius:var(--radius-s); padding:12px 14px; font-style:italic;}
+.rd-proscons{display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;}
+.rd-proscons div{flex:1; min-width:200px; font-size:13.3px;}
+.rd-proscons .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; margin-bottom:4px; display:block; color:var(--ink-faint);}
+.rd-tasks{margin-top:16px; border-top:1px dashed var(--line); padding-top:14px; font-size:13.6px; color:var(--ink-soft);}
+.rd-tasks .lab2{font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; display:block;}
+
+/* TIME BUDGET */
+.timebar{display:flex; height:34px; border-radius:999px; overflow:hidden; margin:24px 0 6px; box-shadow:var(--shadow);}
+.timebar span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; font-family:'JetBrains Mono';}
+.timebar-legend{display:flex; flex-wrap:wrap; gap:10px 16px; font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;}
+.timebar-legend span{display:flex; align-items:center; gap:6px;}
+.timebar-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+/* TABLE */
+.table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:14px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:12px 16px; font-family:'Unbounded'; font-size:12.5px; font-weight:600;}
+table.crit td{padding:12px 16px; border-bottom:1px solid var(--line); vertical-align:top;}
+table.crit tr:last-child td{border-bottom:none; font-weight:800;}
+table.crit td:last-child, table.crit th:last-child{text-align:right; white-space:nowrap;}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:56ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+
+@media(max-width:640px){
+  .rd-cols{grid-template-columns:1fr;}
+  table.crit td, table.crit th{padding:10px 12px; font-size:13px;}
+  .flow-node{flex-wrap:wrap;}
+  .rc-body-in{padding-left:18px;}
+}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">🎨 Методичні рекомендації</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#meta">Мета уроку</a>
+      <a href="#pidhotovka">Підготовка</a>
+      <a href="#hid-uroku">Хід уроку</a>
+      <a href="#trudnoshi">Труднощі</a>
+      <a href="#dyferentsiatsiya">Диференціація</a>
+      <a href="#otsinyuvannya">Оцінювання</a>
+      <a href="#dovidnyk">Довідник</a>
+      <a href="#refleksiya">Рефлексія</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none" aria-hidden="true">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Для вчителя · Курс «Цифрова лабораторія AI» · Урок 11</div>
+    <h1>Методичні рекомендації до уроку</h1>
+    <p class="lede">Покроковий сценарій, хронометраж, орієнтовні репліки, типові труднощі й поради для проведення уроку «Генерація та обробка зображень засобами ChatGPT і Gemini» (90 хв, учні 8–12 років).</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">🎯</span> Мета і завдання</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">⏱️</span> Хронометраж 90 хв</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">{ }</span> JSON-рецепт стилю</div>
+      <div class="chip" style="--chip-color:#F2495C;"><span class="chip-ico">🛡️</span> Безпека й вікові правила</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🦸</span> Домашнє: три персонажі для коміксу</div>
+    </div>
+  </div>
+</header>
+
+<section class="block c-blue" id="meta">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎯</span><span class="label">МЕТА УРОКУ</span></div>
+    <h2>Навчальна, розвивальна й виховна мета</h2>
+    <p class="intro">Фінальний результат заняття: учні складають промпти за формулою для ChatGPT і Gemini, записують стиль картинки у вигляді JSON і переносять його на нові зображення, просять правки за принципом «що змінити + що залишити» та готують трьох власних персонажів для комікса.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">📘</div><h4>Навчальна</h4><p>Показати особливості промптів для генерації зображень у ChatGPT (розмова, список деталей) і Gemini (опис-історія), способи обробки зображень у кожному з них, а також структуру та використання JSON-коду стилю.</p></div>
+      <div class="whale"><div class="whale-ico">🧩</div><h4>Розвивальна</h4><p>Розвивати вміння чітко формулювати задум, структурувати його (формула з семи пунктів, пари «ключ: значення»), порівнювати результати двох сервісів і вдосконалювати їх уточненнями.</p></div>
+      <div class="whale"><div class="whale-ico">🛡️</div><h4>Виховна</h4><p>Формувати повагу до приватності (без фото людей і особистих даних у промптах), до авторства (оригінальні персонажі, не копії відомих героїв) та звичку чесно підписувати «створено ШІ».</p></div>
+    </div>
+    <div class="callout">📌 <b>Тип уроку:</b> комбінований (демонстрація + практика). <b>Вік учнів:</b> 8–12 років. <b>Тривалість:</b> 90 хв. <b>Формат:</b> фронтальна робота з інтерактивним посібником, практика в парах на акаунті дорослого, безкоштовні плани ChatGPT і Gemini.</div>
+    <div class="callout bad">👨‍👩‍👧 <b>Вікові обмеження — ключове організаційне питання.</b> За відомими умовами OpenAI, ChatGPT — для користувачів від 13 років, а до 18 потрібен дозвіл батьків (саму сторінку умов відкрити не вдалося, тож перевірте її до уроку). Google дозволяє дітям до 13 років користуватися Gemini лише через Family Link, а для користувачів до 18 років обмежує редагування завантажених зображень. Тому акаунти створює й тримає <b>дорослий</b>, діти працюють у парах, а завантаження й редагування зображень у Gemini виконує дорослий. Фото людей не завантажуємо взагалі.</div>
+  </div>
+</section>
+
+<section class="block c-orange" id="pidhotovka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧰</span><span class="label">ПІДГОТОВКА</span></div>
+    <h2>Що підготувати заздалегідь</h2>
+    <p class="intro">Позначте пункти в міру готовності — прогрес-бар покаже, наскільки урок готовий до старту.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarPrep"></div></div>
+      <div id="clListPrep"></div>
+    </div>
+    <div class="callout warn">📊 <b>Про цифри лімітів.</b> За оглядами сторонніх сайтів, безкоштовні користувачі ChatGPT мають лише кілька зображень на добу, а Gemini дає обмежені квоти на кращу модель і потім переходить на початкову версію. Точних цифр немає, умови змінюються. У день уроку перевірте стан обох сервісів і заздалегідь підготуйте запасні згенеровані картинки.</div>
+    <div class="callout pink">🖼️ <b>Безпечні зображення для практики.</b> Приготуйте 2–3 картинки без облич людей: фото іграшки або предмета, дитячий малюнок, раніше згенеровану ШІ картинку. Їх завантажує дорослий для JSON-опису й правок.</div>
+  </div>
+</section>
+
+<section class="block c-purple" id="hid-uroku">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🗺️</span><span class="label">ХІД УРОКУ</span></div>
+    <h2>Алгоритм уроку та хронометраж (90 хв)</h2>
+    <p class="intro">Натисни на будь-який етап, щоб розгорнути методичні поради: що робити, які репліки використати та на що звернути увагу.</p>
+    <div class="timebar-legend" id="timebarLegend"></div>
+    <div class="timebar" id="timebar"></div>
+    <div class="flow" id="stageFlow"></div>
+    <div class="rule-detail" id="stageDetail"></div>
+  </div>
+</section>
+
+<section class="block c-teal" id="trudnoshi">
+  <div class="wrap">
+    <div class="kicker"><span class="num">⚡</span><span class="label">ТИПОВІ ТРУДНОЩІ</span></div>
+    <h2>З чим найчастіше стикаються вчителі на цьому уроці</h2>
+    <p class="intro">Клацни на картку, щоб побачити пораду щодо подолання труднощі.</p>
+    <div class="rule-grid" id="difficultyGrid"></div>
+  </div>
+</section>
+
+<section class="block c-pink" id="dyferentsiatsiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🌈</span><span class="label">ДИФЕРЕНЦІАЦІЯ</span></div>
+    <h2>Як адаптувати завдання під різний рівень і вік класу</h2>
+    <p class="intro">Вік 8–12 років — помітна різниця у вмінні формулювати думку й працювати з текстом. Диференціюйте обсяг промпту й самостійність, а не складність сервісів.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">🌱</div><h4>Молодшим учням і тим, хто працює повільно</h4><p>Достатньо виконати 2 із 3 практичних завдань. Користуйтеся конструктором промпту: він підказує пункти формули. JSON-рецепт збирайте вибором зі списків, без ручного набору.</p></div>
+      <div class="whale"><div class="whale-ico">🚀</div><h4>Старшим і впевненим учням</h4><p>Запропонуйте порівняти один задум у двох сервісах, написати власний JSON з нуля й перевірити його за п'ятьма правилами, а для персонажів додати поле consistency_lock і описати історію героїв.</p></div>
+      <div class="whale"><div class="whale-ico">🤝</div><h4>Для роботи на одному акаунті</h4><p>Поділіть клас на пари з ролями: «режисер» (придумує промпт), «оператор» (дорослий вводить його в чат), «експерт» (порівнює результат із задумом і перевіряє літери й безпеку). Ролі змінюються після кожного завдання.</p></div>
+    </div>
+    <div class="callout violet">💡 Тренажер правок сам диференціює: одні учні просто вмикають правки, інші порівнюють чіткий і нечіткий промпти й пояснюють, чому відрізняється результат.</div>
+  </div>
+</section>
+
+<section class="block c-green" id="otsinyuvannya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📊</span><span class="label">ОЦІНЮВАННЯ</span></div>
+    <h2>Формативне оцінювання під час уроку та критерії результату</h2>
+    <p class="intro">Основне оцінювання вбудоване в посібник: чек-лист безпеки, конструктори промптів, JSON-детектив, тренажер правок, квіз і чек-лист домашнього завдання. Таблицю нижче можна використати для підсумкової оцінки роботи учня (чи пари) за урок.</p>
+    <div class="whale-grid">
+      <div class="whale"><div class="whale-ico">👀</div><h4>Спостереження</h4><p>Чи учень дотримується правил безпеки? Чи формулює промпт за формулою? Чи перевіряє літери й деталі результату?</p></div>
+      <div class="whale"><div class="whale-ico">🎯</div><h4>«ChatGPT чи Gemini?»</h4><p>Вибір сервісу для 8 типових завдань показує, чи розуміє учень особливості обох помічників і обмеження.</p></div>
+      <div class="whale"><div class="whale-ico">🏆</div><h4>Квіз наприкінці</h4><p>8 контрольних запитань — швидкий підсумковий зріз розуміння теми, включно з безпекою й чесністю.</p></div>
+    </div>
+    <div class="table-scroll"><table class="crit">
+      <tr><th>Критерій (робота за урок)</th><th>Бал</th></tr>
+      <tr><td>Прочитано правила безпеки й отримано значок «Безпечний творець»</td><td>0–2</td></tr>
+      <tr><td>Складено промпт за формулою для ChatGPT і Gemini та зібрано JSON-рецепт стилю</td><td>0–2</td></tr>
+      <tr><td>Виконано щонайменше два з трьох практичних завдань, збережено початкову й виправлену версії</td><td>0–2</td></tr>
+      <tr><td>Пройдено квіз (не менш як 6/8 правильних)</td><td>0–2</td></tr>
+      <tr><td>Результат підписано «створено ШІ», перевірено літери й деталі, виконано хоча б три пункти домашнього чек-листа</td><td>0–2</td></tr>
+      <tr><td>Разом</td><td>10</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="block c-yellow" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Банк додаткових запитань для обговорення</h2>
+    <p class="intro">Використовуйте, якщо в класі виникла пауза, сервіс тимчасово недоступний або лишився час до кінця уроку.</p>
+    <div class="rule-grid" id="questionBankGrid"></div>
+  </div>
+</section>
+
+<section class="block c-blue" id="refleksiya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🪞</span><span class="label">РЕФЛЕКСІЯ ВЧИТЕЛЯ</span></div>
+    <h2>Самоперевірка після уроку</h2>
+    <p class="intro">Пройдіться чек-листом одразу після уроку, поки враження свіжі — це допоможе підготуватися до наступного заняття.</p>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="clBarReflect"></div></div>
+      <div id="clListReflect"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Методичні рекомендації · Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 11 <span class="heart">🎨</span><br>Ви режисер, ШІ — помічник: чіткий задум, безпека й чесний підпис «створено ШІ».</p>
+</footer>
+
+<script>
+/* ---------- NAV ---------- */
+const sections = ["meta","pidhotovka","hid-uroku","trudnoshi","dyferentsiatsiya","otsinyuvannya","dovidnyk","refleksiya"].map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+cur));
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- CHECKLIST ---------- */
+function buildChecklist(items, listElId, barElId){
+  const listEl = document.getElementById(listElId);
+  const barEl = document.getElementById(barElId);
+  items.forEach(t=>{
+    const row = document.createElement("div"); row.className="cl-item"; row.tabIndex=0; row.setAttribute("role","checkbox"); row.setAttribute("aria-checked","false");
+    row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${t}</span>`;
+    const toggle = ()=>{
+      const on = row.classList.toggle("checked"); row.setAttribute("aria-checked", on);
+      const done = listEl.querySelectorAll(".cl-item.checked").length;
+      barEl.style.width = (done/items.length*100)+"%";
+    };
+    row.addEventListener("click", toggle);
+    row.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); }});
+    listEl.appendChild(row);
+  });
+}
+const stages = [
+  {ico:"🛡️", time:"7 хв", title:"Оргмомент і правила безпеки",
+   essence:"Налаштувати клас на роботу з двома ШІ-помічниками й до будь-якої практики пройти шість правил безпеки з посібника.",
+   good:"Почніть із запитання: «Якби ви могли намалювати що завгодно одним реченням — що б це було?». Потім поясніть правила: акаунт тримає дорослий, діти — «режисери» в парі, фото людей не завантажуємо, особистих даних у промптах немає, фільтри не обходимо, результат підписуємо «створено ШІ».",
+   bad:"Пропустити безпеку «заради часу» або дозволити «просто спробувати» із фото друзів чи відомих героїв. Не плутайте режисера й оператора: вводить промпт дорослий.",
+   quote:"«Сьогодні ви — режисери. Режисер вигадує й керує, а помічник малює. Щоб отримати значок „Безпечний творець“, прочитайте шість правил і поставте галочки.»",
+   expect:"Діти швидко ставлять галочки й одразу просять «намалювати Людину-павука» або «додати фото класу». Відповідь: вигадуємо власних персонажів, фото людей не використовуємо.",
+   watch:"Окремо наголосіть на правилах «без облич і даних» та «підпис створено ШІ». Вони знадобляться в домашньому завданні.",
+   materials:"Розділ «Безпека» посібника (6 правил і значок «Безпечний творець»)."},
+  {ico:"💬", time:"10 хв", title:"Промпт для ChatGPT",
+   essence:"Показати, що ChatGPT добре розуміє розмову й списки деталей, і навчити складати промпт за формулою з семи пунктів.",
+   good:"Спершу покажіть слабкий промпт («намалюй кота»), потім ту саму ідею за формулою: хто, що робить, де, стиль, світло, кольори, що не додавати. Дайте парам зібрати промпт у конструкторі й порівняйте з вихідним.",
+   bad:"Починати з довгого тексту без прикладів. Не змушуйте писати все самостійно, якщо клас не готовий: конструктор підказує пункти.",
+   quote:"«ChatGPT любить, коли з ним розмовляють і дають список деталей. Скажіть йому, що саме має бути в кадрі, а потім уточніть: „Залиш усе, але зміни фон“.»",
+   expect:"Діти пишуть дуже короткі промпти або одразу додають десять деталей. Підкажіть: 3–5 важливих деталей краще, ніж двадцять.",
+   watch:"Якщо на картинці з'явився напис, перевіряйте літери: ШІ часто робить помилки в тексті.",
+   materials:"Розділ «ChatGPT» посібника: 6 особливостей, конструктор промпту."},
+  {ico:"✨", time:"10 хв", title:"Промпт для Gemini",
+   essence:"Показати, що Gemini краще працює з описом-історією, і порівняти його стиль із ChatGPT на одному задумі.",
+   good:"Візьміть той самий задум і розкажіть його як коротку історію: настрій, місце, світло, дія. Порівняйте таблицю відмінностей з посібника й попросіть клас сказати, у чому результат відрізняється.",
+   bad:"Оцінювати сервіси як «кращий» і «гірший». Це різні помічники для різних завдань.",
+   quote:"«Gemini ніби слухає казку: розкажіть йому сцену, а не список. Спробуйте ті самі слова в обох — і порівняйте.»",
+   expect:"Діти запитують, хто «круціший». Скеруйте: обираємо сервіс під завдання, а не навпаки.",
+   watch:"Нагадайте, що в безкоштовних планах є ліміти: якщо сервіс відмовив, використайте запасну картинку.",
+   materials:"Розділ «Gemini» посібника: 6 особливостей, конструктор, порівняльна таблиця."},
+  {ico:"{ }", time:"13 хв", title:"JSON-код зображення і рецепт стилю",
+   essence:"Пояснити, що JSON — це акуратна картка з парами «ключ: значення», і показати, як записати стиль картинки й перенести його на нові зображення.",
+   good:"Почніть з аналогії «шафа з підписаними шухлядками». Розберіть п'ять правил JSON, дайте класу «JSON-детектив» (знайти помилку в трьох фрагментах), потім зберіть картку в конструкторі й пройдіть п'ять кроків «витягти стиль і перенести».",
+   bad:"Вимагати від молодших ручного набору дужок і лапок. Складні вкладені структури залиште старшим.",
+   quote:"«JSON — це паспорт картинки. Якщо записати стиль у такий паспорт, його можна вставити в нове завдання, і серія виглядатиме як із однієї студії.»",
+   expect:"Діти забувають коми й лапки, а ШІ іноді відхиляється від стилю. Це нормально: уточнюйте промпт, а не вимагайте ідеального повтору.",
+   watch:"Дорослий завантажує зразок, дитина лише керує. Фото людей для опису стилю не використовуємо.",
+   materials:"Розділ «JSON» посібника: правила, JSON-детектив, конструктор, акордеон із п'яти кроків."},
+  {ico:"🖌️", time:"9 хв", title:"Обробка зображення в ChatGPT",
+   essence:"Показати способи правок: фон, стиль, деталі, колір, крок за кроком, опис і JSON, та навчити формулі «що змінити + що залишити».",
+   good:"Візьміть заготовлену безпечну картинку й проведіть дві правки: змініть фон і залиште персонажа. Використайте карту способів і шість карток промптів. Підкресліть: одна правка — один крок.",
+   bad:"Просити «зроби гарніше». Без чіткої вказівки ШІ змінює все підряд.",
+   quote:"«Кажіть двома частинами: що змінити і що залишити. Тоді ШІ не зіпсує те, що вам подобається.»",
+   expect:"Після правки з'являються нові деталі або зникає потрібне. Порадьте повернутися до попередньої версії й сформулювати точніше.",
+   watch:"Завантажує зображення дорослий, і лише безпечні картинки без облич.",
+   materials:"Розділ «Обробка в ChatGPT» посібника: карта способів і 6 карток промптів."},
+  {ico:"🎞️", time:"8 хв", title:"Обробка зображення в Gemini",
+   essence:"Пояснити способи правок у Gemini, зокрема об'єднання двох зображень і збереження «того самого» героя, та згадати вікове обмеження редагування завантажених зображень.",
+   good:"Покажіть правки на запасному прикладі: фон і світло, стиль, деталі, два фото, той самий персонаж, уточнення. Поясніть, що для користувачів до 18 років завантажене зображення Gemini редагувати не дозволяє, тож завантаження виконує дорослий або показуємо заготовлені результати.",
+   bad:"Обіцяти, що кожна правка спрацює. Сервіс може відмовити або змінити більше, ніж просили.",
+   quote:"«Gemini добре тримає настрій і світло. Скажіть, що змінити, що залишити — і додайте одне уточнення за раз.»",
+   expect:"Діти запитують, чому в них не виходить, як у відео. Поясніть про вікові та лімітні обмеження й покажіть заготовлений приклад.",
+   watch:"Умови Google можуть змінюватися. У день уроку перевірте, що доступно вашому акаунту.",
+   materials:"Розділ «Обробка в Gemini» посібника: карта способів і 6 карток промптів."},
+  {ico:"🤖", time:"5 хв", title:"Тренажер правок і вибір помічника",
+   essence:"Закріпити чіткі формулювання в тренажері й навчити обирати сервіс для 8 типових завдань.",
+   good:"Дайте парам натиснути шість правок у тренажері, зокрема нечітку «Зроби гарніше», і порівняти результати. Потім разом пройдіть вибір помічника: ChatGPT чи Gemini.",
+   bad:"Витрачати на тренажер понад 5 хвилин: головний час — на практику.",
+   quote:"«Подивіться, що зробив робот на нечіткій команді, і що — на чіткій. Різниця — у вашому промпті.»",
+   expect:"Діти сперечаються про «правильний» сервіс. Нагадайте: часто підійдуть обидва, важливо пояснити вибір.",
+   watch:"Якщо клас відстає, пропустіть вибір сервісу й повернетесь до нього в підсумку.",
+   materials:"Розділи «Тренажер правок» і «Який помічник?» посібника."},
+  {ico:"🎨", time:"18 хв", title:"Практика: три творчі завдання",
+   essence:"У парах виконати щонайменше два з трьох завдань: «Магічний предмет у двох помічників», «Рецепт стилю: від картинки до серії», «Фабрика правок».",
+   good:"Розподіліть ролі: режисер, оператор (дорослий вводить промпт), експерт (порівнює результат із задумом, перевіряє літери й безпеку). Ролі міняйте після кожного завдання. Фіксуйте кожну пару на таймері.",
+   bad:"Дозволяти змагатися за кількість картинок. Цінність — у якості промпту й порівнянні.",
+   quote:"«Не питайте, яка картинка гарніша. Питайте: що я написав і що з цього вийшло? Що зміню, щоб вийшло ближче до задуму?»",
+   expect:"З'являються проблеми з лімітами, помилки в літерах, невдалі JSON. Тримайте запасні результати й давайте підказки, а не готові відповіді.",
+   watch:"Слідкуйте за безпекою: жодних фото людей, особистих даних і відомих героїв. Кожний результат підписуємо «створено ШІ».",
+   materials:"Розділ «Три творчі завдання» посібника, акаунти дорослих, запасні картинки."},
+  {ico:"🏆", time:"7 хв", title:"Квіз і підсумок",
+   essence:"Перевірити розуміння теми квізом із 8 запитань і зробити короткий усний підсумок.",
+   good:"Пройдіть квіз разом, обговорюючи пояснення до кожної відповіді. Попросіть кожну пару назвати одне нове правило промпту й одну правку, яка спрацювала.",
+   bad:"Перетворювати квіз на оцінювання з балами. Це швидкий зріз розуміння.",
+   quote:"«Назвіть одне, що ви сьогодні зробили інакше, ніж зробили б на початку уроку.»",
+   expect:"Найчастіше плутають особливості ChatGPT і Gemini та правила безпеки. Повертайтеся до таблиці порівняння.",
+   watch:"Зафіксуйте, хто потребує додаткової підтримки з формулюванням промптів.",
+   materials:"Розділ «Квіз» посібника."},
+  {ico:"🦸", time:"3 хв", title:"Домашнє: три персонажі для коміксу",
+   essence:"Пояснити творче домашнє завдання: вигадати трьох персонажів (Герой, Помічник, Витівник), оформити паспорти, спільний стиль і JSON-картку з consistency_lock.",
+   good:"Покажіть поля паспорта (імʼя, хто, зовнішність, кольори, риса, талант, коронна фраза) і вимогу єдиного стилю. Нагадайте: лише вигадані герої, без реальних людей і відомих персонажів. Додайте питання «подумати вдома».",
+   bad:"Залишити домашнє без пояснення. Діти можуть скопіювати відомих героїв.",
+   quote:"«Ваші троє героїв зустрінуться на наступному уроці в коміксі. Вигадайте їм характер і однаковий стиль — і запишіть їхній паспорт.»",
+   expect:"Діти запитують, чи можна взяти улюбленого героя з мультфільму. Відповідь: ні, вигадуємо власного.",
+   watch:"Генерацію вдома виконує дорослий або разом із ним. Нагадайте про чек-лист і рівні від Новачка до Майстра коміксу.",
+   materials:"Розділи «Домашнє: комікс» і «Подумати вдома» посібника."},
+];
+
+const totalMinutes = stages.reduce((s,x)=>s+parseInt(x.time),0);
+const flowEl = document.getElementById("stageFlow");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  if(i>0){ const ar=document.createElement("div"); ar.className="flow-arrow"; flowEl.appendChild(ar); }
+  const node = document.createElement("div"); node.className="flow-node"; node.dataset.idx=i;
+  node.tabIndex=0; node.setAttribute("role","button");
+  node.style.setProperty("--fn-color", color);
+  node.innerHTML = `<div class="fn-ico">${s.ico}</div><div class="fn-title">${s.title}</div><div class="fn-time">${s.time}</div>`;
+  node.addEventListener("click", ()=>selectStage(i, true));
+  node.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); selectStage(i, true); }});
+  flowEl.appendChild(node);
+});
+function selectStage(i, scroll){
+  document.querySelectorAll(".flow-node").forEach(n=>n.classList.remove("active"));
+  flowEl.querySelector(`[data-idx="${i}"]`).classList.add("active");
+  const s = stages[i]; const color = rainbow[i%rainbow.length];
+  const rd = document.getElementById("stageDetail");
+  rd.style.setProperty("--rd-color", color);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${s.ico}</div><div class="rd-title">${s.title} <span style="color:var(--ink-faint); font-family:'JetBrains Mono'; font-size:13px;">· ${s.time}</span></div></div>
+    <div class="rd-essence">${s.essence}</div>
+    <div class="rd-cols">
+      <div class="rd-example good"><span class="lab">✅ Що варто робити</span>${s.good}</div>
+      <div class="rd-example bad"><span class="lab">❌ Чого уникати</span>${s.bad}</div>
+    </div>
+    <div class="rd-analysis">💬 ${s.quote}</div>
+    <div class="rd-proscons">
+      <div><span class="lab2">Очікувані реакції учнів</span>${s.expect}</div>
+      <div><span class="lab2">На що звернути увагу</span>${s.watch}</div>
+    </div>
+    <div class="rd-tasks"><span class="lab2">Матеріали до етапу</span>${s.materials}</div>`;
+  if(scroll) rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+selectStage(0, false);
+
+const timebar = document.getElementById("timebar"), legend = document.getElementById("timebarLegend");
+stages.forEach((s,i)=>{
+  const color = rainbow[i%rainbow.length];
+  const pct = (parseInt(s.time)/totalMinutes*100);
+  const seg = document.createElement("span"); seg.style.width=pct+"%"; seg.style.background=color;
+  seg.textContent = pct>6? s.time : "";
+  timebar.appendChild(seg);
+  const leg = document.createElement("span"); leg.innerHTML = `<i style="background:${color}"></i>${s.title} (${s.time})`;
+  legend.appendChild(leg);
+});
+
+/* ---------- ACCORDION ---------- */
+function buildAccordion(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((e,i)=>{
+    const card = document.createElement("div"); card.className="rule-card";
+    card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+    card.innerHTML = `<button class="rc-head" aria-expanded="false"><span class="rc-num">${e.ico}</span><span class="rc-title">${e.title}</span><span class="rc-arrow">▾</span></button>
+    <div class="rc-body"><div class="rc-body-in">${e.body}</div></div>`;
+    const btn = card.querySelector(".rc-head");
+    btn.addEventListener("click", ()=>{ const o = card.classList.toggle("open"); btn.setAttribute("aria-expanded", o); });
+    grid.appendChild(card);
+  });
+}
+buildChecklist([
+  "Прочитано умови користування ChatGPT і Gemini; уточнено вікові правила (ChatGPT — за відомими умовами від 13 років, до 18 потрібен дозвіл батьків; Gemini для дітей до 13 — лише через Family Link)",
+  "Акаунти в обох сервісах створені й відкриті <b>дорослим</b> (учитель/батьки); дитячих персональних даних у профілях немає",
+  "Узгоджено з керівництвом закладу чи батьками використання зовнішніх ШІ-сервісів на уроці",
+  "Перевірено, що chatgpt.com і gemini.google.com відкриваються в мережі закладу",
+  "Перевірено актуальні безкоштовні ліміти на генерацію зображень і доступність редагування завантажених зображень",
+  "Підготовлено 2–3 безпечні зображення без облич людей: іграшка, дитячий малюнок, раніше згенерована картинка",
+  "Заздалегідь згенеровано запасні результати для кожного завдання на випадок вичерпання лімітів",
+  "Перевірено тестові промпти (за формулою, JSON-картка стилю, правка «що змінити + що залишити»)",
+  "Проєктор або великий екран для показу інтерактивного посібника Уроку 11; учні мають доступ до нього на своїх пристроях",
+  "На дошці чи слайді — коротка пам'ятка з 6 правилами безпеки; таймер на видноті",
+], "clListPrep", "clBarPrep");
+
+buildChecklist([
+  "Чи всі учні прочитали правила безпеки й розуміли, чому акаунт тримає дорослий?",
+  "Чи більшість пар склали промпт за формулою, а не одним словом?",
+  "Чи зрозуміли учні різницю між ChatGPT (список деталей) і Gemini (опис-історія)?",
+  "Чи впоралися діти з JSON-карткою та п'ятьма правилами?",
+  "Чи просили учні правки за принципом «що змінити + що залишити»?",
+  "Чи вдалося виконати практику в межах лімітів, чи знадобилися запасні результати?",
+  "Чи підписали учні результати «створено ШІ» й перевірили літери на картинках?",
+  "Які питання «подумати вдома» і які персонажі викликали найбільший інтерес для наступного уроку-коміксу?",
+], "clListReflect", "clBarReflect");
+
+buildAccordion([
+  {ico:"🔞", title:"Вікові обмеження й акаунти дітей", body:"<b>Порада:</b> не створюйте дітям власних акаунтів. За відомими умовами, ChatGPT призначений для користувачів від 13 років (до 18 — з дозволу батьків), а Gemini для дітей до 13 доступний лише через Family Link. Працюйте через акаунт дорослого й перевірте умови до уроку."},
+  {ico:"⏳", title:"Ліміт безкоштовного плану вичерпано", body:"<b>Порада:</b> за оглядами, безкоштовні плани дають небагато зображень на добу. Тримайте запасні результати, виконуйте завдання в парах (одна генерація на пару) і розподіліть сервіси: одні пари в ChatGPT, інші в Gemini."},
+  {ico:"📸", title:"Діти хочуть завантажити фото друзів чи себе", body:"<b>Порада:</b> не дозволяйте. Фото людей не завантажуємо взагалі. Використовуйте іграшки, малюнки й згенеровані картинки. Поясніть, що ШІ може зберегти або змінити зображення, а особисті дані в промптах не пишемо."},
+  {ico:"🦸", title:"«Намалюй відомого героя»", body:"<b>Порада:</b> вигадуємо власних персонажів. Запропонуйте змінити задум: «Опишіть героя за рисами й талантом, а не за іменем з мультфільму». Це також готує до домашнього завдання з паспортами."},
+  {ico:"🔤", title:"Літери на картинці з помилками", body:"<b>Порада:</b> це відома слабкість генерації зображень. Просіть короткі слова, перевіряйте кожну літеру, а за потреби додайте текст вручну в редакторі. Обговоріть: «ШІ малює літери як візерунок»."},
+  {ico:"{ }", title:"JSON із помилками або ШІ відхиляється від стилю", body:"<b>Порада:</b> перевірте п'ять правил: лапки, коми, двокрапки, дужки, одне значення. Для молодших використовуйте готовий конструктор. Якщо ШІ відхилився від стилю, додайте в картку поле consistency_lock та повторіть із чіткішим «залиш такі самі»."},
+  {ico:"🧩", title:"Персонажі виходять різними в кожній картинці", body:"<b>Порада:</b> використовуйте паспорт героя та однакову JSON-картку в кожному промпті, додавайте «той самий персонаж, ті самі кольори й одяг». Покажіть, що точність зростає з кожним уточненням."},
+  {ico:"🚫", title:"Gemini не редагує завантажене зображення", body:"<b>Порада:</b> для користувачів до 18 років Google обмежує редагування завантажених зображень. Завантаження виконує дорослий, або використайте заготовлені результати чи генерацію з нуля. Не обходьте обмеження."},
+  {ico:"🗯️", title:"Нечіткі промпти («зроби гарніше»)", body:"<b>Порада:</b> покажіть у тренажері, що вийшло на нечітку команду, і попросіть переформулювати за схемою «що змінити + що залишити + який настрій»."},
+  {ico:"⚠️", title:"Результат вийшов дивним чи недоречним", body:"<b>Порада:</b> негайно припиніть, закрийте результат і не показуйте його класу. Заспокойте дітей: це помилка ШІ, а не їхня вина. За потреби повідомте адміністрацію."},
+], "difficultyGrid");
+
+buildAccordion([
+  {ico:"💬", title:"Додаткові запитання: промпти", body:"<ul><li>Які сім пунктів формули найважливіші для вашого задуму?</li><li>Чому «намалюй кота» дає випадкову картинку?</li><li>Чим відрізняється список деталей від опису-історії?</li></ul>"},
+  {ico:"{ }", title:"Додаткові запитання: JSON", body:"<ul><li>Чому JSON називають «паспортом картинки»?</li><li>Що станеться, якщо забути кому чи лапки?</li><li>Навіщо в картці поле consistency_lock?</li></ul>"},
+  {ico:"🖌️", title:"Додаткові запитання: обробка", body:"<ul><li>Чому краще змінювати одне за раз?</li><li>Як сказати, що залишити без змін?</li><li>Коли варто почати нову картинку, а не уточнювати стару?</li></ul>"},
+  {ico:"🛡️", title:"Додаткові запитання: безпека й чесність", body:"<ul><li>Чому не можна завантажувати фото друзів?</li><li>Навіщо підписувати «створено ШІ»?</li><li>Чим вигаданий герой кращий за копію відомого?</li></ul>"},
+  {ico:"🦸", title:"Додаткові запитання: комікс", body:"<ul><li>Який талант у вашого Помічника і чому він потрібен Герою?</li><li>Що вигадає Витівник, щоб ускладнити історію?</li><li>Як зробити, щоб троє героїв виглядали як із одного коміксу?</li></ul>"},
+], "questionBankGrid");
+
+</script>
+</body>
+</html>
