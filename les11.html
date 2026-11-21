@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 11. ChatGPT і Gemini для зображень</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFDF7; --bg-hero:#FFF6E4; --surface:#FFFFFF;
+  --ink:#20222E; --ink-soft:#555A6E; --ink-faint:#8D91A6; --line:#ECE6D6;
+  --accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;
+  --violet:#8B5CF6; --violet-soft:#F1EAFE;
+  --warn:#FFB020; --warn-soft:#FFF1D2;
+  --bad:#F2495C; --bad-soft:#FDE3E7;
+  --good:#22B573; --good-soft:#DDF7EC;
+  --teal:#12B3A0; --teal-soft:#DBF7F2;
+  --pink:#EC4899; --pink-soft:#FCE1EF;
+  --orange:#FF7A2F; --orange-soft:#FFE7D4;
+  --radius-s:12px; --radius-m:18px; --radius-l:28px;
+  --shadow:0 2px 0 rgba(20,22,30,.06), 0 10px 26px rgba(20,22,30,.06);
+  --shadow-pop:0 4px 0 rgba(20,22,30,.14);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+    --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+    --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151D; --bg-hero:#191B26; --surface:#1D2029; --ink:#F1F2FA; --ink-soft:#B7BBD0;
+  --ink-faint:#83879C; --line:#2E3140; --accent-soft:#123457; --violet-soft:#291F52;
+  --warn-soft:#3E2F0C; --bad-soft:#3E1A22; --good-soft:#0F3A2A; --teal-soft:#0E3A36; --pink-soft:#3A1730; --orange-soft:#3A210F;
+  color-scheme: dark;
+}
+.block.c-blue{--accent:#1E88E5; --accent-ink:#0F5FA8; --accent-soft:#E1F0FE;}
+.block.c-orange{--accent:#FF7A2F; --accent-ink:#B8500F; --accent-soft:#FFE7D4;}
+.block.c-purple{--accent:#8B5CF6; --accent-ink:#5B34C4; --accent-soft:#F1EAFE;}
+.block.c-teal{--accent:#12B3A0; --accent-ink:#0B8377; --accent-soft:#DBF7F2;}
+.block.c-pink{--accent:#EC4899; --accent-ink:#B22770; --accent-soft:#FCE1EF;}
+.block.c-green{--accent:#22B573; --accent-ink:#167A4E; --accent-soft:#DDF7EC;}
+.block.c-yellow{--accent:#FFB020; --accent-ink:#8A5F0F; --accent-soft:#FFF1D2;}
+.block.c-red{--accent:#F2495C; --accent-ink:#B23A4C; --accent-soft:#FDE3E7;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+}
+:root[data-theme="dark"] .block{--accent-ink:color-mix(in srgb,var(--accent) 55%,#fff);}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth; scroll-padding-top:calc(78px + env(safe-area-inset-top,0px));}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Manrope',sans-serif; font-size:16px; line-height:1.6; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif; margin:0 0 .5em; line-height:1.22; font-weight:700; letter-spacing:-.01em;}
+p{margin:0 0 1em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+img,svg{max-width:100%;}
+
+.topnav{position:sticky; top:0; z-index:50; background:rgba(255,253,247,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px);}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .topnav{background:rgba(20,21,29,.88);} }
+:root[data-theme="dark"] .topnav{background:rgba(20,21,29,.88);}
+.topnav-inner{max-width:980px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:14px; overflow-x:auto; scrollbar-width:none;}
+.topnav-inner::-webkit-scrollbar{display:none;}
+.brand{font-family:'Unbounded'; font-weight:700; font-size:14px; white-space:nowrap; color:var(--accent-ink); flex:none;}
+.navlinks{display:flex; gap:4px; flex:none;}
+.navlinks a{white-space:nowrap; text-decoration:none; color:var(--ink-soft); font-weight:600; font-size:12.5px; padding:8px 11px; border-radius:999px; transition:background .15s, color .15s;}
+.navlinks a:hover{background:var(--accent-soft); color:var(--accent-ink);}
+.navlinks a.active{background:var(--ink); color:var(--surface);}
+
+.hero{
+  background:
+    radial-gradient(circle at 6% 15%, rgba(30,136,229,.16) 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(255,122,47,.16) 0, transparent 38%),
+    radial-gradient(circle at 80% 90%, rgba(139,92,246,.16) 0, transparent 42%),
+    radial-gradient(circle at 15% 90%, rgba(236,72,153,.13) 0, transparent 40%),
+    var(--bg-hero);
+  padding:56px 0 44px; border-bottom:1px solid var(--line); position:relative; overflow:hidden;
+}
+.hero-eyebrow{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.hero h1{font-size:clamp(24px,4vw,38px); max-width:19ch;}
+.hero p.lede{font-size:17px; color:var(--ink-soft); max-width:62ch;}
+.hero-net{position:absolute; right:-40px; top:-30px; width:300px; opacity:.5; pointer-events:none;}
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+.chip{background:var(--surface); border:2px solid var(--chip-color,var(--line)); padding:8px 14px; border-radius:999px; font-size:12.5px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; box-shadow:var(--shadow-pop);}
+.chip .chip-ico{font-size:15px;}
+
+section.block{padding:52px 0; border-bottom:1px solid var(--line);}
+section.block:last-of-type{border-bottom:none;}
+.kicker{font-family:'JetBrains Mono'; font-size:13px; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:12px;}
+.kicker .num{background:var(--accent); color:#fff; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--shadow-pop); transform:rotate(-6deg); flex:none;}
+.kicker .label{background:var(--accent-soft); color:var(--accent-ink); padding:5px 12px; border-radius:999px; letter-spacing:.02em;}
+.block h2{font-size:clamp(21px,2.8vw,28px); max-width:26ch;}
+.block > .wrap > p.intro, .block p.intro{color:var(--ink-soft); max-width:64ch; font-size:16px;}
+.callout{background:var(--accent-soft); border-radius:var(--radius-m); padding:18px 22px; font-size:15.5px; color:var(--accent-ink); margin:22px 0; border:1px solid rgba(15,157,138,.18);}
+.callout.violet{background:var(--violet-soft); color:#463A9E; border-color:rgba(111,92,224,.2);}
+.callout.warn{background:var(--warn-soft); color:#8A5F0F; border-color:rgba(222,154,44,.25);}
+.callout.pink{background:var(--pink-soft); color:#9A2A66; border-color:rgba(236,72,153,.25);}
+.callout.good{background:var(--good-soft); color:#1E7A45; border-color:rgba(47,158,91,.25);}
+.callout.bad{background:var(--bad-soft); color:#B23A4C; border-color:rgba(242,73,92,.25);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .callout.violet{color:#CFC4FF;}
+  :root:not([data-theme="light"]) .callout.warn{color:#FFD98A;}
+  :root:not([data-theme="light"]) .callout.pink{color:#FFB6DA;}
+  :root:not([data-theme="light"]) .callout.good{color:#8CE6BC;}
+  :root:not([data-theme="light"]) .callout.bad{color:#FFA3AE;}
+}
+:root[data-theme="dark"] .callout.violet{color:#CFC4FF;}
+:root[data-theme="dark"] .callout.warn{color:#FFD98A;}
+:root[data-theme="dark"] .callout.pink{color:#FFB6DA;}
+:root[data-theme="dark"] .callout.good{color:#8CE6BC;}
+:root[data-theme="dark"] .callout.bad{color:#FFA3AE;}
+
+/* MINDMAP */
+.mindmap-wrap{position:relative; margin:30px 0 10px;}
+.mindmap-svg{width:100%; height:auto; display:block;}
+.mm-node{cursor:pointer;}
+.mm-node circle{fill:var(--surface); stroke:var(--mm-color,var(--line)); stroke-width:3; transition:.15s;}
+.mm-node:hover circle, .mm-node.active circle{fill:var(--mm-color,var(--accent)); fill-opacity:.14;}
+.mm-node.active circle{stroke-width:4;}
+.mm-node text{font-family:'Manrope'; font-weight:700; fill:var(--ink); font-size:12.5px;}
+.mm-node .mm-icon{font-size:19px;}
+.mm-hub circle{fill:var(--accent); stroke:none;}
+.mm-hub text{fill:#fff; font-family:'Unbounded'; font-size:11.5px;}
+.mm-line{stroke:var(--line); stroke-width:2.5;}
+.rule-detail{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; box-shadow:var(--shadow); margin-top:8px;}
+.rule-detail-head{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+.rd-badge{font-size:20px; background:var(--rd-color,var(--accent)); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:var(--shadow-pop);}
+.rd-title{font-family:'Unbounded'; font-size:17px;}
+.rd-body{color:var(--ink-soft); font-size:14.5px;}
+.rd-body b{color:var(--ink);}
+.rd-example{border-radius:var(--radius-s); padding:12px 15px; font-size:13.4px; background:var(--accent-soft); color:var(--accent-ink); margin-top:12px; font-family:'JetBrains Mono';}
+
+/* ACCORDION */
+.rule-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:26px;}
+.rule-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--rc-color,var(--accent)); border-radius:var(--radius-m); padding:0; box-shadow:var(--shadow); overflow:hidden;}
+.rule-card.wide{grid-column:1/-1;}
+.rule-card button.rc-head{width:100%; text-align:left; background:none; border:none; cursor:pointer; padding:16px 18px; display:flex; gap:13px; align-items:flex-start; font-family:'Manrope'; color:var(--ink);}
+.rc-num{font-size:19px; color:#fff; background:var(--rc-color,var(--accent)); width:36px; height:36px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.rc-head span.rc-title{font-weight:700; font-size:14.5px; flex:1; padding-top:6px;}
+.rc-head .rc-arrow{color:var(--ink-faint); transition:transform .2s; flex:none; padding-top:6px;}
+.rule-card.open .rc-arrow{transform:rotate(180deg);}
+.rc-body{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+.rc-body-in{padding:0 18px 20px 18px; font-size:14px; color:var(--ink-soft);}
+.rule-card.open .rc-body{max-height:800px;}
+
+/* WHALE CARDS */
+.whale-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:26px 0;}
+.whale{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:20px; box-shadow:var(--shadow);}
+.whale-ico{width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px; box-shadow:var(--shadow-pop);}
+.whale h4{font-size:15px; margin-bottom:6px;}
+.whale p{font-size:13.6px; color:var(--ink-soft); margin:0;}
+
+/* CHECKER */
+.checker{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:24px; box-shadow:var(--shadow);}
+.checker-grid{display:grid; grid-template-columns:1.2fr 1fr; gap:24px;}
+@media(max-width:780px){.checker-grid{grid-template-columns:1fr;}}
+.checker textarea{width:100%; min-height:170px; border-radius:var(--radius-m); border:1.5px solid var(--line); background:var(--bg); padding:16px; font-family:'Manrope'; font-size:14.5px; color:var(--ink); resize:vertical; line-height:1.6;}
+.checker textarea:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.checker label.fl{display:block; font-size:11.5px; font-weight:800; color:var(--ink-faint); text-transform:uppercase; margin:12px 0 6px;}
+.score-ring-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.score-ring{position:relative; width:150px; height:150px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring .ring-bg{fill:none; stroke:var(--line); stroke-width:12;}
+.score-ring .ring-fg{fill:none; stroke:var(--accent); stroke-width:12; stroke-linecap:round; transition:stroke-dasharray .4s ease, stroke .4s ease;}
+.score-ring .ring-num{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;}
+.score-ring .ring-num b{font-family:'Unbounded'; font-size:30px; line-height:1;}
+.score-ring .ring-num span{font-size:11px; color:var(--ink-faint); font-weight:700; text-transform:uppercase;}
+.rank-badge{margin-top:8px; font-family:'Unbounded'; font-size:13px; padding:7px 16px; border-radius:999px; color:#fff; background:var(--accent);}
+.cat-list{margin-top:18px; display:flex; flex-direction:column; gap:10px;}
+.cat-item{font-size:12.8px;}
+.cat-item .cat-top{display:flex; justify-content:space-between; margin-bottom:4px; font-weight:700;}
+.cat-bar-bg{height:7px; border-radius:999px; background:var(--line); overflow:hidden;}
+.cat-bar-fg{height:100%; border-radius:999px; transition:width .35s ease;}
+.tips-box{margin-top:16px; background:var(--warn-soft); color:#8A5F0F; border-radius:var(--radius-s); padding:13px 15px; font-size:13px; display:none;}
+.tips-box.show{display:block;}
+.tips-box ul{margin:6px 0 0; padding-left:18px;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tips-box{color:#FFD98A;} }
+:root[data-theme="dark"] .tips-box{color:#FFD98A;}
+
+/* PROMPT BOX / BUILDER */
+.promptbox{background:var(--ink); color:#EAF7F4; border-radius:var(--radius-m); padding:16px 18px; font-family:'JetBrains Mono'; font-size:12.8px; line-height:1.65; white-space:pre-wrap; margin:14px 0;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .promptbox{background:#0B0C12; border:1px solid var(--line);} }
+:root[data-theme="dark"] .promptbox{background:#0B0C12; border:1px solid var(--line);}
+.promptbox .lab{display:block; font-family:'Manrope'; font-weight:800; color:#9ADCCB; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;}
+.copy-btn{margin-top:4px; background:var(--accent); color:#fff; border:none; padding:10px 20px; border-radius:999px; font-weight:800; font-size:13px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+.copy-msg{font-size:12px; color:var(--good); margin-left:10px; opacity:0; transition:.2s;}
+.copy-msg.show{opacity:1;}
+.builder{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:16px; box-shadow:var(--shadow);}
+.builder-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px;}
+.builder-field label{display:block; font-size:11.5px; font-weight:800; color:var(--ink-faint); text-transform:uppercase; margin-bottom:6px;}
+.builder-field select{width:100%; padding:10px 11px; border-radius:9px; border:1.5px solid var(--line); background:var(--bg); font-family:'Manrope'; font-weight:600; font-size:13px; color:var(--ink);}
+
+/* PLATFORM HEAD */
+.platform-head{display:flex; align-items:center; gap:16px; margin:6px 0 14px; flex-wrap:wrap;}
+.platform-logo{width:54px; height:54px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; box-shadow:var(--shadow-pop); flex:none; background:var(--accent);}
+.platform-link{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--accent-ink); background:var(--accent-soft); padding:5px 12px; border-radius:999px; text-decoration:none;}
+
+/* SIMULATOR */
+.simulator{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; margin-top:26px; box-shadow:var(--shadow); display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+@media(max-width:760px){.simulator{grid-template-columns:1fr;}}
+.sim-controls .ctrl-row{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px dashed var(--line); gap:10px;}
+.sim-controls .ctrl-row:last-child{border-bottom:none;}
+.ctrl-label{font-size:13.5px; font-weight:700;}
+.ctrl-label small{display:block; font-weight:500; color:var(--ink-faint); font-size:11.5px;}
+.switch{position:relative; width:44px; height:25px; flex:none;}
+.switch input{opacity:0; width:0; height:0;}
+.slider-tog{position:absolute; inset:0; background:var(--line); border-radius:999px; cursor:pointer; transition:.2s;}
+.slider-tog::before{content:""; position:absolute; width:19px; height:19px; left:3px; top:3px; background:var(--surface); border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.2);}
+input:checked + .slider-tog{background:var(--accent);}
+input:checked + .slider-tog::before{transform:translateX(19px);}
+.switch input:focus-visible + .slider-tog{outline:2px solid var(--accent); outline-offset:2px;}
+.sim-meter-wrap{margin-top:18px;}
+.sim-meter-label{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--ink-faint); margin-bottom:6px;}
+.sim-meter{height:10px; border-radius:999px; background:var(--line); overflow:hidden;}
+.sim-meter-bar{height:100%; width:10%; border-radius:999px; background:linear-gradient(90deg,var(--bad),var(--warn),var(--good)); transition:width .35s;}
+.preview-box{border-radius:var(--radius-m); min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-size:14px; color:#fff; font-weight:700; transition:background .4s ease; position:relative; overflow:hidden;}
+.preview-box .preview-emoji{font-size:40px; display:block; margin-bottom:10px;}
+.preview-box .preview-text{font-family:'Manrope'; font-weight:600; font-size:13px; max-width:30ch;}
+
+/* CHECKLIST */
+.checklist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:22px; box-shadow:var(--shadow);}
+.cl-progress{height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:16px;}
+.cl-progress-bar{height:100%; width:0%; background:var(--accent); transition:width .3s;}
+.cl-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px; cursor:pointer;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ink-faint); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent;}
+.cl-item.checked .cl-box{background:var(--good); border-color:var(--good); color:#fff;}
+.cl-item.checked span.cl-label{color:var(--ink-faint); text-decoration:line-through;}
+.cl-status{margin-top:14px; font-family:'Unbounded'; font-size:13px; color:var(--accent-ink);}
+
+/* QUIZ */
+.quiz-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:28px; margin-top:26px; box-shadow:var(--shadow);}
+.quiz-progress{display:flex; gap:5px; margin-bottom:20px;}
+.quiz-progress span{flex:1; height:5px; border-radius:999px; background:var(--line);}
+.quiz-progress span.done{background:var(--accent);}
+.quiz-q{font-family:'Unbounded'; font-size:16px; margin-bottom:16px; line-height:1.4;}
+.quiz-opts{display:grid; gap:9px;}
+.qz-btn{text-align:left; padding:12px 15px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-size:14px; font-weight:700; color:var(--ink); box-shadow:var(--shadow-pop); transition:.12s; font-family:'Manrope';}
+.qz-btn:hover{border-color:var(--accent); transform:translateY(1px); box-shadow:0 3px 0 rgba(20,22,30,.14);}
+.qz-btn.correct{background:var(--good-soft); border-color:var(--good); color:#1E7A45;}
+.qz-btn.wrong{background:var(--bad-soft); border-color:var(--bad); color:#B23A4C;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .qz-btn.correct{color:#8CE6BC;} :root:not([data-theme="light"]) .qz-btn.wrong{color:#FFA3AE;} }
+:root[data-theme="dark"] .qz-btn.correct{color:#8CE6BC;}
+:root[data-theme="dark"] .qz-btn.wrong{color:#FFA3AE;}
+.qz-explain{margin-top:14px; background:var(--accent-soft); color:var(--accent-ink); padding:13px 15px; border-radius:var(--radius-s); font-size:13.6px; display:none;}
+.qz-explain.show{display:block;}
+.qz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+.next-btn{background:var(--accent); color:#fff; border:none; padding:11px 22px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; opacity:.4; pointer-events:none; transition:.2s; box-shadow:var(--shadow-pop);}
+.next-btn.ready{opacity:1; pointer-events:all;}
+.quiz-result{text-align:center; padding:20px 0;}
+.quiz-result .score{font-family:'Unbounded'; font-size:50px; color:var(--accent-ink);}
+.restart-btn{margin-top:16px; background:var(--pink); color:#fff; border:none; padding:11px 24px; border-radius:999px; font-weight:800; font-size:13.6px; cursor:pointer; font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+
+/* THINK */
+.think-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:26px;}
+.think-card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--tc-color,var(--accent)); border-radius:var(--radius-m); padding:18px 20px; box-shadow:var(--shadow); font-size:14.5px; color:var(--ink);}
+.think-card .think-num{font-family:'Unbounded'; font-size:13px; color:var(--tc-color,var(--accent)); margin-bottom:6px; display:block;}
+
+/* GLOSSARY + CHEAT + TABLE */
+.gloss-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-top:22px;}
+.gloss-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:17px 18px; box-shadow:var(--shadow);}
+.gloss-card h4{font-size:14px; font-family:'JetBrains Mono'; color:var(--accent-ink); margin-bottom:6px;}
+.gloss-card p{font-size:13.3px; color:var(--ink-soft); margin:0;}
+.cheat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:20px;}
+.cheat-item{border-radius:var(--radius-m); padding:16px 10px; text-align:center; font-weight:800; font-size:12.5px; color:#fff; box-shadow:var(--shadow-pop);}
+.table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+table.crit{width:100%; border-collapse:collapse; margin-top:22px; font-size:13.6px; background:var(--surface); border-radius:var(--radius-m); overflow:hidden; box-shadow:var(--shadow);}
+table.crit th{background:var(--accent); color:#fff; text-align:left; padding:11px 14px; font-family:'Unbounded'; font-size:12px; font-weight:600;}
+table.crit td{padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top;}
+table.crit tr:last-child td{border-bottom:none;}
+
+/* SCENE (ObjectRemover) */
+.scene-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:26px; box-shadow:var(--shadow);}
+.scene-svg{width:100%; height:auto; display:block; border-radius:var(--radius-m); background:#CFE8FF;}
+.obj{cursor:pointer; transition:opacity .6s ease, transform .6s ease;}
+.obj .mask{fill:#F2495C; opacity:0; transition:opacity .2s;}
+.obj path.mask{fill:none;}
+.obj.sel .mask{opacity:.55;}
+.obj:hover .mask{opacity:.28;}
+.obj.sel:hover .mask{opacity:.55;}
+.obj.gone{opacity:0; pointer-events:none;}
+.obj text{font-size:46px; text-anchor:middle; dominant-baseline:central;}
+.scene-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:16px;}
+.btn{border:none; cursor:pointer; padding:11px 20px; border-radius:999px; font-weight:800; font-size:13.4px; font-family:'Manrope'; color:#fff; background:var(--accent); box-shadow:var(--shadow-pop);}
+.btn.alt{background:var(--ink-faint);}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+.scene-status{font-size:13.6px; color:var(--ink-soft); font-weight:700; flex:1; min-width:200px;}
+
+/* CHOOSER */
+.chooser{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:26px;}
+@media(max-width:760px){.chooser{grid-template-columns:1fr;}}
+.choose-list{display:grid; gap:9px;}
+.choose-btn{text-align:left; padding:12px 15px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-size:14px; font-weight:700; color:var(--ink); font-family:'Manrope'; box-shadow:var(--shadow-pop);}
+.choose-btn.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink);}
+.choose-out{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); padding:24px; box-shadow:var(--shadow); min-height:200px;}
+.choose-out h4{font-size:16px;}
+.tool-tag{display:inline-block; font-family:'JetBrains Mono'; font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; color:#fff; margin:0 6px 6px 0;}
+
+footer{padding:40px 0 50px; text-align:center;}
+footer p{color:var(--ink-faint); font-size:13px; max-width:54ch; margin:0 auto;}
+footer .heart{color:var(--accent);}
+@media(max-width:640px){
+  .simulator{padding:20px;}
+  table.crit td, table.crit th{padding:9px 10px; font-size:12.5px;}
+}
+
+/* ===== LESSON 10 EXTRAS ===== */
+.photo-frame{background:#fff; padding:10px; border-radius:6px; box-shadow:0 2px 0 rgba(20,22,30,.08), 0 12px 28px rgba(20,22,30,.14);}
+.photo-inner{overflow:hidden; background:#fff; border-radius:2px;}
+.photo-frame.checker .photo-inner{background-color:#fff; background-image:conic-gradient(#D9DBE6 25%, #fff 0 50%, #D9DBE6 0 75%, #fff 0); background-size:20px 20px;}
+.photo-svg{display:block; width:100%; height:auto; transition:filter .55s ease;}
+.photo-cap{margin-top:10px; font-size:12.5px; color:var(--ink-faint); text-align:center; font-weight:700;}
+.lab-btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;}
+.lab-msg{margin-top:14px; background:var(--accent-soft); color:var(--accent-ink); border-radius:var(--radius-s); padding:12px 15px; font-size:13.4px; font-weight:600;}
+.ctrl-label small b{color:var(--accent-ink);}
+.txt-in{width:100%; padding:10px 12px; border-radius:9px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); font-family:'Manrope'; font-size:14px; font-weight:600;}
+.txt-in:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.field-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:14px;}
+.field-grid label{display:block; font-size:11.5px; font-weight:800; color:var(--ink-faint); text-transform:uppercase; margin-bottom:6px;}
+.prob-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; margin-bottom:18px;}
+.prob{display:flex; gap:10px; align-items:center; text-align:left; padding:12px 14px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-family:'Manrope'; font-weight:700; font-size:13.6px; color:var(--ink); box-shadow:var(--shadow-pop); transition:.12s;}
+.prob .pi{font-size:19px;}
+.prob.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink);}
+.pipe{display:grid; gap:10px; margin-top:6px;}
+.pipe-step{display:flex; gap:14px; align-items:flex-start; background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--ps-color,var(--accent)); border-radius:var(--radius-m); padding:14px 16px; box-shadow:var(--shadow);}
+.pipe-num{flex:none; width:34px; height:34px; border-radius:50%; background:var(--ps-color,var(--accent)); color:#fff; font-family:'Unbounded'; font-size:13px; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-pop);}
+.pipe-title{font-weight:800; font-size:14.5px; margin-bottom:4px;}
+.pipe-tip{font-size:13px; color:var(--ink-soft); margin-top:4px;}
+.pipe-note{margin-top:14px; font-size:13px; color:var(--ink-soft);}
+.tool-tag.sm{font-size:11.5px; padding:3px 10px;}
+
+
+/* ===== LESSON 11 EXTRAS ===== */
+.pcard-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; margin-top:18px;}
+.pcard{background:var(--surface); border:1px solid var(--line); border-top:5px solid var(--pc-color,var(--accent)); border-radius:var(--radius-m); padding:16px 18px; box-shadow:var(--shadow);}
+.pcard h4{font-size:14.5px; margin-bottom:8px;}
+.pcard .promptbox{font-size:12.2px; margin-bottom:8px; white-space:pre-wrap;}
+.pcard .pc-note{font-size:12.6px; color:var(--ink-soft); margin-top:6px;}
+.pcard .copy-btn{padding:7px 15px; font-size:12px;}
+.meter{height:12px; border-radius:999px; background:var(--line); overflow:hidden; margin:6px 0 4px;}
+.meter>i{display:block; height:100%; width:0; background:var(--accent); border-radius:999px; transition:width .3s;}
+.meter-lab{font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:12px;}
+.ed-wrap{display:grid; grid-template-columns:1.1fr 1fr; gap:22px; align-items:start;}
+@media(max-width:760px){.ed-wrap{grid-template-columns:1fr;}}
+.ed-btns{display:grid; gap:9px;}
+.ed-btn{text-align:left; padding:11px 14px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--surface); cursor:pointer; font-family:'Manrope'; font-weight:700; font-size:13.4px; color:var(--ink); box-shadow:var(--shadow-pop); transition:.12s;}
+.ed-btn.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink);}
+.ed-btn.bad{border-style:dashed;}
+.ed-svg{display:block; width:100%; height:auto; transition:filter .5s ease;}
+.seg{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+.seg button{padding:9px 16px; border-radius:999px; border:2px solid var(--line); background:var(--surface); font-family:'Manrope'; font-weight:800; font-size:13px; color:var(--ink); cursor:pointer;}
+.seg button.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+.json-det{display:grid; gap:14px; margin-top:16px;}
+.jd-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; box-shadow:var(--shadow);}
+.jd-card .promptbox{margin-bottom:10px; white-space:pre-wrap;}
+.jd-opts{display:grid; gap:8px;}
+.jd-opts button{text-align:left; padding:10px 13px; border-radius:var(--radius-s); border:2px solid var(--line); background:var(--bg); cursor:pointer; font-family:'Manrope'; font-weight:700; font-size:13.4px; color:var(--ink);}
+.jd-opts button.correct{border-color:var(--good); background:var(--good-soft); color:var(--ink);}
+.jd-opts button.wrong{border-color:var(--bad); background:var(--bad-soft); color:var(--ink);}
+.jd-msg{font-size:13px; margin-top:8px; color:var(--ink-soft); display:none;}
+.jd-msg.show{display:block;}
+.syn-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:18px 0;}
+.syn{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; box-shadow:var(--shadow);}
+.syn code{display:inline-block; font-family:'JetBrains Mono'; font-size:15px; font-weight:700; background:var(--accent-soft); color:var(--accent-ink); padding:2px 10px; border-radius:8px; margin-bottom:6px;}
+.syn p{margin:0; font-size:13px; color:var(--ink-soft);}
+.tool-tag.sm{font-size:11.5px; padding:3px 10px;}
+
+
+.simulator.ed{display:block;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .block{--accent-soft:color-mix(in srgb,var(--accent) 20%,var(--surface));}
+}
+:root[data-theme="dark"] .block{--accent-soft:color-mix(in srgb,var(--accent) 20%,var(--surface));}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">🎨 Цифрова лабораторія AI</div>
+    <div class="navlinks" id="navlinks">
+      <a href="#bezpeka">Безпека</a>
+      <a href="#gpt">Промпт ChatGPT</a>
+      <a href="#gemini">Промпт Gemini</a>
+      <a href="#json">JSON-стиль</a>
+      <a href="#editgpt">Правки ChatGPT</a>
+      <a href="#editgem">Правки Gemini</a>
+      <a href="#lab">Тренажер правок</a>
+      <a href="#choose">Що обрати?</a>
+      <a href="#zavdannya">Завдання</a>
+      <a href="#quiz">Перевір себе</a>
+      <a href="#vdoma">Подумати вдома</a>
+      <a href="#komiks">Персонажі</a>
+      <a href="#dovidnyk">Довідник</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-net" viewBox="0 0 300 260" fill="none" aria-hidden="true">
+    <g stroke="#8B5CF6" stroke-width="1.4" opacity=".55">
+      <line x1="30" y1="40" x2="120" y2="90"/><line x1="120" y1="90" x2="220" y2="50"/>
+      <line x1="120" y1="90" x2="90" y2="180"/><line x1="120" y1="90" x2="210" y2="160"/>
+      <line x1="210" y1="160" x2="260" y2="220"/><line x1="90" y1="180" x2="40" y2="230"/>
+    </g>
+    <circle cx="30" cy="40" r="6" fill="#FF7A2F"/><circle cx="220" cy="50" r="5" fill="#EC4899"/><circle cx="260" cy="220" r="6" fill="#22B573"/>
+    <circle cx="120" cy="90" r="8" fill="#1E88E5"/><circle cx="90" cy="180" r="6" fill="#FFB020"/><circle cx="210" cy="160" r="7" fill="#12B3A0"/><circle cx="40" cy="230" r="5" fill="#8B5CF6"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-eyebrow"><span class="dot"></span>Курс «Цифрова лабораторія AI» · Урок 11</div>
+    <h1>Генерація та обробка зображень у ChatGPT і Gemini</h1>
+    <p class="lede">Сьогодні ти станеш режисером зображень: навчишся писати промпти для двох найвідоміших ШІ-помічників, складати «JSON-рецепт стилю», який можна переносити на нові картинки, і правильно просити про правки. А ще вигадаєш трьох персонажів для майбутнього коміксу!</p>
+    <div class="chiplist">
+      <div class="chip" style="--chip-color:#12B3A0;"><span class="chip-ico">💬</span> ChatGPT</div>
+      <div class="chip" style="--chip-color:#1E88E5;"><span class="chip-ico">✨</span> Gemini</div>
+      <div class="chip" style="--chip-color:#8B5CF6;"><span class="chip-ico">{ }</span> JSON-стиль</div>
+      <div class="chip" style="--chip-color:#FF7A2F;"><span class="chip-ico">🪄</span> Правки промптом</div>
+      <div class="chip" style="--chip-color:#EC4899;"><span class="chip-ico">🦸</span> Три персонажі</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= BEZPEKA ================= -->
+<section class="block c-red" id="bezpeka">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🛡️</span><span class="label">СПОЧАТКУ БЕЗПЕКА</span></div>
+    <h2>Правила безпеки: розмова з ШІ — це не секретний щоденник</h2>
+    <p class="intro">ChatGPT і Gemini — це чат-помічники для дорослих і підлітків, а не іграшки. Усе, що ти пишеш і завантажуєш, потрапляє на сервери компаній. Прочитай шість правил і клікай на кожне, коли зрозумієш.</p>
+
+    <div class="callout bad">👨‍👩‍👧 <b>Вікові правила — головне.</b> За відомими умовами OpenAI, ChatGPT призначений для користувачів від 13 років, а до 18 потрібен дозвіл батьків (сторінку з умовами відкрити не вдалося — перевір її разом із дорослим). Google дозволяє дітям до 13 років користуватися Gemini лише через батьківський акаунт Family Link. Для користувачів до 18 років Google обмежує редагування завантажених зображень. Тому на уроці ми працюємо на <b>акаунті дорослого</b>, а діти — у парах, як «режисери».</div>
+
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="safeBar"></div></div>
+      <div id="safeList"></div>
+      <div class="cl-status" id="safeStatus">Прочитай усі правила — і отримаєш значок «Безпечний творець» 🏅</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GPT PROMPT ================= -->
+<section class="block c-teal" id="gpt">
+  <div class="wrap">
+    <div class="kicker"><span class="num">💬</span><span class="label">ПРОМПТ · CHATGPT</span></div>
+    <h2>ChatGPT: малюємо розмовою</h2>
+    <div class="platform-head">
+      <div class="platform-logo" style="background:#12B3A0;">💬</div>
+      <div><b>ChatGPT</b> — чат-помічник від компанії OpenAI. Він уміє не лише писати тексти, а й створювати зображення за описом. Головна ідея: ти <b>розмовляєш</b>, а не вводиш «магічні заклинання».<br><a class="platform-link" href="https://chatgpt.com/" target="_blank" rel="noopener">chatgpt.com</a></div>
+    </div>
+    <h3 style="font-size:18px; margin-top:26px;">🔑 Особливості промпту для ChatGPT</h3>
+    <div class="whale-grid" id="gptFeat"></div>
+    <div class="callout warn">📊 <b>Безкоштовний план:</b> за оглядами сторонніх сайтів, безкоштовні користувачі мають лише кілька зображень на добу, а ліміти змінюються. Тому спершу складай промпт у конструкторі, а потім відправляй його в чат.</div>
+
+    <h3 style="font-size:18px; margin-top:30px;">🛠️ Конструктор промпту для ChatGPT</h3>
+    <p class="intro">Заповни поля — промпт складеться в стилі ChatGPT. Чим більше полів заповнено, тим вища «шкала готовності».</p>
+    <div class="builder" id="bGpt"></div>
+  </div>
+</section>
+
+<!-- ================= GEMINI PROMPT ================= -->
+<section class="block c-blue" id="gemini">
+  <div class="wrap">
+    <div class="kicker"><span class="num">✨</span><span class="label">ПРОМПТ · GEMINI</span></div>
+    <h2>Gemini: малюємо описом-історією</h2>
+    <div class="platform-head">
+      <div class="platform-logo" style="background:#1E88E5;">✨</div>
+      <div><b>Gemini</b> — ШІ-помічник від Google. Створення зображень у ньому працює на моделі Nano Banana. Gemini особливо любить <b>повний опис сцени</b>, ніби ти розповідаєш про картину.<br><a class="platform-link" href="https://gemini.google.com/" target="_blank" rel="noopener">gemini.google.com</a></div>
+    </div>
+    <h3 style="font-size:18px; margin-top:26px;">🔑 Особливості промпту для Gemini</h3>
+    <div class="whale-grid" id="gemFeat"></div>
+    <div class="callout">🆓 <b>Безкоштовно й ліміти:</b> за повідомленнями преси, безкоштовні користувачі мають обмежені квоти на кращу модель, а потім отримують початкову версію. Точних цифр немає, тому перевіряй актуальні умови на сайті. Google також застерігає, що фільтри не ідеальні.</div>
+
+    <h3 style="font-size:18px; margin-top:30px;">🛠️ Конструктор промпту для Gemini</h3>
+    <p class="intro">Ті самі поля, але результат — це розповідь-опис. Порівняй його з промптом для ChatGPT.</p>
+    <div class="builder" id="bGem"></div>
+
+    <h3 style="font-size:18px; margin-top:34px;">⚖️ ChatGPT і Gemini: чим відрізняються промпти</h3>
+    <div class="table-scroll"><table class="crit">
+      <tr><th></th><th>ChatGPT</th><th>Gemini</th></tr>
+      <tr><td>Стиль запиту</td><td>Коротка команда + список деталей, далі уточнення в розмові</td><td>Опис-абзац: сцена, світло, настрій, ракурс</td></tr>
+      <tr><td>Напис на картинці</td><td>У лапках, коротко; обов'язково перевір літери</td><td>У лапках, коротко; обов'язково перевір літери</td></tr>
+      <tr><td>Чого не хочеш</td><td>Окремо: «Без: …» (негативного поля немає)</td><td>Окремо: «Не додавай …»</td></tr>
+      <tr><td>Уточнення</td><td>Наступними повідомленнями: «зміни лише …»</td><td>Наступними повідомленнями: «зміни лише …»</td></tr>
+    </table></div>
+    <p style="font-size:12.5px; color:var(--ink-faint); margin-top:12px;">Це загальні поради, а не жорсткі правила: обидва помічники розуміють звичайну мову. Найкращий спосіб — спробувати той самий задум в обох і порівняти.</p>
+  </div>
+</section>
+
+<!-- ================= JSON ================= -->
+<section class="block c-purple" id="json">
+  <div class="wrap">
+    <div class="kicker"><span class="num">{ }</span><span class="label">JSON-КОД ЗОБРАЖЕННЯ</span></div>
+    <h2>JSON-рецепт стилю: опиши картинку один раз — використовуй багато разів</h2>
+    <p class="intro"><b>JSON</b> — це охайний спосіб записати інформацію як «ключ: значення». Якщо попросити ШІ описати зображення у вигляді JSON, ми отримаємо <b>рецепт стилю</b>: кольори, світло, настрій, композицію. Потім цей рецепт можна вставити в новий промпт, щоб інші картинки мали такий самий вигляд.</p>
+
+    <h3 style="font-size:18px; margin-top:26px;">📖 П'ять правил JSON</h3>
+    <div class="syn-grid">
+      <div class="syn"><code>{ }</code><p>Фігурні дужки охоплюють увесь запис. Відкрив — закрий.</p></div>
+      <div class="syn"><code>"ключ"</code><p>Назви (ключі) пишуть у подвійних лапках: "style".</p></div>
+      <div class="syn"><code>:</code><p>Двокрапка зв'язує ключ із його значенням: "mood": "веселий".</p></div>
+      <div class="syn"><code>,</code><p>Кома розділяє пари. Після останньої пари коми немає.</p></div>
+      <div class="syn"><code>[ ]</code><p>Квадратні дужки містять список: ["синій", "жовтий", "білий"].</p></div>
+    </div>
+
+    <h3 style="font-size:18px; margin-top:30px;">🕵️ JSON-детектив: знайди помилку</h3>
+    <div class="json-det" id="jsonDet"></div>
+
+    <h3 style="font-size:18px; margin-top:34px;">🧪 Конструктор JSON-стилю</h3>
+    <p class="intro">Склади рецепт, а потім перенеси його на новий предмет. Скопіюй результат і встав його в ChatGPT чи Gemini.</p>
+    <div class="builder" id="bJson"></div>
+
+    <h3 style="font-size:18px; margin-top:34px;">📷 Як отримати JSON зі своєї картинки</h3>
+    <div class="rule-grid" id="jsonSteps"></div>
+    <div class="callout warn">⚠️ JSON — це підказка, а не чарівна кнопка. ШІ може трохи відхилитися від рецепта, тому порівнюй результат із першою картинкою й за потреби дописуй: «збережи стиль точніше».</div>
+  </div>
+</section>
+
+<!-- ================= EDIT GPT ================= -->
+<section class="block c-orange" id="editgpt">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🪄</span><span class="label">ОБРОБКА · CHATGPT</span></div>
+    <h2>ChatGPT: способи обробки зображення й промпти</h2>
+    <p class="intro">Зображення можна змінювати словами: розмову з ШІ про картинку. Натисни на кульку, щоб побачити спосіб і готовий промпт. Для завантаження фото користуйся лише навчальними картинками, предметами й малюнками (без облич людей).</p>
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 560" aria-label="Способи обробки зображення в ChatGPT">
+        <g id="mmLinesG"></g>
+        <g class="mm-node mm-hub" transform="translate(400,280)"><circle r="58"/><text text-anchor="middle" dy="-4">ПРАВКИ</text><text text-anchor="middle" dy="14">CHATGPT</text></g>
+        <g id="mmNodesG"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetailG"></div>
+    <h3 style="font-size:18px; margin-top:30px;">📋 Готові промпти (клікни «Скопіювати»)</h3>
+    <div class="pcard-grid" id="gptPrompts"></div>
+  </div>
+</section>
+
+<!-- ================= EDIT GEMINI ================= -->
+<section class="block c-pink" id="editgem">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🪄</span><span class="label">ОБРОБКА · GEMINI</span></div>
+    <h2>Gemini: способи обробки зображення й промпти</h2>
+    <div class="callout bad">🔞 <b>Важливо про вік:</b> у повідомленні Google про навчальні акаунти сказано, що користувачі до 18 років можуть уточнювати <b>створені</b> зображення, але не можуть редагувати власні завантажені. За повідомленнями преси, редагування в звичайному Gemini теж доступне з 18 років. Тому завантажує й редагує <b>дорослий</b>, а ти — режисер, який придумує промпт.</div>
+    <div class="mindmap-wrap">
+      <svg class="mindmap-svg" viewBox="0 0 800 560" aria-label="Способи обробки зображення в Gemini">
+        <g id="mmLinesM"></g>
+        <g class="mm-node mm-hub" transform="translate(400,280)"><circle r="58"/><text text-anchor="middle" dy="-4">ПРАВКИ</text><text text-anchor="middle" dy="14">GEMINI</text></g>
+        <g id="mmNodesM"></g>
+      </svg>
+    </div>
+    <div class="rule-detail" id="ruleDetailM"></div>
+    <h3 style="font-size:18px; margin-top:30px;">📋 Готові промпти (клікни «Скопіювати»)</h3>
+    <div class="pcard-grid" id="gemPrompts"></div>
+  </div>
+</section>
+
+<!-- ================= LAB ================= -->
+<section class="block c-blue" id="lab">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧪</span><span class="label">ТРЕНАЖЕР</span></div>
+    <h2>Тренажер правок: скажи, що змінити — і що залишити</h2>
+    <p class="intro">Це навчальна модель, а не справжній ШІ. Обери промпт — і побачиш, як змінюється картинка. Потім натисни «Зроби гарніше» й порівняй: нечіткий промпт змінює все підряд.</p>
+    <div class="simulator ed">
+      <div class="ed-wrap">
+        <div>
+          <div class="photo-frame"><div class="photo-inner">
+            <svg class="ed-svg" id="edSvg" viewBox="0 0 400 260" role="img" aria-label="Мультяшний робот у парку">
+              <rect id="edSky" x="0" y="0" width="400" height="170" fill="#9AD7FF"/>
+              <g id="edSun"><circle cx="330" cy="50" r="24" fill="#FFD84D"/></g>
+              <g id="edStars" opacity="0"><circle cx="60" cy="40" r="2.5" fill="#fff"/><circle cx="130" cy="70" r="2" fill="#fff"/><circle cx="210" cy="30" r="2.5" fill="#fff"/><circle cx="280" cy="80" r="2" fill="#fff"/><circle cx="360" cy="30" r="2.5" fill="#fff"/></g>
+              <g id="edCloud" fill="#fff"><ellipse cx="90" cy="55" rx="38" ry="14"/><ellipse cx="115" cy="45" rx="26" ry="14"/></g>
+              <rect x="0" y="170" width="400" height="90" fill="#6CCB6C"/>
+              <g id="edTree"><rect x="318" y="115" width="14" height="70" fill="#8A5A2B"/><circle cx="325" cy="100" r="36" fill="#2E9E4F"/></g>
+              <g id="edRobotG">
+                <rect id="edRobot" x="160" y="115" width="80" height="75" rx="12" fill="#3B82F6"/>
+                <rect x="172" y="75" width="56" height="42" rx="10" fill="#9DB4D8"/>
+                <circle cx="188" cy="95" r="7" fill="#fff"/><circle cx="212" cy="95" r="7" fill="#fff"/>
+                <circle cx="188" cy="95" r="3" fill="#20222E"/><circle cx="212" cy="95" r="3" fill="#20222E"/>
+                <rect x="196" y="58" width="8" height="17" fill="#555A6E"/><circle cx="200" cy="55" r="6" fill="#F2495C"/>
+                <rect x="132" y="125" width="28" height="12" rx="6" fill="#9DB4D8"/><rect x="240" y="125" width="28" height="12" rx="6" fill="#9DB4D8"/>
+                <rect x="172" y="190" width="18" height="28" rx="5" fill="#555A6E"/><rect x="210" y="190" width="18" height="28" rx="5" fill="#555A6E"/>
+                <g id="edHat" opacity="0"><rect x="176" y="62" width="48" height="8" rx="3" fill="#FFC21A"/><rect x="186" y="40" width="28" height="24" rx="4" fill="#FFC21A"/></g>
+              </g>
+            </svg>
+          </div></div>
+          <div class="photo-cap" id="edCap">Оригінал: синій робот у парку</div>
+          <div class="meter-lab" style="margin-top:12px;">Застосовано правок: <b id="edCount">0</b></div>
+        </div>
+        <div>
+          <div class="ed-btns" id="edBtns"></div>
+          <div class="lab-btns"><button class="copy-btn" id="edReset" style="background:var(--ink-soft);">↺ Повернути оригінал</button></div>
+        </div>
+      </div>
+      <div class="promptbox" id="edPrompt" style="margin-top:16px;"><span class="lab">Промпт</span>Обери правку зі списку.</div>
+      <div class="lab-msg" id="edMsg">Секрет гарної правки: <b>що змінити</b> + <b>що залишити без змін</b>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHOOSE ================= -->
+<section class="block c-teal" id="choose">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🧭</span><span class="label">ЩО ОБРАТИ?</span></div>
+    <h2>ChatGPT чи Gemini: хто допоможе з твоїм завданням</h2>
+    <p class="intro">Жоден помічник не «найкращий» в усьому. Обери завдання — і дізнаєшся, з чого почати. А ще краще — спробуй в обох.</p>
+    <div class="chooser">
+      <div class="choose-list" id="chooseList"></div>
+      <div class="choose-out" id="chooseOut"><p style="color:var(--ink-faint);">👈 Обери завдання зі списку</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZAVDANNYA ================= -->
+<section class="block c-yellow" id="zavdannya">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🎨</span><span class="label">ПРАКТИКА</span></div>
+    <h2>Три творчі завдання</h2>
+    <p class="intro">Працюйте в парах на акаунті дорослого. У промптах ніколи не вживайте справжніх імен, адрес, назв школи й не завантажуйте фото людей. Для редагування бери предмети, іграшки й власні малюнки. Зберігай усі результати поруч із промптами.</p>
+    <div class="rule-grid" id="taskSteps"></div>
+    <div class="callout warn">📌 Підпиши кожну роботу: «створено/оброблено ШІ (ChatGPT чи Gemini)». Принеси результати на наступний урок.</div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="block c-purple" id="quiz">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🏆</span><span class="label">ПЕРЕВІР СЕБЕ</span></div>
+    <h2>Контрольні питання</h2>
+    <p class="intro">Вісім запитань за матеріалом уроку. Обери відповідь — і одразу дізнаєшся, чи правильно.</p>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VDOMA ================= -->
+<section class="block c-teal" id="vdoma">
+  <div class="wrap">
+    <div class="kicker"><span class="num">💭</span><span class="label">ПОДУМАТИ ВДОМА</span></div>
+    <h2>Творчі питання для роздумів</h2>
+    <p class="intro">Ці питання не мають єдиної правильної відповіді. Подумай над ними сам(а) або обговори з родиною — а на наступному уроці поділишся думками.</p>
+    <div class="think-grid" id="thinkGrid"></div>
+  </div>
+</section>
+
+<!-- ================= KOMIKS ================= -->
+<section class="block c-orange" id="komiks">
+  <div class="wrap">
+    <div class="kicker"><span class="num">🦸</span><span class="label">ДОМАШНЄ ЗАВДАННЯ</span></div>
+    <h2>Три персонажі для твого коміксу</h2>
+    <p class="intro">На наступному уроці ми створюватимемо комікси. Щоб історія вийшла, потрібна команда героїв. Твоє завдання — придумати <b>трьох власних персонажів</b>, скласти для кожного «паспорт» і за допомогою дорослого згенерувати їхні портрети в ChatGPT або Gemini.</p>
+
+    <div class="callout pink">⚠️ <b>Золоті правила:</b> 1) персонажі — <b>тільки вигадані</b>, не схожі на відомих героїв кіно, мультфільмів і ігор; 2) не роби персонажа з реальної людини (себе, однокласника, вчителя) і не завантажуй фото людей; 3) не вводь у промптах справжні імена й адреси; 4) підписуй роботи «створено ШІ».</div>
+
+    <h3 style="margin-top:30px; font-size:18px;">📋 П'ять кроків завдання</h3>
+    <div class="rule-grid" id="komSteps"></div>
+
+    <h3 style="margin-top:34px; font-size:18px;">🧬 Паспорт персонажа та JSON-картка</h3>
+    <p class="intro">Обери персонажа й заповни поля. Нижче одразу побудуються JSON-картка й готовий промпт для аркуша персонажа.</p>
+    <div class="builder">
+      <div class="seg" id="charTabs"></div>
+      <div class="field-grid" id="charFields"></div>
+      <div class="meter"><i id="charMeter"></i></div>
+      <div class="meter-lab" id="charMeterLab"></div>
+      <div class="promptbox" id="charJson"></div>
+      <div class="promptbox" id="charPrompt" style="margin-top:12px;"></div>
+      <button class="copy-btn" id="charCopyJson">📋 Скопіювати JSON</button>
+      <button class="copy-btn" id="charCopyPrompt" style="background:var(--teal);">📋 Скопіювати промпт аркуша</button><span class="copy-msg" id="charMsg">Скопійовано!</span>
+    </div>
+
+    <h3 style="margin-top:34px; font-size:18px;">✅ Чек-лист виконання</h3>
+    <div class="checklist">
+      <div class="cl-progress"><div class="cl-progress-bar" id="komBar"></div></div>
+      <div id="komList"></div>
+      <div class="cl-status" id="komStatus">Рівень: Новачок 🌱</div>
+    </div>
+    <div class="callout warn" style="margin-top:22px;">📌 Принеси на наступний урок: три паспорти персонажів (JSON-картки), три згенеровані портрети та одне речення про те, у якій пригоді вони зустрінуться.</div>
+  </div>
+</section>
+
+<!-- ================= DOVIDNYK ================= -->
+<section class="block c-pink" id="dovidnyk">
+  <div class="wrap">
+    <div class="kicker"><span class="num">📚</span><span class="label">ДОВІДНИК</span></div>
+    <h2>Довідкові матеріали</h2>
+    <h3 style="font-size:18px;">Глосарій</h3>
+    <div class="gloss-grid" id="glossGrid"></div>
+    <h3 style="margin-top:36px; font-size:18px;">Шпаргалка: хороший промпт для зображення</h3>
+    <div class="cheat-grid" id="cheatGrid"></div>
+    <h3 style="margin-top:36px; font-size:18px;">ChatGPT і Gemini — коротко</h3>
+    <div class="table-scroll"><table class="crit">
+      <tr><th>Помічник</th><th>Вік і вхід</th><th>Зображення</th><th>Безкоштовно</th></tr>
+      <tr><td>ChatGPT</td><td>За відомими умовами OpenAI: 13+, до 18 — з дозволу батьків; вхід через акаунт</td><td>Створення за описом, уточнення в розмові, робота із завантаженими картинками</td><td>Обмежена кількість зображень на добу (за оглядами); умови змінюються</td></tr>
+      <tr><td>Gemini</td><td>Діти до 13 — лише через Family Link; створення зображень з 13+; редагування завантажених фото — з 18 (за повідомленнями)</td><td>Модель Nano Banana: створення й уточнення в розмові</td><td>Обмежені квоти на кращу модель; точних цифр немає</td></tr>
+    </table></div>
+    <p style="font-size:12.5px; color:var(--ink-faint); margin-top:12px;">Умови й ліміти змінюються. Актуальні дані дивись на chatgpt.com та gemini.google.com разом із дорослим.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Курс «Цифрова лабораторія AI» · STEAM-HUB · Урок 11 <span class="heart">🎨</span><br>ШІ малює те, що ти опишеш. Тож описуй чітко, чесно й безпечно.</p>
+</footer>
+
+<script>
+/* ---------- NAV ---------- */
+const sectionIds = ["bezpeka","gpt","gemini","json","editgpt","editgem","lab","choose","zavdannya","quiz","vdoma","komiks","dovidnyk"];
+const sections = sectionIds.map(id=>document.getElementById(id));
+const navA = document.querySelectorAll(".navlinks a");
+function onScroll(){
+  let cur = sections[0].id;
+  for(const s of sections){ if(window.scrollY + 100 >= s.offsetTop) cur = s.id; }
+  navA.forEach(a=>{
+    const on = a.getAttribute("href")==="#"+cur;
+    a.classList.toggle("active", on);
+    if(on){ const box=a.parentElement.parentElement; const r=a.getBoundingClientRect(), b=box.getBoundingClientRect(); if(r.left<b.left||r.right>b.right){ box.scrollTo({left: box.scrollLeft + (r.left-b.left) - 20, behavior:"smooth"}); } }
+  });
+}
+window.addEventListener("scroll", onScroll); onScroll();
+
+const rainbow = ["#1E88E5","#FF7A2F","#8B5CF6","#12B3A0","#EC4899","#22B573","#FFB020","#F2495C"];
+
+/* ---------- MINDMAP ---------- */
+function buildMindmap(items, linesId, nodesId, detailId){
+  const mmLines = document.getElementById(linesId);
+  const mmNodes = document.getElementById(nodesId);
+  const cx=400, cy=280, R=210, n = items.length;
+  items.forEach((r,i)=>{
+    const angle = (-90 + i*(360/n)) * Math.PI/180;
+    const x = cx + R*Math.cos(angle), y = cy + R*Math.sin(angle);
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",cx); line.setAttribute("y1",cy); line.setAttribute("x2",x); line.setAttribute("y2",y);
+    line.setAttribute("class","mm-line"); mmLines.appendChild(line);
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","mm-node"); g.setAttribute("transform",`translate(${x},${y})`); g.dataset.idx=i;
+    g.setAttribute("tabindex","0"); g.setAttribute("role","button"); g.setAttribute("aria-label", r.title);
+    g.style.setProperty("--mm-color", rainbow[i%rainbow.length]);
+    const shortTitle = r.title.length>14? r.title.slice(0,13)+"…": r.title;
+    g.innerHTML = `<circle r="46"/><text class="mm-icon" text-anchor="middle" dy="-14">${r.icon}</text><text text-anchor="middle" dy="10">${shortTitle}</text>`;
+    const pick = ()=>selectMindNode(items, i, nodesId, detailId, true);
+    g.addEventListener("click", pick);
+    g.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); }});
+    mmNodes.appendChild(g);
+  });
+}
+function selectMindNode(items, i, nodesId, detailId, scroll){
+  document.querySelectorAll(`#${nodesId} .mm-node`).forEach(n=>n.classList.remove("active"));
+  const g = document.querySelector(`#${nodesId} [data-idx="${i}"]`); if(g) g.classList.add("active");
+  const r = items[i];
+  const rd = document.getElementById(detailId);
+  rd.style.setProperty("--rd-color", rainbow[i%rainbow.length]);
+  rd.innerHTML = `
+    <div class="rule-detail-head"><div class="rd-badge">${r.icon}</div><div class="rd-title">${r.title}</div></div>
+    <div class="rd-body">${r.body}</div>
+    ${r.example? `<div class="rd-example">💡 ${r.example}</div>` : ""}`;
+  if(scroll) rd.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+/* ---------- ACCORDION ---------- */
+function buildStepAccordion(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((s,i)=>{
+    const card = document.createElement("div"); card.className="rule-card wide";
+    card.style.setProperty("--rc-color", rainbow[i%rainbow.length]);
+    card.innerHTML = `<button class="rc-head" aria-expanded="false"><span class="rc-num">${s.icon}</span><span class="rc-title">${s.title}</span><span class="rc-arrow">▾</span></button>
+    <div class="rc-body"><div class="rc-body-in">${s.body}</div></div>`;
+    const btn = card.querySelector(".rc-head");
+    btn.addEventListener("click", ()=>{ const o = card.classList.toggle("open"); btn.setAttribute("aria-expanded", o); });
+    grid.appendChild(card);
+  });
+}
+function buildWhaleGrid(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((it,i)=>{
+    const c = document.createElement("div"); c.className="whale";
+    c.innerHTML = `<div class="whale-ico" style="background:${rainbow[i%rainbow.length]};">${it.icon}</div><h4>${it.title}</h4><p>${it.body}</p>`;
+    grid.appendChild(c);
+  });
+}
+/* ---------- SAFETY CHECKLIST ---------- */
+function buildChecklist(items, listId, barId, statusId, statusFn){
+  const list = document.getElementById(listId), bar = document.getElementById(barId), status = document.getElementById(statusId);
+  function upd(){
+    const total = list.children.length, n = list.querySelectorAll(".cl-item.checked").length;
+    bar.style.width = (n/total*100)+"%";
+    status.textContent = statusFn(n, total);
+  }
+  items.forEach(label=>{
+    const row = document.createElement("div"); row.className="cl-item"; row.tabIndex=0; row.setAttribute("role","checkbox"); row.setAttribute("aria-checked","false");
+    row.innerHTML = `<div class="cl-box">✓</div><span class="cl-label">${label}</span>`;
+    const t = ()=>{ const on = row.classList.toggle("checked"); row.setAttribute("aria-checked", on); upd(); };
+    row.addEventListener("click", t);
+    row.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); t(); }});
+    list.appendChild(row);
+  });
+  upd();
+}
+
+
+const TC = {G:"#12B3A0", M:"#1E88E5"};
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+async function copyText(t, msgEl){
+  try{ await navigator.clipboard.writeText(t); }catch(e){}
+  if(msgEl){ msgEl.classList.add("show"); setTimeout(()=>msgEl.classList.remove("show"), 2000); }
+}
+
+/* ---------- SAFETY ---------- */
+buildChecklist([
+  "Акаунти ChatGPT і Gemini створює й тримає відкритими <b>дорослий</b>. Вікові правила сервісів ми перевіряємо разом із ним, а діти працюють у парах.",
+  "Я не вводжу в промпти <b>особисті дані</b>: справжнє прізвище, адресу, телефон, назву школи, паролі.",
+  "Я не завантажую <b>фото людей</b> (себе, друзів, родичів) і не прошу «змінити обличчя». Для правок беру іграшки, предмети й власні малюнки.",
+  "Я вигадую <b>власних</b> персонажів і не прошу малювати відомих героїв чи справжніх людей.",
+  "Я підписую роботи: <b>«створено ШІ»</b>. ШІ може помилятися, тому перевіряю літери, деталі й факти.",
+  "Якщо результат дивний, лякає чи недоречний — <b>закриваю його</b> й кажу дорослому. Фільтри безпеки не обходжу.",
+], "safeList","safeBar","safeStatus", (n,t)=> n===t? "🏅 Значок «Безпечний творець» отримано! Можна починати." : `Прочитано правил: ${n} з ${t}`);
+
+/* ---------- FEATURES ---------- */
+buildWhaleGrid([
+  {icon:"💬", title:"Розмова замість заклинання", body:"Не обов'язково писати ідеальний промпт одразу. Створи зображення, а потім уточнюй: «зроби світліше», «додай місяць»."},
+  {icon:"📋", title:"Список деталей", body:"Запит у вигляді «що + де + стиль + світло + кольори» легко читати й змінювати по одному пункту."},
+  {icon:"🔤", title:"Напис у лапках", body:"Текст бери в подвійні лапки й роби коротким. Літери зазвичай виходять добре, але помилки трапляються — завжди перевіряй."},
+  {icon:"🚫", title:"Окремо «Без…»", body:"Окремого негативного поля немає. Просто додай речення: «Без: розмитості, зайвих предметів, водяних знаків»."},
+  {icon:"🔁", title:"Одна правка за раз", body:"У наступних повідомленнях проси лише одну зміну й пиши, що залишити. Так ШІ не «ламає» решту картинки."},
+  {icon:"🧩", title:"Чат пам'ятає розмову", body:"Можна сказати: «Зроби такого самого героя, але в лісі». Повторити персонажа точно вдається не завжди, тому перевіряй."},
+], "gptFeat");
+buildWhaleGrid([
+  {icon:"📖", title:"Опис-історія", body:"Пиши повними реченнями, ніби розповідаєш про картину: хто на ній, де він, що відбувається навколо."},
+  {icon:"💡", title:"Світло й ракурс", body:"Gemini добре реагує на описи світла та камери: «м'яке вечірнє світло», «вид знизу», «крупний план»."},
+  {icon:"🔄", title:"Уточнення розмовою", body:"Після першої картинки пиши, що змінити. Усе інше Gemini намагається зберегти."},
+  {icon:"🖼️", title:"Кілька варіантів", body:"Можна попросити кілька варіантів одного задуму й вибрати найкращий — або об'єднати їхні кращі риси."},
+  {icon:"🔤", title:"Напис у лапках", body:"Як і в ChatGPT: короткий текст у подвійних лапках. Літери перевіряй уважно."},
+  {icon:"🛡️", title:"Фільтри безпеки", body:"На деякі запити Gemini відмовляє. Це нормально — не намагайся «обійти» фільтр, а зміни задум."},
+], "gemFeat");
+
+/* ---------- PROMPT BUILDERS ---------- */
+const OPT = {
+  style:["мультфільм у 3D","акварельний малюнок","комікс із чіткими контурами","олівцевий малюнок","піксель-арт","паперова аплікація"],
+  light:["м'яке денне світло","тепле світло заходу сонця","нічне світло ліхтарів","яскраве сонячне світло","казкове сяйво"],
+  colors:["яскраві й веселі кольори","пастельні кольори","синьо-жовта гама","теплі помаранчеві тони","холодні сині тони"],
+  mood:["радісний","загадковий","спокійний","пригодницький","смішний"],
+  ratio:["1:1 (квадрат)","16:9 (широкий)","9:16 (вертикальний)","4:3"]
+};
+function selHtml(id, label, list, first){
+  return `<div class="builder-field"><label for="${id}">${label}</label><select id="${id}">${first? `<option value="">— не обирати —</option>`:""}${list.map(o=>`<option value="${o}">${o}</option>`).join("")}</select></div>`;
+}
+function makeBuilder(rootId, mode){
+  const root = document.getElementById(rootId), p = rootId+"_";
+  root.innerHTML = `
+    <div class="builder-grid">
+      <div class="builder-field"><label for="${p}subj">Що намалювати *</label><input class="txt-in" id="${p}subj" type="text" placeholder="Наприклад: дракончик-кухар"></div>
+      <div class="builder-field"><label for="${p}place">Де відбувається</label><input class="txt-in" id="${p}place" type="text" placeholder="Наприклад: на кухні в замку"></div>
+      ${selHtml(p+"style","Стиль",OPT.style,true)}
+      ${selHtml(p+"light","Світло",OPT.light,true)}
+      ${selHtml(p+"colors","Кольори",OPT.colors,true)}
+      ${selHtml(p+"mood","Настрій",OPT.mood,true)}
+      ${selHtml(p+"ratio","Формат кадру",OPT.ratio,true)}
+      <div class="builder-field"><label for="${p}text">Напис (коротко)</label><input class="txt-in" id="${p}text" type="text" placeholder="Наприклад: Кухня дракона"></div>
+      <div class="builder-field"><label for="${p}avoid">Чого не хочу бачити</label><input class="txt-in" id="${p}avoid" type="text" placeholder="Наприклад: розмитість, зайві предмети"></div>
+    </div>
+    <div class="meter"><i id="${p}meter"></i></div>
+    <div class="meter-lab" id="${p}lab"></div>
+    <div class="promptbox" id="${p}out"></div>
+    <button class="copy-btn" id="${p}copy">📋 Скопіювати промпт</button><span class="copy-msg" id="${p}msg">Скопійовано!</span>`;
+  const g = id=>document.getElementById(p+id);
+  const ids = ["subj","place","style","light","colors","mood","ratio","text","avoid"];
+  function text(){
+    const v = {}; ids.forEach(i=>v[i]=g(i).value.trim());
+    const subj = v.subj || "[що намалювати]";
+    if(mode==="gpt"){
+      let t = `Створи зображення: ${subj}${v.place? ", "+v.place : ""}.`;
+      if(v.style) t += `\n- Стиль: ${v.style}`;
+      if(v.light) t += `\n- Світло: ${v.light}`;
+      if(v.colors) t += `\n- Кольори: ${v.colors}`;
+      if(v.mood) t += `\n- Настрій: ${v.mood}`;
+      if(v.ratio) t += `\n- Формат: ${v.ratio}`;
+      if(v.text) t += `\n- Напис на зображенні: «${v.text}» (без помилок у літерах)`;
+      if(v.avoid) t += `\n- Без: ${v.avoid}`;
+      return t;
+    }
+    let t = `Намалюй ${v.style? v.style : "зображення"}, на якому ${subj}${v.place? " "+v.place : ""}.`;
+    if(v.light) t += ` Світло: ${v.light}.`;
+    if(v.colors) t += ` Кольорова гама: ${v.colors}.`;
+    if(v.mood) t += ` Настрій сцени — ${v.mood}.`;
+    if(v.ratio) t += ` Формат кадру: ${v.ratio}.`;
+    if(v.text) t += ` На картинці є напис «${v.text}»; літери мають бути правильні.`;
+    if(v.avoid) t += ` Не додавай: ${v.avoid}.`;
+    return t;
+  }
+  function upd(){
+    const n = ["subj","place","style","light","colors","mood","ratio"].filter(i=>g(i).value.trim()).length;
+    g("meter").style.width = (n/7*100)+"%";
+    g("lab").textContent = `Готовність промпту: ${n} з 7 — ` + (n<3? "занадто коротко, ШІ багато вгадуватиме" : n<6? "добре, додай ще кілька деталей" : "чудовий промпт!");
+    g("out").innerHTML = `<span class="lab">${mode==="gpt"? "Промпт для ChatGPT" : "Промпт для Gemini"}</span>`;
+    g("out").appendChild(document.createTextNode(text()));
+  }
+  ids.forEach(i=>{ g(i).addEventListener("input", upd); g(i).addEventListener("change", upd); });
+  g("copy").addEventListener("click", ()=>copyText(text(), g("msg")));
+  upd();
+}
+makeBuilder("bGpt","gpt");
+makeBuilder("bGem","gem");
+
+/* ---------- JSON ---------- */
+const jdItems = [
+  {code:'{\n  "style": "акварель",\n  "mood": "теплий"', opts:["Немає закритої фігурної дужки }","Забагато лапок","Слово «акварель» треба писати англійською"], correct:0, why:"Кожна відкрита дужка { має мати пару }. Тут запис не закрито."},
+  {code:'{\n  "style": "комікс"\n  "mood": "веселий"\n}', opts:["Двокрапка зайва","Між двома парами не вистачає коми","Значення «веселий» не можна писати в лапках"], correct:1, why:"Пари «ключ: значення» розділяємо комою. Після «комікс» її не вистачає."},
+  {code:'{\n  style: "піксель-арт"\n}', opts:["Значення не можна писати українською","Фігурні дужки зайві","Ключ style має бути в подвійних лапках"], correct:2, why:"У JSON ключі завжди пишуть у подвійних лапках: \"style\"."},
+];
+const jd = document.getElementById("jsonDet");
+jdItems.forEach((it,i)=>{
+  const c = document.createElement("div"); c.className="jd-card";
+  c.innerHTML = `<div class="promptbox"><span class="lab">Запис №${i+1}: що тут не так?</span>${esc(it.code)}</div><div class="jd-opts"></div><div class="jd-msg"></div>`;
+  const box = c.querySelector(".jd-opts"), msg = c.querySelector(".jd-msg");
+  it.opts.forEach((o,k)=>{
+    const b = document.createElement("button"); b.textContent = o;
+    b.addEventListener("click", ()=>{
+      [...box.children].forEach(x=>x.style.pointerEvents="none");
+      if(k===it.correct){ b.classList.add("correct"); msg.textContent = "✅ Так! "+it.why; }
+      else{ b.classList.add("wrong"); box.children[it.correct].classList.add("correct"); msg.textContent = "Майже. "+it.why; }
+      msg.classList.add("show");
+    });
+    box.appendChild(b);
+  });
+  jd.appendChild(c);
+});
+
+(function(){
+  const root = document.getElementById("bJson");
+  const JS = {
+    style:["акварельний малюнок","мультфільм у 3D","комікс із чіткими контурами","олівцевий малюнок","піксель-арт","паперова аплікація"],
+    palette:["синій, жовтий, білий","рожевий, м'ятний, кремовий","червоний, чорний, сірий","зелений, коричневий, золотий","фіолетовий, бірюзовий, сріблястий"],
+    light:OPT.light, mood:OPT.mood,
+    comp:["крупний план","середній план","загальний план","вид зверху"],
+    tex:["м'які мазки пензля","чіткі чорні контури","гладка 3D-поверхня","зерниста фактура паперу"],
+    ratio:["1:1","16:9","9:16","4:3"],
+    subj:["кіт-астронавт","дракончик-кухар","старий маяк на скелі","робот-садівник","лісова хатинка"]
+  };
+  root.innerHTML = `
+    <div class="builder-grid">
+      ${selHtml("j_style","Стиль (style)",JS.style)}
+      ${selHtml("j_palette","Кольори (palette)",JS.palette)}
+      ${selHtml("j_light","Світло (lighting)",JS.light)}
+      ${selHtml("j_mood","Настрій (mood)",JS.mood)}
+      ${selHtml("j_comp","Композиція (composition)",JS.comp)}
+      ${selHtml("j_tex","Лінії й фактура",JS.tex)}
+      ${selHtml("j_ratio","Формат (aspect_ratio)",JS.ratio)}
+      ${selHtml("j_subj","Новий предмет для перенесення",JS.subj)}
+    </div>
+    <div class="promptbox" id="j_out"></div>
+    <div class="promptbox" id="j_prompt" style="margin-top:12px;"></div>
+    <button class="copy-btn" id="j_copy1">📋 Скопіювати JSON</button>
+    <button class="copy-btn" id="j_copy2" style="background:var(--teal);">📋 Скопіювати промпт перенесення</button><span class="copy-msg" id="j_msg">Скопійовано!</span>`;
+  const v = id=>document.getElementById(id).value;
+  function obj(){
+    return {style:v("j_style"), palette:v("j_palette").split(", "), lighting:v("j_light"), mood:v("j_mood"), composition:v("j_comp"), line_and_texture:v("j_tex"), aspect_ratio:v("j_ratio"), avoid:["текст на зображенні","водяні знаки","зайві пальці та деталі"]};
+  }
+  function jsonText(){ return JSON.stringify(obj(), null, 2); }
+  function promptText(){ return `Створи нове зображення: ${v("j_subj")}.\nВикористай стиль із цього JSON і не змінюй його значень:\n${jsonText()}`; }
+  function upd(){
+    const o = document.getElementById("j_out"); o.innerHTML = `<span class="lab">JSON-рецепт стилю</span>`; o.appendChild(document.createTextNode(jsonText()));
+    const q = document.getElementById("j_prompt"); q.innerHTML = `<span class="lab">Промпт перенесення стилю на новий предмет</span>`; q.appendChild(document.createTextNode(promptText()));
+  }
+  root.querySelectorAll("select").forEach(s=>s.addEventListener("change", upd));
+  document.getElementById("j_copy1").addEventListener("click", ()=>copyText(jsonText(), document.getElementById("j_msg")));
+  document.getElementById("j_copy2").addEventListener("click", ()=>copyText(promptText(), document.getElementById("j_msg")));
+  upd();
+})();
+
+buildStepAccordion([
+  {icon:"1️⃣", title:"Крок 1 · Обери безпечну картинку", body:"Підійде малюнок, іграшка, предмет чи вже згенерована ШІ картинка. <b>Без облич людей.</b> Завантажує її дорослий, бо в Gemini завантажені зображення редагують лише з 18 років."},
+  {icon:"2️⃣", title:"Крок 2 · Попроси JSON-опис", body:"Завантаж картинку в чат і напиши:<div class=\"promptbox\" style=\"margin:10px 0;\">Опиши цю картинку у вигляді JSON, щоб я міг(ла) відтворити такий самий стиль. Ключі: style, palette, lighting, mood, composition, line_and_texture, aspect_ratio, avoid. Значення пиши українською.</div>Скопіюй отриманий JSON у блокнот."},
+  {icon:"3️⃣", title:"Крок 3 · Перенеси стиль на нову картинку", body:"Почни нову розмову й напиши:<div class=\"promptbox\" style=\"margin:10px 0;\">Створи нове зображення: [твій предмет]. Використай цей JSON як стиль і не змінюй його значень: { …вставити JSON… }</div>"},
+  {icon:"4️⃣", title:"Крок 4 · Перенеси стиль на іншу фотографію", body:"Дорослий завантажує <b>безпечне</b> фото предмета (не людей) і пише:<div class=\"promptbox\" style=\"margin:10px 0;\">Онови це зображення за стилем із цього JSON: зміни кольори, світло й настрій. Предмет і його форму залиш без змін. JSON: { …вставити JSON… }</div>Так одним рецептом можна «одягнути» в однаковий стиль і малюнок, і фото іграшки."},
+  {icon:"5️⃣", title:"Крок 5 · Порівняй і підкрути", body:"Поклади поруч першу й нову картинки. Чи збігаються кольори, світло й настрій? Якщо ні, допиши: «Збережи кольори з JSON точніше» або змін одне значення в JSON і спробуй ще раз."},
+], "jsonSteps");
+
+/* ---------- EDIT MINDMAPS ---------- */
+const gptWays = [
+  {icon:"🌆", title:"Фон", body:"Змінюємо сцену позаду, а головний предмет залишаємо таким самим. Завжди пиши, що саме має лишитися без змін.", example:"«Заміни лише фон на нічне місто. Іграшку не змінюй.»"},
+  {icon:"🎨", title:"Стиль", body:"Перетворюємо ту саму картинку на акварель, мультфільм чи комікс. Композиція має зберегтися.", example:"«Перероби у стилі акварелі. Збережи композицію й кольори предмета.»"},
+  {icon:"🎩", title:"Деталі", body:"Додаємо або прибираємо окремий предмет. Чим точніше місце, тим краще: «ліворуч», «на столі».", example:"«Додай жовтий капелюх на голову робота. Решту не змінюй.»"},
+  {icon:"🖍️", title:"Колір", body:"Перефарбовуємо один предмет. Назви предмет, старий і новий колір.", example:"«Перефарбуй синього робота на червоного. Форму залиш.»"},
+  {icon:"🪜", title:"Крок за кроком", body:"Одна правка — одне повідомлення. Так легко знайти, яка зміна зіпсувала картинку, і повернутися назад.", example:"«Тепер зроби світлішим небо. Більше нічого не змінюй.»"},
+  {icon:"🔎", title:"Опис і JSON", body:"ШІ може описати картинку, знайти недоліки й видати JSON-рецепт стилю. Це допомагає складати кращі промпти.", example:"«Опиши, що на малюнку, і запропонуй 3 способи покращити його.»"},
+];
+const gemWays = [
+  {icon:"💡", title:"Фон і світло", body:"Просимо змінити сцену або освітлення. Gemini добре розуміє описи світла.", example:"«Зроби вечір: тепле світло заходу сонця. Предмет у центрі залиш без змін.»"},
+  {icon:"🎨", title:"Стиль", body:"Змінюємо манеру малювання, а сюжет зберігаємо.", example:"«Перероби у стилі паперової аплікації, але збережи розташування предметів.»"},
+  {icon:"🎩", title:"Деталі", body:"Додаємо чи прибираємо окремі речі. Описуй місце й вигляд нової деталі.", example:"«Прибери дерево праворуч і заповни місце травою.»"},
+  {icon:"🖼️", title:"Два фото", body:"Дорослий може завантажити два безпечні зображення й попросити поєднати їх, наприклад, предмет з одного — у сцену з іншого.", example:"«Візьми іграшку з першого зображення й постав її в сцену з другого. Стиль другого збережи.»"},
+  {icon:"🧸", title:"Той самий", body:"Просимо створити того самого персонажа в іншій ситуації. Дизайн може трохи відхилятися, тому порівнюй з першою картинкою.", example:"«Покажи цього самого героя в лісі. Одяг, кольори й пропорції не змінюй.»"},
+  {icon:"🔁", title:"Уточнення", body:"Після кожної картинки пиши коротке уточнення. Це дозволено навіть для користувачів до 18 років, коли вони уточнюють створене зображення.", example:"«Зроби очі більшими, решту залиш.»"},
+];
+buildMindmap(gptWays,"mmLinesG","mmNodesG","ruleDetailG"); selectMindNode(gptWays,0,"mmNodesG","ruleDetailG",false);
+buildMindmap(gemWays,"mmLinesM","mmNodesM","ruleDetailM"); selectMindNode(gemWays,0,"mmNodesM","ruleDetailM",false);
+
+function buildPromptCards(items, gridId){
+  const grid = document.getElementById(gridId);
+  items.forEach((it,i)=>{
+    const c = document.createElement("div"); c.className="pcard"; c.style.setProperty("--pc-color", rainbow[i%rainbow.length]);
+    c.innerHTML = `<h4>${it.title}</h4><div class="promptbox"></div><button class="copy-btn">📋 Скопіювати</button><span class="copy-msg">Скопійовано!</span>${it.note? `<div class="pc-note">${it.note}</div>`:""}`;
+    c.querySelector(".promptbox").textContent = it.text;
+    c.querySelector(".copy-btn").addEventListener("click", ()=>copyText(it.text, c.querySelector(".copy-msg")));
+    grid.appendChild(c);
+  });
+}
+buildPromptCards([
+  {title:"Змінити фон", text:"Заміни лише фон на казковий нічний ліс. Предмет у центрі, його форму й кольори залиш без змін."},
+  {title:"Інший стиль", text:"Перероби це зображення у стилі акварельного малюнка. Збережи композицію та розташування предметів."},
+  {title:"Додати деталь", text:"Додай маленький червоний прапорець у праву руку персонажа. Усе інше залиш таким самим."},
+  {title:"Прибрати зайве", text:"Прибери предмет у лівому нижньому куті й заповни місце тим самим фоном. Решту не змінюй."},
+  {title:"Виправити напис", text:"На плакаті напис має бути точно: «Клуб юних вчених». Виправ літери, решту не змінюй.", note:"Після правки уважно перевір кожну літеру."},
+  {title:"Опис і поради", text:"Опиши, що зображено на малюнку. Знайди 3 недоліки й запропонуй, як їх виправити окремими правками.", note:"Корисно перед тим, як вносити правки."},
+], "gptPrompts");
+buildPromptCards([
+  {title:"Світло й настрій", text:"Зроби цю сцену вечірньою: тепле світло заходу сонця, довгі м'які тіні. Предмет у центрі та його колір залиш без змін."},
+  {title:"Інший стиль", text:"Перероби зображення у стилі паперової аплікації з чіткими краями. Збережи сюжет і розташування предметів."},
+  {title:"Додати деталь", text:"Додай на столі невелику лампу з жовтим світлом. Інші предмети, їхні кольори та положення не змінюй."},
+  {title:"Поєднати два зображення", text:"Візьми іграшку з першого зображення й постав її в сцену з другого. Збережи стиль другого зображення.", note:"Завантажує дорослий; без облич людей."},
+  {title:"Той самий персонаж", text:"Покажи цього самого персонажа в зимовому лісі. Одяг, кольори, пропорції та вираз обличчя залиш такими самими."},
+  {title:"Уточнення створеного", text:"Зроби небо світлішим і додай ще дві хмаринки. Більше нічого не змінюй.", note:"Уточнення створеного зображення — найпростіший спосіб правки."},
+], "gemPrompts");
+
+/* ---------- EDIT LAB ---------- */
+(function(){
+  const E = {night:false, hat:false, tree:false, red:false, style:false, bad:false};
+  const edits = [
+    {k:"night", t:"🌙 Зроби вечір", p:"Зміни лише фон: зроби ніч із місяцем і зірками. Робота й парк залиш без змін."},
+    {k:"hat", t:"🎩 Додай капелюх", p:"Додай роботу жовтий капелюх. Усе інше не змінюй."},
+    {k:"tree", t:"🌳 Прибери дерево", p:"Прибери дерево праворуч і заповни місце фоном. Робота й небо не чіпай."},
+    {k:"red", t:"🔴 Перефарбуй робота", p:"Перефарбуй тулуб робота із синього на червоний. Форму й деталі залиш."},
+    {k:"style", t:"🖌️ Акварельний стиль", p:"Перероби зображення у стилі м'якої акварелі. Збережи композицію."},
+    {k:"bad", t:"✨ «Зроби гарніше» (нечіткий промпт)", p:"Зроби гарніше.", bad:true},
+  ];
+  const $ = id=>document.getElementById(id);
+  const btnBox = $("edBtns");
+  edits.forEach(e=>{
+    const b = document.createElement("button"); b.className="ed-btn"+(e.bad?" bad":""); b.textContent = e.t; b.dataset.k = e.k;
+    b.addEventListener("click", ()=>{ E[e.k] = !E[e.k]; render(e); });
+    btnBox.appendChild(b);
+  });
+  function render(last){
+    $("edSky").setAttribute("fill", E.night? "#1B2A5C" : "#9AD7FF");
+    $("edStars").setAttribute("opacity", E.night? 1 : 0);
+    $("edCloud").setAttribute("opacity", E.night? .25 : 1);
+    $("edSun").firstElementChild.setAttribute("fill", E.night? "#F4F1DE" : "#FFD84D");
+    $("edHat").setAttribute("opacity", E.hat? 1 : 0);
+    $("edTree").setAttribute("opacity", E.tree? 0 : 1);
+    $("edRobot").setAttribute("fill", E.red? "#EF4444" : "#3B82F6");
+    $("edSvg").style.filter = E.bad? "hue-rotate(110deg) saturate(1.7) blur(1px)" : E.style? "saturate(.65) contrast(.92) blur(.6px) sepia(.18)" : "none";
+    btnBox.querySelectorAll(".ed-btn").forEach(b=>b.classList.toggle("on", E[b.dataset.k]));
+    $("edCount").textContent = Object.values(E).filter(Boolean).length;
+    const o = $("edPrompt");
+    if(last){
+      o.innerHTML = `<span class="lab">${E[last.k]? "Промпт" : "Правку скасовано"}</span>`;
+      o.appendChild(document.createTextNode(E[last.k]? last.p : last.p+"  ← (повертаємо як було)"));
+      $("edMsg").innerHTML = last.bad && E.bad? "😵 Нечіткий промпт змінив <b>усе</b>: кольори, настрій, навіть небо. ШІ не знає, що саме покращувати й що зберегти. Додай конкретики!" : E[last.k]? "👍 Чітка правка: <b>що змінити</b> + <b>що залишити</b>. Саме так ШІ не псує решту картинки." : "Правку скасовано. Можна спробувати іншу.";
+    }
+    $("edCap").textContent = Object.values(E).some(Boolean)? "Результат після правок" : "Оригінал: синій робот у парку";
+  }
+  $("edReset").addEventListener("click", ()=>{ Object.keys(E).forEach(k=>E[k]=false); render(null); $("edPrompt").innerHTML = `<span class="lab">Промпт</span>Обери правку зі списку.`; $("edMsg").innerHTML = "Секрет гарної правки: <b>що змінити</b> + <b>що залишити без змін</b>."; });
+})();
+
+/* ---------- CHOOSER ---------- */
+const chooseData = [
+  {q:"Хочу плакат з коротким написом", tools:[["ChatGPT",TC.G],["Gemini",TC.M]], why:"Обидва помічники вміють додавати текст. Напис бери в лапки й роби коротким. Спробуй в обох і порівняй, хто менше помилився в літерах."},
+  {q:"Хочу описати сцену як історію", tools:[["Gemini",TC.M],["ChatGPT",TC.G]], why:"Gemini любить повний опис-абзац, а ChatGPT — список деталей. Спробуй обидва формати й порівняй."},
+  {q:"Хочу змінювати картинку маленькими кроками", tools:[["ChatGPT",TC.G],["Gemini",TC.M]], why:"В обох можна уточнювати розмовою: «зміни лише…». Пиши по одній правці й завжди додавай, що залишити."},
+  {q:"Хочу JSON-рецепт стилю зі своєї картинки", tools:[["ChatGPT",TC.G],["Gemini",TC.M]], why:"Попроси описати безпечну картинку (без людей) у вигляді JSON і використай його в новому промпті. Завантажує дорослий."},
+  {q:"Хочу поєднати предмет з одного малюнка й сцену з іншого", tools:[["Gemini",TC.M],["ChatGPT",TC.G]], why:"Gemini вміє поєднувати кілька зображень, але редагування завантажених фото — справа дорослого. ChatGPT теж можна спробувати з двома картинками."},
+  {q:"Хочу придумати персонажа й історію", tools:[["ChatGPT",TC.G],["Gemini",TC.M]], why:"Спершу попроси помічника допомогти з іменем, характером і талантом, а потім створи портрет. Але вигадуй сам(а): ідея має бути твоя."},
+  {q:"Хочу, щоб ШІ описав мій малюнок і порадив, що покращити", tools:[["ChatGPT",TC.G],["Gemini",TC.M]], why:"Обидва помічники можуть проаналізувати зображення. Використовуй його поради як підказки, а не як остаточну істину."},
+  {q:"Хочу змінити фото однокласника чи його обличчя", tools:[["Не робимо на уроці",'#F2495C']], why:"Фото людей без їхньої згоди завантажувати не можна, а обличчя змінювати не потрібно. Для правок використовуй іграшки, предмети й свої малюнки."},
+];
+const chooseList = document.getElementById("chooseList"), chooseOut = document.getElementById("chooseOut");
+chooseData.forEach(d=>{
+  const b = document.createElement("button"); b.className="choose-btn"; b.textContent = d.q;
+  b.addEventListener("click", ()=>{
+    [...chooseList.children].forEach(c=>c.classList.remove("on")); b.classList.add("on");
+    chooseOut.innerHTML = `<h4>Рекомендація</h4><div>${d.tools.map(t=>`<span class="tool-tag" style="background:${t[1]};">${t[0]}</span>`).join("")}</div><p style="color:var(--ink-soft); font-size:14.5px;">${d.why}</p>`;
+  });
+  chooseList.appendChild(b);
+});
+
+/* ---------- TASKS ---------- */
+buildStepAccordion([
+  {icon:"🪄", title:"Завдання 1 · «Магічний предмет у двох помічників»", body:"<b>Мета:</b> порівняти, як ChatGPT і Gemini розуміють різні промпти.<br>1) Вигадай магічний предмет (наприклад, парасолька, що збирає хмаринки).<br>2) У конструкторі склади промпт для <b>ChatGPT</b> (список деталей) і промпт для <b>Gemini</b> (опис-історія).<br>3) Дорослий відправляє їх у відповідні чати.<br>4) Порівняй картинки: що збіглося, що ні? Чи помилилися в написах?<br>5) Зроби дві уточнювальні правки в кожному: «зміни лише…».<br><b>Підсумок:</b> запиши, чий промпт спрацював краще й чому."},
+  {icon:"{ }", title:"Завдання 2 · «Рецепт стилю: від картинки до серії»", body:"<b>Мета:</b> створити JSON-стиль і перенести його на інші предмети.<br>1) Згенеруй у ChatGPT або Gemini одну картинку в стилі, що тобі подобається.<br>2) Попроси описати її у вигляді JSON (ключі style, palette, lighting, mood, composition…).<br>3) Перевір JSON за п'ятьма правилами: дужки, лапки, коми.<br>4) Вставляй JSON у три нових промпти з різними предметами (наприклад, дракон, маяк, робот).<br>5) Поклади чотири картинки поруч: чи схожі вони стилем?<br><b>Бонус:</b> дорослий завантажує фото іграшки, а ти просиш оновити його за JSON-стилем."},
+  {icon:"🪜", title:"Завдання 3 · «Фабрика правок»", body:"<b>Мета:</b> навчитися просити правки так, щоб решта картинки не змінювалась.<br>1) Візьми власний малюнок або фото іграшки (без людей). Завантажує дорослий.<br>2) Зроби п'ять правок по одній: фон, стиль, нова деталь, колір, прибрати зайве.<br>3) Кожну правку пиши за формулою: «Змін лише …. … залиш без змін».<br>4) Після кожної правки відповідай: що змінилося, а що ні?<br>5) Спробуй одну нечітку правку («зроби гарніше») й подивись, що станеться.<br><b>Звіт:</b> таблиця «правка — промпт — результат — оцінка 1–5». Пам'ятай: Gemini може обмежувати редагування завантажених фото для користувачів до 18 років, тому операції виконує дорослий."},
+], "taskSteps");
+
+/* ---------- QUIZ ---------- */
+const quizData = [
+  {q:"Яка головна ідея промпту для ChatGPT?", opts:["Треба знати чарівні слова","Це розмова: запит, перегляд і уточнення наступними повідомленнями","Достатньо одного слова","Чим довший запит, тим краще, навіть із зайвим"], correct:1, explain:"ChatGPT працює як чат: можна уточнювати, що змінити, наступними повідомленнями."},
+  {q:"Як найкраще описувати сцену для Gemini?", opts:["Лише набором слів без зв'язку","Тільки назвою стилю","Повним описом: хто, де, яке світло, який настрій","Тільки кольором"], correct:2, explain:"Gemini добре розуміє опис-історію: сцену, світло й настрій."},
+  {q:"Що таке JSON?", opts:["Структурований запис «ключ: значення» у дужках","Програма для малювання","Назва нового ШІ","Формат відео"], correct:0, explain:"JSON — це охайний спосіб записати дані парами «ключ: значення»."},
+  {q:"Що з правил JSON правильне?", opts:["Ключі пишуть без лапок","Кома потрібна після останньої пари","Квадратні дужки — це завжди помилка","Ключі пишуть у подвійних лапках, а пари розділяють комою"], correct:3, explain:"У JSON ключі беруть у подвійні лапки, а між парами ставлять кому (після останньої — ні)."},
+  {q:"Навіщо переносити JSON-стиль на нові картинки?", opts:["Щоб картинки були без кольору","Щоб нові зображення мали схожий стиль, світло й настрій","Щоб ШІ працював швидше","Щоб приховати, що це ШІ"], correct:1, explain:"JSON — це рецепт стилю: він допомагає створити серію схожих картинок."},
+  {q:"Яка правка складена найкраще?", opts:["Зроби гарніше","Зроби все інакше","Заміни лише фон на нічний. Предмет у центрі залиш без змін","Не знаю, придумай сам"], correct:2, explain:"Хороша правка називає, що змінити і що залишити. Тоді ШІ не псує решту."},
+  {q:"Хто завантажує й редагує фото в Gemini на уроці?", opts:["Дорослий, і лише безпечні зображення без облич людей","Будь-хто з класу","Лише найкращий учень","Ніхто не контролює"], correct:0, explain:"Google обмежує редагування завантажених зображень для користувачів до 18 років. Тому завантажує дорослий, і лише безпечні картинки."},
+  {q:"Що правильно для персонажів майбутнього коміксу?", opts:["Взяти відомого героя й трохи змінити","Створити героя з фото однокласника","Скопіювати персонажа з улюбленого мультфільму","Вигадати власного героя з іменем, характером і єдиним стилем"], correct:3, explain:"Персонажі мають бути вигаданими й оригінальними: так ми поважаємо авторів і приватність людей."},
+];
+let qi=0, qScore=0;
+const quizBody = document.getElementById("quizBody"), quizProgress = document.getElementById("quizProgress");
+quizData.forEach(()=>quizProgress.appendChild(document.createElement("span")));
+function renderQuiz(){
+  [...quizProgress.children].forEach((s,i)=>s.classList.toggle("done", i<qi));
+  if(qi>=quizData.length){
+    quizBody.innerHTML = `<div class="quiz-result"><div class="score">${qScore}/${quizData.length}</div><p style="color:var(--ink-soft);">${qScore===quizData.length? "Відмінно! Ти справжній(я) режисер(ка) ШІ-зображень.": qScore>=6? "Дуже добре! Ще трохи — і буде ідеально.": "Непогано! Перечитай теорію й спробуй ще раз."}</p><button class="restart-btn" id="restartBtn">Пройти ще раз</button></div>`;
+    document.getElementById("restartBtn").addEventListener("click", ()=>{ qi=0; qScore=0; renderQuiz(); });
+    return;
+  }
+  const item = quizData[qi];
+  quizBody.innerHTML = `<div class="quiz-q">${qi+1}. ${item.q}</div><div class="quiz-opts" id="quizOpts"></div><div class="qz-explain" id="qzExplain">${item.explain}</div><div class="qz-nav"><button class="next-btn" id="nextBtn">${qi===quizData.length-1? "Результат →":"Далі →"}</button></div>`;
+  const opts = document.getElementById("quizOpts");
+  item.opts.forEach((o,i)=>{
+    const b = document.createElement("button"); b.className="qz-btn"; b.textContent=o;
+    b.addEventListener("click", ()=>{
+      [...opts.children].forEach(c=>c.style.pointerEvents="none");
+      if(i===item.correct){ b.classList.add("correct"); qScore++; }
+      else{ b.classList.add("wrong"); opts.children[item.correct].classList.add("correct"); }
+      document.getElementById("qzExplain").classList.add("show");
+      document.getElementById("nextBtn").classList.add("ready");
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById("nextBtn").addEventListener("click", ()=>{ qi++; renderQuiz(); });
+}
+renderQuiz();
+
+/* ---------- THINK AT HOME ---------- */
+const thinkQuestions = [
+  "Якби ти міг(ла) наказати ШІ намалювати будь-що, що б це було? Які п'ять слів ти додав(ла) б, щоб він зрозумів твою ідею точно?",
+  "Чому ШІ іноді малює не те, що ти уявляв(ла)? Як змінити промпт, щоб «зустрітися» з ним посередині?",
+  "JSON — це рецепт стилю. А що б ти записав(ла) у «JSON свого настрою»: які кольори, світло й композиція?",
+  "Якщо ШІ зміг «підправити» картинку за одне речення, чи важливо розповідати іншим, що це зробив ШІ? Чому?",
+  "Чим схожі й чим відрізняються ChatGPT і Gemini, на твою думку? Який із них ти б обрав(ла) для комікса і чому?",
+  "Яким має бути добрий герой комікса: що він любить, чого боїться, яка в нього слабкість? Чому герой із недоліками цікавіший?",
+];
+const thinkGrid = document.getElementById("thinkGrid");
+thinkQuestions.forEach((q,i)=>{
+  const c = document.createElement("div"); c.className="think-card";
+  c.style.setProperty("--tc-color", rainbow[i%rainbow.length]);
+  c.innerHTML = `<span class="think-num">Питання ${i+1}</span>${q}`;
+  thinkGrid.appendChild(c);
+});
+
+/* ---------- COMIC CHARACTERS ---------- */
+buildStepAccordion([
+  {icon:"1️⃣", title:"Крок 1 · Придумай команду з трьох", body:"Тобі потрібні <b>герой</b> (головний), <b>помічник</b> (друг чи тваринка) та <b>витівник</b> (той, хто створює проблеми, але не обов'язково злий). Вони мають відрізнятися характером, кольорами й силуетом."},
+  {icon:"2️⃣", title:"Крок 2 · Заповни паспорти", body:"Скористайся конструктором нижче: ім'я, хто це, зовнішність, кольори, характер, талант і улюблена фраза. Не копіюй відомих героїв і не бери за основу реальних людей."},
+  {icon:"3️⃣", title:"Крок 3 · Обери один стиль для всіх", body:"Щоб комікс виглядав єдиним, усі троє мають бути в <b>одному стилі</b> (наприклад, «комікс із чіткими контурами»). Обери його в конструкторі один раз."},
+  {icon:"4️⃣", title:"Крок 4 · Згенеруй аркуші персонажів", body:"Разом із дорослим вставляй промпт аркуша в ChatGPT чи Gemini. Попроси: вигляд спереду, збоку, ззаду й чотири емоції. Якщо дизайн «попливе», допиши: «Збережи одяг, кольори й пропорції точніше»."},
+  {icon:"5️⃣", title:"Крок 5 · Підпиши й збережи", body:"Збережи портрети та JSON-картки в одну теку. Підпиши кожен: «створено ШІ (ChatGPT/Gemini)». Вигадай одне речення про пригоду, яка зведе трьох героїв разом."},
+], "komSteps");
+
+(function(){
+  const chars = [
+    {role:"Герой", ico:"🦸", v:{}}, {role:"Помічник", ico:"🐾", v:{}}, {role:"Витівник", ico:"🎭", v:{}}
+  ];
+  const fields = [
+    ["name","Ім'я","Наприклад: Зоряна"],
+    ["who","Хто це","Наприклад: дівчинка-астронавтка"],
+    ["look","Зовнішність і одяг","Наприклад: сріблястий скафандр, смішна косичка"],
+    ["colors","Головні кольори","Наприклад: сріблястий, фіолетовий"],
+    ["trait","Характер","Наприклад: сміливий, трохи неуважний"],
+    ["talent","Особливий талант","Наприклад: чує, як співають зорі"],
+    ["catch","Улюблена фраза","Наприклад: «Курс — на зорі!»"],
+  ];
+  let cur = 0, style = OPT.style[2];
+  const tabs = document.getElementById("charTabs"), box = document.getElementById("charFields");
+  const $ = id=>document.getElementById(id);
+  chars.forEach((c,i)=>{ const b=document.createElement("button"); b.textContent = `${c.ico} ${i+1}. ${c.role}`; b.addEventListener("click", ()=>{ cur=i; draw(); }); tabs.appendChild(b); });
+  box.innerHTML = fields.map(f=>`<div><label for="ch_${f[0]}">${f[1]}</label><input class="txt-in" id="ch_${f[0]}" type="text" placeholder="${f[2]}"></div>`).join("") +
+    `<div><label for="ch_style">Єдиний стиль для всіх трьох</label><select class="txt-in" id="ch_style">${OPT.style.map(s=>`<option ${s===style?"selected":""}>${s}</option>`).join("")}</select></div>`;
+  fields.forEach(f=>$("ch_"+f[0]).addEventListener("input", e=>{ chars[cur].v[f[0]] = e.target.value; upd(); }));
+  $("ch_style").addEventListener("change", e=>{ style = e.target.value; upd(); });
+  function draw(){
+    [...tabs.children].forEach((b,i)=>b.classList.toggle("on", i===cur));
+    fields.forEach(f=>{ $("ch_"+f[0]).value = chars[cur].v[f[0]] || ""; });
+    upd();
+  }
+  function g(k){ return (chars[cur].v[k]||"").trim() || "..."; }
+  function jsonText(){
+    return JSON.stringify({role:chars[cur].role, name:g("name"), type:g("who"), appearance:g("look"), main_colors:g("colors"), personality:g("trait"), special_talent:g("talent"), catchphrase:g("catch"), art_style:style, consistency_lock:"Завжди той самий одяг, ті самі кольори й пропорції"}, null, 2);
+  }
+  function promptText(){
+    return `Створи аркуш персонажа для коміксу у стилі «${style}». Персонаж описаний у JSON нижче. Покажи його спереду, збоку й ззаду, а також чотири емоції: радість, подив, злість, сум. Фон світлий однотонний. Дизайн (одяг, кольори, пропорції) має бути однаковим на всіх малюнках.\n${jsonText()}`;
+  }
+  function filled(c){ return fields.filter(f=>(c.v[f[0]]||"").trim()).length; }
+  function upd(){
+    const n = filled(chars[cur]), ready = chars.filter(c=>filled(c)>=6).length;
+    $("charMeter").style.width = (n/fields.length*100)+"%";
+    $("charMeterLab").textContent = `Паспорт «${chars[cur].role}»: ${n} з ${fields.length} полів · Готових персонажів: ${ready} з 3`;
+    const j = $("charJson"); j.innerHTML = `<span class="lab">JSON-картка персонажа</span>`; j.appendChild(document.createTextNode(jsonText()));
+    const p = $("charPrompt"); p.innerHTML = `<span class="lab">Промпт аркуша персонажа</span>`; p.appendChild(document.createTextNode(promptText()));
+  }
+  $("charCopyJson").addEventListener("click", ()=>copyText(jsonText(), $("charMsg")));
+  $("charCopyPrompt").addEventListener("click", ()=>copyText(promptText(), $("charMsg")));
+  draw();
+})();
+
+buildChecklist([
+  "Придумав(ла) <b>трьох власних</b> персонажів: героя, помічника й витівника",
+  "Жоден персонаж не схожий на відомого героя й не створений із реальної людини",
+  "Заповнив(ла) паспорти й отримав(ла) <b>JSON-картки</b> для всіх трьох",
+  "Обрав(ла) <b>єдиний стиль</b> для всієї команди",
+  "Разом із дорослим згенерував(ла) аркуш (спереду, збоку, ззаду й емоції) для кожного",
+  "Перевірив(ла), чи дизайн (одяг, кольори, пропорції) однаковий на всіх малюнках",
+  "Підписав(ла) роботи позначкою <b>«створено ШІ»</b>",
+  "Записав(ла) одне речення про пригоду, яка зведе трьох героїв",
+], "komList","komBar","komStatus", (n,t)=>{
+  const lv = n===0? "Новачок 🌱" : n<3? "Початківець 🔰" : n<5? "Дизайнер героїв 🎨" : n<t? "Режисер команди 🎬" : "Майстер коміксу 🏆";
+  return `Рівень: ${lv} (${n} з ${t})`;
+});
+
+/* ---------- CHEAT + GLOSSARY ---------- */
+const cheat = [["🎯","1. Що малюємо"],["📍","2. Де"],["🖌️","3. Стиль"],["💡","4. Світло"],["🌈","5. Кольори"],["😊","6. Настрій"],["📐","7. Формат"],["🚫","8. Без чого"]];
+const cheatGrid = document.getElementById("cheatGrid");
+cheat.forEach((r,i)=>{
+  const d = document.createElement("div"); d.className="cheat-item"; d.style.background = rainbow[i%rainbow.length];
+  d.innerHTML = `<div style="font-size:20px;margin-bottom:4px;">${r[0]}</div>${r[1]}`;
+  cheatGrid.appendChild(d);
+});
+const glossTerms = [
+  ["💬","Промпт","текстовий запит до ШІ: що створити чи змінити."],
+  ["{ }","JSON","запис даних у вигляді пар «ключ: значення» у фігурних дужках."],
+  ["🔑","Ключ","назва поля в JSON, наприклад \"style\"."],
+  ["📦","Значення","те, що записано біля ключа, наприклад \"акварель\"."],
+  ["📋","Список","кілька значень у квадратних дужках: [\"синій\", \"жовтий\"]."],
+  ["🖌️","Стиль","манера малювання: акварель, комікс, піксель-арт тощо."],
+  ["📐","Співвідношення сторін","форма кадру: 1:1 — квадрат, 16:9 — широкий."],
+  ["🔁","Ітерація","повторення з поліпшенням: створили, подивилися, уточнили."],
+  ["🚫","Негативні вказівки","перелік того, чого не має бути на картинці."],
+  ["🧬","Єдиний стиль","однакові кольори, лінії й пропорції в усіх зображеннях серії."],
+  ["🏷️","Позначка «створено ШІ»","чесний підпис, що зображення створене чи оброблене нейромережею."],
+  ["👻","Артефакт","помилка ШІ: зайвий палець, неправильна літера чи дивна деталь."],
+];
+const glossGrid = document.getElementById("glossGrid");
+glossTerms.forEach((t,i)=>{
+  const c = document.createElement("div"); c.className="gloss-card";
+  c.innerHTML = `<div class="whale-ico" style="background:${rainbow[i%rainbow.length]};margin-bottom:10px;">${t[0]}</div><h4>${t[1]}</h4><p>${t[2]}</p>`;
+  glossGrid.appendChild(c);
+});
+
+</script>
+</body>
+</html>
